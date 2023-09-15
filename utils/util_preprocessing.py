@@ -10,10 +10,12 @@
 # This script contains the available preprocessing functions defined in the yaml file.
 #
 # Notes:
-
+import numpy as np
 import pandas as pd
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 from utils.logger import CustomLogger
+from utils.util_plot import plot_timeseries_transient
 
 logger = CustomLogger().get_logger()
 
@@ -114,3 +116,119 @@ def check_low_variance(df: pd.DataFrame, col: str, threshold: float = 0.01) -> b
     else:
         logger.error(f"Possible sensor freeze/stuck on '{col}' (var {variance:.4f}<{threshold}).")
         return True
+
+
+def preprocess(df, configuration):
+    """
+    This function preprocesses the dataframe according to the configuration file.
+    :param df: the raw dataset
+    :param configuration: dictionary of configuration files
+    """
+    df = resample(df=df, window=f'{configuration["aggregation"]}T')
+
+    for col in df.columns:
+        try:
+
+            if col in ['sat_col', 'oat_col', 'rat_col', 'mat_col']:
+
+                # wandb.configuration.update({'check_sensor_passed': True}, allow_val_change=True)
+                # logger.info('check_sensor_passed = True')
+
+                # find outliers
+                series = drop_na(df[col])
+                # seasonal period assumed to be 1 day nd so adapt to aggregation parameter
+                period = int(24 * 60 / configuration['aggregation'])
+                stl_result = seasonal_decompose(series, period=period)
+                # stl_result.plot().show()
+                # get outlier from the residuals
+                arr1 = stl_result.resid.dropna()
+
+                # finding the 1st quartile
+                q1 = np.quantile(arr1, 0.25)
+                # finding the 3rd quartile
+                q3 = np.quantile(arr1, 0.75)
+                med = np.median(arr1)
+                # finding the iqr region
+                iqr = q3 - q1
+                # finding upper and lower whiskers
+                upper_bound = q3 + (20 * iqr)
+                lower_bound = q1 - (20 * iqr)
+                outliers = arr1[(arr1 <= lower_bound) | (arr1 >= upper_bound)]
+
+                if 0 < len(outliers) < 20:
+                    # limit the number of outliers to first 10 sort
+                    outliers = outliers.sort_values(ascending=False).head(10)
+                    logger.warning(f'Dropping {len(outliers)} outliers in {col}\n{outliers}')
+                    # stl_result.plot().show()
+                    df.loc[outliers.index, col] = None
+
+                # variance = df[col].var()
+                # if variance < 0.01:
+                #     print(f'column {col} has variance {variance} and will be dropped')
+                #     df[col] = None
+
+            elif col in ['cooling_sig_col', 'heating_sig_col', 'oa_dmpr_sig_col']:
+                # find outliers
+                normalize_01(df, col)
+            else:
+                pass
+        except KeyError:
+            pass
+
+    # calculate missing values from available data
+    df["oaf"] = (df["rat_col"] - df["sat_col"]) / (df["rat_col"] - df["oat_col"])
+    df["oaf"] = np.where(df["oaf"] < 0, None, np.where(df["oaf"] > 1, None, df["oaf"]))
+
+    # calculate optional variables if necessary
+    if df["mat_col"].isnull().values.all():
+        df["mat_col"] = df["oaf"] * df["oat_col"] + (1 - df["oaf"]) * df["rat_col"]
+    df["dt"] = df["sat_col"] - df["mat_col"]
+    df['time'] = df.index
+    return df
+
+
+def get_steady(df, config, plot_flag=False):
+    """
+    This function finds the steady state periods in the dataset.
+    :param df:  the raw dataset
+    :param config:  dictionary of configuration files
+    :param plot_flag: whether to plot the results
+    :return:
+    """
+    df_steady = df.copy()
+    # expand resampling to 1 hour expanding on timeseries where no data is available
+    # df_steady = df_steady.resample(f'{config["aggregation"]}min', on='time').mean().reset_index()
+    slope_cooling = pd.Series(
+        np.gradient(df_steady['cooling_sig_col']),
+        df_steady.index,
+        name='slope_cooling')
+    slope_heating = pd.Series(
+        np.gradient(df_steady['heating_sig_col']),
+        df_steady.index,
+        name='slope_heating')
+    slope_damper = pd.Series(
+        np.gradient(df_steady['oa_dmpr_sig_col']),
+        df_steady.index,
+        name='slope_damper')
+
+    # join slopes to unique slope series keeping the max value
+    slope = pd.concat([slope_cooling, slope_damper, slope_heating], axis=1)
+    slope = slope.abs().max(axis=1)
+    # concatenate slope to df_damper
+    df_steady = pd.concat([df_steady, slope], axis=1)
+    df_steady = df_steady.rename(columns={0: 'slope'})
+
+    if plot_flag:
+        plot_timeseries_transient(df_steady, config)
+
+    # if more than threshold tag
+    df_steady['slope'] = np.where(
+        df_steady['slope'] > config['transient_cutoff'],
+        'transient',
+        'steady'
+    )
+    # count steady vs transient
+    # perc_steady = df_steady[df_steady['slope'] == 'steady'].shape[0] / df_steady.shape[0]
+    # perc_transient = df_steady[df_steady['slope'] == 'transient'].shape[0] / df_steady.shape[0]
+
+    return df_steady
