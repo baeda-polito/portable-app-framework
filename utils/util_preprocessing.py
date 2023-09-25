@@ -118,12 +118,14 @@ def check_low_variance(df: pd.DataFrame, col: str, threshold: float = 0.01) -> b
         return True
 
 
-def preprocess(df, configuration):
+def preprocess(df, configuration: dict):
     """
     This function preprocesses the dataframe according to the configuration file.
     :param df: the raw dataset
     :param configuration: dictionary of configuration files
     """
+    # df['time'] = pd.to_datetime(df['Datetime']).dt.floor(f'{config["aggregation"]}min')
+    # df = df.groupby('time').mean().reset_index()
     df = resample(df=df, window=f'{configuration["aggregation"]}T')
 
     for col in df.columns:
@@ -187,11 +189,12 @@ def preprocess(df, configuration):
     return df
 
 
-def get_steady(df, config, plot_flag=False):
+def get_steady(df, configuration: dict, plot_flag: bool = False, filename=None):
     """
     This function finds the steady state periods in the dataset.
+    :param filename:
     :param df:  the raw dataset
-    :param config:  dictionary of configuration files
+    :param configuration:  dictionary of configuration files
     :param plot_flag: whether to plot the results
     :return:
     """
@@ -219,11 +222,11 @@ def get_steady(df, config, plot_flag=False):
     df_steady = df_steady.rename(columns={0: 'slope'})
 
     if plot_flag:
-        plot_timeseries_transient(df_steady, config)
+        plot_timeseries_transient(df_steady, configuration, filename)
 
     # if more than threshold tag
     df_steady['slope'] = np.where(
-        df_steady['slope'] > config['transient_cutoff'],
+        df_steady['slope'] > configuration['transient_cutoff'],
         'transient',
         'steady'
     )

@@ -10,13 +10,16 @@
 #
 #
 # Notes:
+import os
 
 import plotly.express as px
 
 
-def plot_histogram(df):
+def plot_histogram(df, filename=None):
     """
     Plot the histogram of the variables
+    :param filename: name of the dataset
+    :param df: the dataframe containing the variables
     :return: 
     """
     p = px.histogram(df, x='value', y='value',
@@ -29,13 +32,14 @@ def plot_histogram(df):
     p.update_yaxes(matches=None, showticklabels=True)
     # wandb.log({'VARIABLES DISTRIBUTIONS': p})
     p.update_layout(xaxis_title='', yaxis_title='')
-    p.show()
-    # p.write_image(f'./img/precheck/TIMESERIES_{filename}.png', width=800, height=1100)
+
+    p.write_html(os.path.join('..', 'results', f'{filename}_HISTOGRAM.html'))
 
 
-def plot_timeseries_transient(df, configuration):
+def plot_timeseries_transient(df, configuration: dict, filename=None):
     """
     Plot the timeseries of the variables with relative transient score and threshold
+    :param filename: name of the dataset
     :param df: the dataframe containing the variables
     :param configuration: a dictionary of thresholds
     """
@@ -60,13 +64,14 @@ def plot_timeseries_transient(df, configuration):
     p.add_hrect(y0=0, y1=configuration["transient_cutoff"], col=1,
                 annotation_text="transient_cutoff", annotation_position="left",
                 fillcolor="grey", opacity=0.5, line_width=0)
-    p.show()
-    # wandb.log({'TRANSIENT': p})
+    # p.show()
+    p.write_html(os.path.join('..', 'results', f'{filename}_TRANSIENT.html'))
 
 
-def plot_damper(df, configuration):
+def plot_damper(df, configuration: dict, filename=None):
     """
     Plot the outdoor air damper control signal vs outdoor air fraction
+    :param filename: the name of the file
     :param configuration:  a dictionary of thresholds
     :param df:  the dataframe containing the variables
     """
@@ -109,15 +114,15 @@ def plot_damper(df, configuration):
                       '<br><br>y = %{y:.2f}%<br>x = %{x:.2f}%<br>%{customdata[2]}<br>'
                       'Outdoor air temperature: %{customdata[1]:.2f}°C')
 
-    # p.show()
-    # wandb.log({'DAMPER CHECK': p})
+    p.write_html(os.path.join('..', 'results', f'{filename}_DAMPER.html'))
 
 
-def plot_valves(df, configuration):
+def plot_valves(df, configuration: dict, filename=None):
     """
     Plot the valve control signal vs DT across coil
-    :param df:
-    :param configuration:
+    :param filename: the name of the file
+    :param df: the dataframe containing the variables
+    :param configuration: a dictionary of thresholds
     :return:
     """
     p = px.scatter(df,
@@ -160,5 +165,4 @@ def plot_valves(df, configuration):
                       '<br><br>y = %{y:.2f}<br>x = %{x:.2f}%<br>%{customdata[2]}'
                       '<br>Outdoor air temperature: %{customdata[1]:.2f}°C')
 
-    # p.show()
-    # p.write_image(f'../results/COOLING_VALVE_{filename}.png', width=600, height=600)
+    p.write_html(os.path.join('..', 'results', f'{filename}_VALVES.html'))

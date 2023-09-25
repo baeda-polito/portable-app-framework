@@ -17,14 +17,15 @@ from utils.util import ensure_dir, list_files
 from utils.util_check import check_variables, check_sensor, check_min_oa, check_damper, check_hc, check_log_result, \
     check_valves
 from utils.util_driver import driver_data_fetch
+from utils.util_plot import plot_valves, plot_damper
 from utils.util_preprocessing import preprocess, get_steady
 
 logger = CustomLogger().get_logger()
 if __name__ == '__main__':
 
     # FOLDER = os.path.join("..", "data", "skyspark")
-    # FOLDER = os.path.join("..", "data", "SDAHU_parquet_5T")
-    FOLDER = os.path.join("..", "data", "MZVAV")
+    FOLDER = os.path.join("..", "data", "SDAHU_parquet_5T")
+    # FOLDER = os.path.join("..", "data", "MZVAV")
     # FOLDER = os.path.join("..", "data", "mortar_static")
     plot_flag = False
     ensure_dir(FOLDER)
@@ -38,7 +39,7 @@ if __name__ == '__main__':
         config = {
             # put here variables needed to group
             'datasource': datasource,
-            'aggregation': 15,
+            'aggregation': 15,  # minutes
             'transient_cutoff': 0.01,
             'valves_cutoff': 0.01,
             'damper_cutoff': 0.0,
@@ -63,9 +64,6 @@ if __name__ == '__main__':
         n = check_log_result(result, 'check_sensor', n, message)
 
         # PREPROCESSING
-
-        # df['time'] = pd.to_datetime(df['Datetime']).dt.floor(f'{config["aggregation"]}min')
-        # df = df.groupby('time').mean().reset_index()
         df = preprocess(df, config)
 
         # HISTOGRAM OF ALL VARIABLES
@@ -73,7 +71,7 @@ if __name__ == '__main__':
         # plot_histogram(df_hist)
 
         # IDENTIFY TRANSIENT
-        df_steady = get_steady(df, config)
+        df_steady = get_steady(df, config, plot_flag=plot_flag, filename=datasource)
 
         # ############  TEMPERATURE BIAS SENSOR ############
         # # scatter plot
@@ -139,8 +137,10 @@ if __name__ == '__main__':
         df_damper_min = df_steady[
             (df_steady['oa_dmpr_sig_col'] > config["damper_cutoff"])
         ]
-        result, message = check_min_oa(df, config)
+        result, message = check_min_oa(df_damper_min, config)
         n = check_log_result(result, 'check_min_oa', n, message)
+        if plot_valves:
+            plot_damper(df_damper_min, config, filename=datasource)
 
         ############ FREEZE PROTECTION ############
         # df_damper_frozen = df_steady[
@@ -157,7 +157,6 @@ if __name__ == '__main__':
         #     logger.info(f'check_freeze_protection_passed = True (median damper position = {damper_frozen})')
 
         # DAMPER CHECK
-
         df_damper = df_steady[
             (df_steady['cooling_sig_col'] < config["valves_cutoff"]) &
             (df_steady['heating_sig_col'] < config["valves_cutoff"]) &
@@ -197,5 +196,7 @@ if __name__ == '__main__':
 
         result, message = check_valves(df_valves, df_valves_eco, config)
         n = check_log_result(result, 'check_valves', n, message)
+        if plot_flag:
+            plot_valves(df_valves, config, filename=datasource)
 
         logger.info(f'n = {n} [' + "✅" * n + '❌' * (6 - n) + ']')
