@@ -14,19 +14,16 @@ import os
 
 from utils.logger import CustomLogger
 from utils.util import ensure_dir, list_files
-from utils.util_check import check_variables, check_sensor, check_min_oa, check_damper, check_hc, check_log_result, \
-    check_valves
+from utils.util_check import check_damper, check_hc, check_log_result, check_min_oa, check_sensor, check_valves, \
+    check_variables
 from utils.util_driver import driver_data_fetch
-from utils.util_plot import plot_valves, plot_damper
-from utils.util_preprocessing import preprocess, get_steady
+from utils.util_plot import plot_damper, plot_valves
+from utils.util_preprocessing import get_steady, preprocess
 
 logger = CustomLogger().get_logger()
 if __name__ == '__main__':
 
-    # FOLDER = os.path.join("..", "data", "skyspark")
-    FOLDER = os.path.join("..", "data", "SDAHU_parquet_5T")
-    # FOLDER = os.path.join("..", "data", "MZVAV")
-    # FOLDER = os.path.join("..", "data", "mortar_static")
+    FOLDER = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
     plot_flag = False
     ensure_dir(FOLDER)
     files = list_files(FOLDER)
