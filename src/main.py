@@ -23,8 +23,8 @@ from utils.util_preprocessing import get_steady, preprocess
 logger = CustomLogger().get_logger()
 if __name__ == '__main__':
 
-    FOLDER = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
-    plot_flag = False
+    FOLDER = os.path.join("..", "data", "LBNL_FDD_Dataset_DDAHU_PQ")
+    plot_flag = True
     ensure_dir(FOLDER)
     files = list_files(FOLDER)
 
@@ -136,7 +136,7 @@ if __name__ == '__main__':
         ]
         result, message = check_min_oa(df_damper_min, config)
         n = check_log_result(result, 'check_min_oa', n, message)
-        if plot_valves:
+        if plot_flag:
             plot_damper(df_damper_min, config, filename=datasource)
 
         ############ FREEZE PROTECTION ############

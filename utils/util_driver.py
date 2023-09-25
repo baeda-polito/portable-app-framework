@@ -46,6 +46,25 @@ def driver_data_fetch(folder, filename) -> pd.DataFrame:
         # keep only some columns
         df = df[['time', 'satsp_col', 'sat_col', 'oat_col', 'rat_col', 'cooling_sig_col', 'heating_sig_col',
                  'oa_dmpr_sig_col', 'mat_col']]
+    elif 'DDAHU' in folder:
+        # load data
+        df = pd.read_parquet(os.path.join(folder, filename))
+        # Select columns and perform data transformations
+        df["time"] = df['Datetime']
+        df['satsp_col'] = fahrenheit_to_celsius(df['RMCLGSPT_E'])
+        df['sat_col'] = fahrenheit_to_celsius(df['VAV_DAT_E'])
+        df['oat_col'] = fahrenheit_to_celsius(df['OA_TEMP'])
+        df['rat_col'] = fahrenheit_to_celsius(df['RA_TEMP'])
+        df['mat_col'] = fahrenheit_to_celsius(df['MA_TEMP'])
+        df['cooling_sig_col'] = df['CHWC_VLV_DM']
+        df['heating_sig_col'] = df['HWC_VLV_DM']
+        df['oa_dmpr_sig_col'] = df['OA_DMPR_DM']
+        # keep only some columns
+        df = df[['time',
+                 'satsp_col',
+                 'sat_col',
+                 'oat_col', 'rat_col', 'cooling_sig_col', 'heating_sig_col',
+                 'oa_dmpr_sig_col', 'mat_col']]
     elif 'MZVAV' in folder:
         # load data
         df = pd.read_csv(os.path.join(folder, filename))
