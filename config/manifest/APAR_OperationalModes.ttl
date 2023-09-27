@@ -1,0 +1,35 @@
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix schema: <http://schema.org/> .
+@prefix sh:     <http://www.w3.org/ns/shacl#> .
+@prefix brick:  <https://brickschema.org/schema/Brick#> .
+@prefix bacnet: <http://data.ashrae.org/bacnet/2020#> .
+@prefix ref:    <https://brickschema.org/schema/Brick/ref#> .
+@prefix :       <urn:dr_constraints/> .
+
+:
+    a owl:Ontology .
+
+:ahu
+    a              sh:NodeShape ;
+    sh:targetClass brick:AHU ;
+#    sh:property    [ sh:path                brick:hasPoint ;
+#                     sh:message             "need 100 Zone_Air_Temperature_Sensor" ;
+#                     sh:qualifiedValueShape [ sh:class brick:Zone_Air_Temperature_Sensor ; ] ;
+#                     sh:qualifiedMinCount   100 ; ] ;
+#    sh:property    [ sh:path                brick:hasPart ;
+#                     sh:message             "need an Outside_Damper" ;
+#                     sh:qualifiedValueShape [ sh:class brick:Outside_Damper ; ] ;
+#                     sh:qualifiedMinCount   1 ; ] ;
+#    sh:property    [ sh:path                brick:hasPart ;
+#                     sh:message             "need a Cooling_Coil" ;
+#                     sh:qualifiedValueShape [ sh:class brick:Cooling_Coil ; ] ;
+#                     sh:qualifiedMinCount   1 ; ] ;
+#    sh:property    [ sh:path                brick:hasPart ;
+#                     sh:message             "need a Supply_Fan" ;
+#                     sh:qualifiedValueShape [ sh:class brick:Supply_Fan ; ] ;
+#                     sh:qualifiedMinCount   1 ; ] ;
+.
+

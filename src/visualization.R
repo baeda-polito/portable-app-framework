@@ -1,40 +1,256 @@
 library(magrittr)
 library(dplyr)
-# How close is the outdoor air fraction compared to outdoor air damper position signal?
-# read csv
-df <- read.csv("data/LBNL_FDD_Dataset_SDAHU/damper_stuck_100_annual_short.csv")
-
-df <- df[1:1000,]
-# convert to posixct time
-df$timestamp <- as.POSIXct(df$Datetime, format = "%Y-%m-%d %H:%M:%S")
-# resample to 15 min and calculate mean
-df<-df %>%
-  mutate(timestamp = as.POSIXct(timestamp)) %>%
-  group_by(timestamp = cut(timestamp, breaks = "15 min")) %>%
-  summarise(OA_TEMP = mean(OA_TEMP, na.rm = T),
-            MA_TEMP = mean(MA_TEMP, na.rm = T),
-            RA_TEMP = mean(RA_TEMP, na.rm = T),
-            OA_DMPR_DM = mean(OA_DMPR_DM, na.rm = T)) %>%
-  mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %H:%M:%S"))
-  
+library(arrow, warn.conflicts = FALSE)
 # make a ggplot line of a single day
 library(ggplot2)
 
-
-ggplot(mpg, aes(displ, hwy)) + 
-  geom_point() + 
-  scale_y_continuous(
-    "mpg (US)", 
-    sec.axis = sec_axis(~ . * 1.20, name = "mpg (UK)")
+mystyle <- function()
+{
+  font <- "Helvetica"
+  ggplot2::theme(
+    plot.title = ggplot2::element_text(
+      family = font,
+      size = 28,
+      face = "bold",
+      color = "#222222"
+    ),
+    plot.subtitle = ggplot2::element_text(
+      family = font,
+      size = 22,
+      margin = ggplot2::margin(9, 0, 9, 0)
+    ),
+    plot.caption = ggplot2::element_blank(),
+    legend.position = "right",
+    legend.text.align = 0,
+    legend.background = ggplot2::element_blank(),
+    legend.title = ggplot2::element_blank(),
+    legend.key = ggplot2::element_blank(),
+    legend.text = ggplot2::element_text(
+      family = font,
+      size = 18,
+      color = "#222222"
+    ),
+    # axis.title = ggplot2::element_blank(),
+    axis.title = ggplot2::element_text(
+      family = font,
+      size = 22,
+      color = "#222222"
+    ),
+    axis.text = ggplot2::element_text(
+      family = font,
+      size = 18,
+      color = "#222222"
+    ),
+    axis.text.x = ggplot2::element_text(margin = ggplot2::margin(5,
+                                                                 b = 10)),
+    axis.ticks = ggplot2::element_blank(),
+    axis.line = ggplot2::element_blank(),
+    panel.grid.minor = ggplot2::element_blank(),
+    panel.grid.major.y = ggplot2::element_line(color = "#cbcbcb"),
+    panel.grid.major.x = ggplot2::element_blank(),
+    panel.background = ggplot2::element_blank(),
+    strip.background = ggplot2::element_rect(fill = "white"),
+    strip.text = ggplot2::element_text(size = 22, hjust = 0)
   )
-scalefactor = 0.01
+}
 
-ggplot(df, linewidth = 2) +
-  geom_line(aes(x = timestamp, y = OA_TEMP), linewidth = 2, color = "blue", show.legend = T) +
-  geom_line(aes(x = timestamp, y = MA_TEMP), linewidth = 2,color = "green") +
-  geom_line(aes(x = timestamp, y = RA_TEMP), linewidth = 2,color = "orange") +
-  geom_line(aes(x = timestamp, y = OA_DMPR_DM/scalefactor),linewidth = 2, color = "red") +
-  
-  geom_line(aes(x = timestamp, y = OA_DMPR_DM/scalefactor),linewidth = 2, color = "red") +
-  scale_x_datetime(date_breaks = "1 hour", date_labels = "%H:%M") +
-  scale_y_continuous("Temperature [°C]", sec.axis = sec_axis(~.*scalefactor, name = "Command [-]")) 
+
+fahrenheit_to_celsius <- function(fahrenheit) {
+  celsius <- (fahrenheit - 32) * (5 / 9)
+  return(celsius)
+}
+
+
+# How close is the outdoor air fraction compared to outdoor air damper position signal?
+# read parquet
+df <-
+  read_parquet("data/LBNL_FDD_Dataset_SDAHU_PQ/AHU_annual.parquet")
+
+
+# resample to 15 min and calculate mean
+df <- df %>%
+  mutate(timestamp = as.POSIXct(df$Datetime, format = "%Y-%m-%d %H:%M:%S")) %>%
+  group_by(timestamp = cut(timestamp, breaks = "30 min")) %>%
+  summarise(
+    OA_TEMP = mean(fahrenheit_to_celsius(OA_TEMP), na.rm = T),
+    MA_TEMP = mean(fahrenheit_to_celsius(MA_TEMP), na.rm = T),
+    RA_TEMP = mean(fahrenheit_to_celsius(RA_TEMP), na.rm = T),
+    OA_DMPR_DM = mean(OA_DMPR_DM, na.rm = T)
+  ) %>%
+  mutate(
+    timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %H:%M:%S"),
+    OAF = (MA_TEMP - RA_TEMP) / (OA_TEMP - RA_TEMP),
+    OAF = ifelse(OAF < 0, NA, ifelse(OAF > 1, NA, OAF)),
+    diff = abs(OA_TEMP - RA_TEMP) < 1,
+    date = as.Date(timestamp)
+  )
+
+df_plot_bands <- df %>%
+  filter(date == "2018-08-10") %>%
+  select(timestamp, diff)
+
+
+df_plot_temp <- df %>%
+  filter(date == "2018-08-10") %>%
+  tidyr::pivot_longer(
+    cols = c(OA_TEMP, MA_TEMP, RA_TEMP),
+    names_to = "variable",
+    values_to = "value"
+  )
+
+df_plot_commands <- df %>%
+  filter(date == "2018-08-10") %>%
+  tidyr::pivot_longer(
+    cols = c(OA_DMPR_DM, OAF),
+    names_to = "variable",
+    values_to = "value"
+  )%>% mutate(value = value*100)
+
+scalefactor <- 2
+
+ggplot() +
+  geom_step(
+    data = df_plot_temp,
+    aes(x = timestamp, y = value, color = variable),
+    linewidth = 1,
+    show.legend = T
+  ) +
+  scale_color_brewer(palette = "Greens")+
+  geom_step(
+    data = df_plot_commands,
+    aes(
+      x = timestamp,
+      y = value / scalefactor,
+      color = variable
+    ),
+    linewidth = 1,
+    show.legend = T
+  ) +
+  scale_color_brewer(palette = "Reds")+
+  geom_rect(
+    data = df_plot_bands,
+    aes(
+      xmin = timestamp,
+      xmax = lead(timestamp),
+      ymin = -Inf,
+      ymax = Inf,
+      fill = diff
+    ),
+    alpha = 0.2,
+    show.legend = F
+  ) +
+  scale_fill_manual(values = c("TRUE" = "gray", "FALSE" = "white")) +  # Customize colors
+  mystyle() + theme(legend.position = "top") +
+  scale_y_continuous(
+    name = NULL,
+    labels = function(x)
+      paste0(x, " °C"),
+    sec.axis = sec_axis(
+      ~ . * scalefactor,
+      labels = function(x)
+        paste0(x, " %")
+    )
+  ) +
+  scale_x_datetime(date_breaks = "4 hour",
+                   date_labels = "%H:%M",
+                   expand = c(0, 0))
+
+ggplot() +
+  geom_point(data = df %>% mutate(tag = ifelse(OA_DMPR_DM<0.09,"Low",ifelse(diff,"inaccurate","ok"))),
+             aes(y = OAF * 100, x = OA_DMPR_DM * 100, color = tag),
+             show.legend = T, alpha = 0.2) +
+  mystyle() + 
+  theme(legend.position = "top") +
+ 
+coord_equal() +
+  scale_x_continuous(
+    name =  "Damper command",
+    labels = function(x)
+      paste0(x, " %"),
+  ) +
+  scale_y_continuous(
+    name = "Outdoor air fraction",
+    labels = function(x)
+      paste0(x, " %"),
+  )
+# scale_y_continuous("Temperature [°F]", sec.axis = sec_axis(~. * scalefactor, name = "Command [-]"))
+
+
+
+
+df <-
+  read_parquet("data/LBNL_FDD_Dataset_SDAHU_PQ/coi_stuck_050_annual.parquet")
+
+
+# resample to 15 min and calculate mean
+df <- df %>%
+  mutate(timestamp = as.POSIXct(df$Datetime, format = "%Y-%m-%d %H:%M:%S")) %>%
+  group_by(timestamp = cut(timestamp, breaks = "30 min")) %>%
+  summarise(
+    OA_TEMP = mean(fahrenheit_to_celsius(OA_TEMP), na.rm = T),
+    MA_TEMP = mean(fahrenheit_to_celsius(MA_TEMP), na.rm = T),
+    RA_TEMP = mean(fahrenheit_to_celsius(RA_TEMP), na.rm = T),
+    OA_DMPR_DM = mean(OA_DMPR_DM, na.rm = T)
+  ) %>%
+  mutate(
+    timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %H:%M:%S"),
+    OAF = (MA_TEMP - RA_TEMP) / (OA_TEMP - RA_TEMP),
+    OAF = ifelse(OAF < 0, NA, ifelse(OAF > 1, NA, OAF)),
+    diff = abs(OA_TEMP - RA_TEMP) < 1,
+    date = as.Date(timestamp)
+  )
+
+
+
+df_plot_temp <- df %>%
+  filter(date == "2018-08-10") %>%
+  tidyr::pivot_longer(
+    cols = c(OA_TEMP, MA_TEMP, RA_TEMP),
+    names_to = "variable",
+    values_to = "value"
+  )
+
+df_plot_commands <- df %>%
+  filter(date == "2018-08-10") %>%
+  tidyr::pivot_longer(
+    cols = c(OA_DMPR_DM, OAF),
+    names_to = "variable",
+    values_to = "value"
+  )%>% mutate(value = value*100)
+
+scalefactor <- 2
+
+ggplot() +
+  geom_step(
+    data = df_plot_temp,
+    aes(x = timestamp, y = value, color = variable),
+    linewidth = 1,
+    show.legend = T
+  ) +
+  geom_step(
+    data = df_plot_commands,
+    aes(
+      x = timestamp,
+      y = value / scalefactor,
+      color = variable
+    ),
+    linewidth = 1,
+    show.legend = T
+  ) +
+  scale_fill_manual(values = c("TRUE" = "gray", "FALSE" = "white")) +  # Customize colors
+  mystyle() + theme(legend.position = "top") +
+  scale_y_continuous(
+    name = NULL,
+    labels = function(x)
+      paste0(x, " °C"),
+    sec.axis = sec_axis(
+      ~ . * scalefactor,
+      labels = function(x)
+        paste0(x, " %")
+    )
+  ) +
+  scale_x_datetime(date_breaks = "4 hour",
+                   date_labels = "%H:%M",
+                   expand = c(0, 0))
+
+

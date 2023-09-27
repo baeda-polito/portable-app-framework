@@ -23,10 +23,11 @@ from utils.util_preprocessing import get_steady, preprocess
 logger = CustomLogger().get_logger()
 if __name__ == '__main__':
 
-    FOLDER = os.path.join("..", "data", "LBNL_FDD_Dataset_DDAHU_PQ")
+    FOLDER = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
     plot_flag = True
     ensure_dir(FOLDER)
-    files = list_files(FOLDER)
+
+    files = list_files(FOLDER, file_formats=[".csv", ".parquet"])
 
     for filename in files:
         print('\n')

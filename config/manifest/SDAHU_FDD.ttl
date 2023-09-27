@@ -1,0 +1,15 @@
+@prefix brick:      <https://brickschema.org/schema/Brick#> .
+@prefix owl:        <http://www.w3.org/2002/07/owl#> .
+@prefix sh:         <http://www.w3.org/ns/shacl#> .
+@prefix constraint: <https://nrel.gov/BuildingMOTIF/constraints#> .
+@prefix :           <urn:my_site_constraints/> .
+
+:
+    a owl:Ontology .
+
+:ahu-count
+    a                     sh:NodeShape ;
+    sh:message            "need 1 AHU" ;
+    sh:targetNode         : ;
+    constraint:exactCount 1 ;
+    constraint:class      brick:AHU .
