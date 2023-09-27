@@ -29,7 +29,7 @@ class BasicValidationInterface:
 
     def __init__(self, graph_path: str, manifest_path: str, load: str = None):
         # use the wrapper BrickGraph to initialize the graph
-        self.graph = BrickGraph(load='nightly')
+        self.graph = BrickGraph()
         # load the ttl file
         self.graph.load_file(graph_path)
         # load all the manifests

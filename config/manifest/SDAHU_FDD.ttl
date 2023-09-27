@@ -2,14 +2,45 @@
 @prefix owl:        <http://www.w3.org/2002/07/owl#> .
 @prefix sh:         <http://www.w3.org/ns/shacl#> .
 @prefix constraint: <https://nrel.gov/BuildingMOTIF/constraints#> .
-@prefix :           <urn:my_site_constraints/> .
+@prefix :           <urn:single-duct-ahu-constraint/> .
 
 :
     a owl:Ontology .
 
-:ahu-count
-    a                     sh:NodeShape ;
-    sh:message            "need 1 AHU" ;
-    sh:targetNode         : ;
-    constraint:exactCount 1 ;
-    constraint:class      brick:AHU .
+:ahu-shape
+    a              sh:NodeShape ;
+    sh:message     "need 1 AHU" ;
+    sh:targetClass brick:AHU ;
+    sh:property    [ sh:path                brick:hasPart ;
+                     sh:message             "need at least 1 Outside_Damper" ;
+                     sh:qualifiedValueShape :outside-damper-shape ;
+                     sh:qualifiedMinCount   1 ; ] ;
+    sh:property    [ sh:path                brick:hasPart ;
+                     sh:message             "need at least 1 Cooling_Coil" ;
+                     sh:qualifiedValueShape :cooling-coil-shape ;
+                     sh:qualifiedMinCount   1 ; ] ;
+    sh:property    [ sh:path                brick:hasPoint ;
+                     sh:message             "need at least 1 Outside_Air_Temperature_Sensor" ;
+                     sh:qualifiedValueShape [ sh:class brick:Outside_Air_Temperature_Sensor ; ] ;
+                     sh:qualifiedMinCount   1 ; ]
+.
+
+
+
+:outside-damper-shape
+    a              sh:NodeShape ;
+    sh:targetClass brick:Outside_Damper ;
+    sh:property    [ sh:path                brick:hasPoint ;
+                     sh:message             "need Damper_Position_Command for Outside_Damper" ;
+                     sh:qualifiedValueShape [ sh:class brick:Damper_Position_Command ; ] ;
+                     sh:qualifiedMinCount   1 ; ] ;
+.
+
+:cooling-coil-shape
+    a              sh:NodeShape ;
+    sh:targetClass brick:Cooling_Coil ;
+    sh:property    [ sh:path                brick:hasPoint ;
+                     sh:message             "need Valve_Position_Command for Cooling_Coil" ;
+                     sh:qualifiedValueShape [ sh:class brick:Valve_Position_Command ; ] ;
+                     sh:qualifiedMinCount   1 ; ] ;
+.

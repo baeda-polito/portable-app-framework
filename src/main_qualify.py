@@ -14,18 +14,22 @@
 
 import os
 
-from utils.util_qualify import BuildingMotifValidationInterface
+from utils.util_qualify import BuildingMotifValidationInterface, BasicValidationInterface
 
 if __name__ == '__main__':
-    # BVI = BasicValidationInterface(
-    #     graph_path=self.graph_path,
-    #     manifest_path=manifest_path,
-    # )
-    # BVI.describe()
-    # BVI.validate()
 
-    BMI = BuildingMotifValidationInterface(
-        graph_path=os.path.join("..", "data", "SDAHU.ttl"),
-        manifest_path=os.path.join("..", "config", "manifest", "SDAHU_FDD.ttl"),
-    )
-    BMI.validate()
+    advanced = True
+
+    if advanced:
+        BMI = BuildingMotifValidationInterface(
+            graph_path=os.path.join("..", "data", "SDAHU.ttl"),
+            manifest_path=os.path.join("..", "config", "manifest", "SDAHU_FDD.ttl"),
+        )
+        BMI.validate()
+    else:
+        BVI = BasicValidationInterface(
+            graph_path=os.path.join("..", "data", "SDAHU.ttl"),
+            manifest_path=os.path.join("..", "config", "manifest", "SDAHU_FDD.ttl"),
+        )
+        # BVI.describe()
+        BVI.validate()
