@@ -22,14 +22,14 @@ if __name__ == '__main__':
 
     if advanced:
         BMI = BuildingMotifValidationInterface(
-            graph_path=os.path.join("..", "data", "SDAHU.ttl"),
-            manifest_path=os.path.join("..", "config", "manifest", "SDAHU_FDD.ttl"),
+            graph_path=os.path.join("..", "data", "example_model.ttl"),
+            manifest_path=os.path.join("..", "config", "manifest", "example_shape.ttl"),
         )
         BMI.validate()
     else:
         BVI = BasicValidationInterface(
-            graph_path=os.path.join("..", "data", "SDAHU.ttl"),
-            manifest_path=os.path.join("..", "config", "manifest", "SDAHU_FDD.ttl"),
+            graph_path=os.path.join("..", "data", "example_model.ttl"),
+            manifest_path=os.path.join("..", "config", "manifest", "example_shape.ttl"),
         )
         # BVI.describe()
         BVI.validate()

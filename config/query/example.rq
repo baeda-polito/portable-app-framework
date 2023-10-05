@@ -1,0 +1,8 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX brick: <https://brickschema.org/schema/Brick#>
+SELECT ?oat
+WHERE {
+    ?ahu a brick:AHU .
+    ?ahu brick:hasPoint ?oat.
+    ?oat rdf:type brick:Outside_Air_Temperature_Sensor .
+}

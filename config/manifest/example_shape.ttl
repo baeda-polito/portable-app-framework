@@ -1,0 +1,18 @@
+@prefix brick:      <https://brickschema.org/schema/Brick#> .
+@prefix owl:        <http://www.w3.org/2002/07/owl#> .
+@prefix sh:         <http://www.w3.org/ns/shacl#> .
+@prefix constraint: <https://nrel.gov/BuildingMOTIF/constraints#> .
+@prefix :           <urn:my-building-constraint/> .
+
+
+:
+    a owl:Ontology .
+
+
+:ahu-shape
+    a              sh:NodeShape ;
+    sh:targetClass brick:AHU ;
+    sh:property    [ sh:path                brick:hasPoint ;
+                     sh:message             "need at least 1 Outside_Air_Temperature_Sensor" ;
+                     sh:qualifiedValueShape [ sh:class brick:Outside_Air_Temperature_Sensor ; ] ;
+                     sh:qualifiedMinCount   1 ; ] .
