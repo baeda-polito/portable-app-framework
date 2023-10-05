@@ -76,7 +76,7 @@ class BuildingMotifValidationInterface:
         :return: print the validation report
         """
         # in-memory instance
-        bm = BuildingMOTIF("sqlite://")
+        BuildingMOTIF("sqlite://")
         # remind to deactivate logger from BuildingMOTIF class in python package
 
         # create the namespace for the building

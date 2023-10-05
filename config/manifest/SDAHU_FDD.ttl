@@ -11,10 +11,12 @@
     a              sh:NodeShape ;
     sh:message     "need 1 AHU" ;
     sh:targetClass brick:AHU ;
+    # I need damper with command or simply command
     sh:property    [ sh:path                brick:hasPart ;
                      sh:message             "need at least 1 Outside_Damper" ;
                      sh:qualifiedValueShape :outside-damper-shape ;
                      sh:qualifiedMinCount   1 ; ] ;
+    # I need damper with command or simply command
     sh:property    [ sh:path                brick:hasPart ;
                      sh:message             "need at least 1 Cooling_Coil" ;
                      sh:qualifiedValueShape :cooling-coil-shape ;
@@ -22,6 +24,14 @@
     sh:property    [ sh:path                brick:hasPoint ;
                      sh:message             "need at least 1 Outside_Air_Temperature_Sensor" ;
                      sh:qualifiedValueShape [ sh:class brick:Outside_Air_Temperature_Sensor ; ] ;
+                     sh:qualifiedMinCount   1 ; ] ;
+    sh:property    [ sh:path                brick:hasPoint ;
+                     sh:message             "need at least 1 Supply_Air_Temperature_Sensor" ;
+                     sh:qualifiedValueShape [ sh:class brick:Supply_Air_Temperature_Sensor ; ] ;
+                     sh:qualifiedMinCount   1 ; ] ;
+    sh:property    [ sh:path                brick:hasPoint ;
+                     sh:message             "need at least 1 Return_Air_Temperature_Sensor" ;
+                     sh:qualifiedValueShape [ sh:class brick:Return_Air_Temperature_Sensor ; ] ;
                      sh:qualifiedMinCount   1 ; ]
 .
 

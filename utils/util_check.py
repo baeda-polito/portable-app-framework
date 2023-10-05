@@ -11,6 +11,7 @@
 #
 # Notes:
 import numpy as np
+import pandas as pd
 
 from utils.logger import CustomLogger
 from utils.util_plot import plot_damper, plot_valves
@@ -42,7 +43,7 @@ def check_log_result(result: bool, check_name: str, n: int, message: ''):
     return n
 
 
-def check_variables(df):
+def check_variables(df: pd.DataFrame):
     """
     Check if the required variables are present in the dataset
     :param df: the dataframe containing the variables
