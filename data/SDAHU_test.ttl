@@ -1,0 +1,10 @@
+@prefix bldg:  <http://my-building> .
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+
+bldg:ahu
+    a              brick:AHU ;
+    brick:hasPoint bldg:oat .
+
+bldg:oat
+    a brick:Outside_Air_Temperature_Sensor .
+

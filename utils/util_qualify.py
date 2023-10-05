@@ -76,7 +76,7 @@ class BuildingMotifValidationInterface:
         :return: print the validation report
         """
         # in-memory instance
-        bm = BuildingMOTIF("sqlite://")
+        BuildingMOTIF("sqlite://")
         # remind to deactivate logger from BuildingMOTIF class in python package
 
         # create the namespace for the building
@@ -92,7 +92,7 @@ class BuildingMotifValidationInterface:
         # print(f"Model length {len(model.graph.serialize())}")
 
         # load brick ontology
-        brick = Library.load(ontology_graph="../data/libraries/Brick-subset.ttl")
+        brick = Library.load(ontology_graph="../config/libraries/Brick-subset.ttl")
         # print(f"Model + brick length {len(model.graph.serialize())}")
 
         # load libraries included with the python package
