@@ -45,11 +45,11 @@ def check_log_result(result: bool, check_name: str, message: ''):
     :param n: the number of the check passed to be updated
     """
     if result is True:
-        logger.info(f'{check_name} = True ✅ ' + message)
+        logger.info(f'{check_name} = PASSED ✅ ' + message)
     elif result is None:
-        logger.warning(f'{check_name} = None ⚠️ ' + message)
+        logger.warning(f'{check_name} = WARNING ⚠️ ' + message)
     elif result is False:
-        logger.error(f'{check_name} = False ❌ ' + message)
+        logger.error(f'{check_name} = FAILED ❌ ' + message)
     else:
         raise Exception('The result of the check is not a boolean')
 
@@ -78,9 +78,9 @@ def check_variables(df: pd.DataFrame):
         # get the difference from the required variables+
         missing_variables = set(required_variables) - set(available_variables)
         if 'heating_sig_col' in missing_variables:
-            return None, f'(Missing variables in the dataset we suggest to measure the missing values if possible: {list(missing_variables)})'
+            return None, f'(Measure {list(missing_variables)} if possible)'
         else:
-            return False, f'(Missing variables in the dataset we suggest to measure the missing values: {list(missing_variables)})'
+            return False, f'(Missing variables {list(missing_variables)})'
     else:
         return True, ''
 
@@ -158,7 +158,7 @@ def check_hc(df):
     :param df:
     """
     if not df.empty:
-        return False, f'(Possible Contemporary heating and cooling)'
+        return None, f'(Possible Contemporary heating and cooling)'
     else:
         return True, ''
 
