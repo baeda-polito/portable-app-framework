@@ -22,7 +22,21 @@ logger = CustomLogger().get_logger()
 plot_flag = False
 
 
-def check_log_result(result: bool, check_name: str, n: int, message: ''):
+def check_log_overall_result(result: list):
+    """
+    Log the result of a check
+    :param result: a list of boolean representing the result
+    """
+    # transform eack bool into an emoji then print
+    # true = ✅
+    # false = ❌
+    # none = ⚠️
+
+    result_emoji = ['✅' if r is True else '❌' if r is False else '⚠️' for r in result]
+    logger.info(f'Result: {"".join(result_emoji)}')
+
+
+def check_log_result(result: bool, check_name: str, message: ''):
     """
     Log the result of a check
     :param message: extra string detailing log
@@ -32,15 +46,12 @@ def check_log_result(result: bool, check_name: str, n: int, message: ''):
     """
     if result is True:
         logger.info(f'{check_name} = True ✅ ' + message)
-        n += 1
     elif result is None:
         logger.warning(f'{check_name} = None ⚠️ ' + message)
     elif result is False:
         logger.error(f'{check_name} = False ❌ ' + message)
     else:
         raise Exception('The result of the check is not a boolean')
-
-    return n
 
 
 def check_variables(df: pd.DataFrame):
@@ -58,16 +69,18 @@ def check_variables(df: pd.DataFrame):
         'heating_sig_col',
         'oa_dmpr_sig_col'
     ]
-
+    # remove if all the column is a zero (workaround)
+    df = df.loc[:, (df != 0).any(axis=0)]
     available_variables = df.columns
     # todo depending on the available variables you can do some checks
     if not all([var in available_variables for var in required_variables]):
         # the variable check has passed we can log and proceed
         # get the difference from the required variables+
         missing_variables = set(required_variables) - set(available_variables)
-        raise Exception(
-            f'Missing variables in the dataset we suggest to measure the missing values: {list(missing_variables)}')
-
+        if 'heating_sig_col' in missing_variables:
+            return None, f'(Missing variables in the dataset we suggest to measure the missing values if possible: {list(missing_variables)})'
+        else:
+            return False, f'(Missing variables in the dataset we suggest to measure the missing values: {list(missing_variables)})'
     else:
         return True, ''
 
