@@ -8,7 +8,6 @@
 *.csv
 *.html
 *.parquet
-*.pdf
 *.log
 
 ### JetBrains template

@@ -1,0 +1,431 @@
+@prefix bldg: <bldg-59#> .
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+
+bldg:Chilled_Water_Pump a brick:Chilled_Water_Pump ;
+    brick:feeds bldg:Cooling_Coil ;
+    brick:hasPoint bldg:CHWP_GPMC,
+        bldg:CHWP_GPMT .
+
+bldg:DDAHU a brick:AHU ;
+    brick:feeds bldg:Mixing_Box_VAV_E,
+        bldg:Mixing_Box_VAV_SA,
+        bldg:Mixing_Box_VAV_SB,
+        bldg:Mixing_Box_VAV_W ;
+    brick:hasPart bldg:Cold_Deck,
+        bldg:Exhaust_Air_Damper,
+        bldg:Hot_Deck,
+        bldg:Outdoor_Air_Damper,
+        bldg:Recirculated_Air_Damper,
+        bldg:Return_Fan ;
+    brick:hasPoint bldg:MA_TEMP,
+        bldg:OA_CFM,
+        bldg:OA_HUMD,
+        bldg:OA_TEMP,
+        bldg:RA_CFM,
+        bldg:RA_HUMD,
+        bldg:RA_TEMP,
+        bldg:RF_DP,
+        bldg:SYS_CTL .
+
+bldg:Heating_Water_Pump a brick:Hot_Water_Pump ;
+    brick:feeds bldg:Heating_Coil ;
+    brick:hasPoint bldg:HWP_GPMC,
+        bldg:HWP_GPMT .
+
+bldg:CHWC_DAT a brick:Discharge_Air_Temperature_Sensor .
+
+bldg:CHWC_EAH a brick:Relative_Humidity_Sensor .
+
+bldg:CHWC_EWT a brick:Entering_Water_Temperature_Sensor .
+
+bldg:CHWC_LWT a brick:Leaving_Water_Temperature_Sensor .
+
+bldg:CHWC_MWT a brick:Water_Temperature_Sensor .
+
+bldg:CHWC_VLV a brick:Valve_Position_Sensor .
+
+bldg:CHWC_VLV_DM a brick:Valve_Command .
+
+bldg:CHWP_GPMC a brick:Water_Flow_Sensor .
+
+bldg:CHWP_GPMT a brick:Water_Flow_Sensor .
+
+bldg:CSA_CFM a brick:Supply_Air_Flow_Sensor .
+
+bldg:CSA_HUMD a brick:Supply_Air_Humidity_Sensor .
+
+bldg:CSA_SP a brick:Supply_Air_Static_Pressure_Sensor .
+
+bldg:CSA_SPSPT a brick:Supply_Air_Static_Pressure_Setpoint .
+
+bldg:CSA_TEMP a brick:Supply_Air_Temperature_Sensor .
+
+bldg:CSA_TEMPSPT a brick:Supply_Air_Temperature_Setpoint .
+
+bldg:CSF_CS a brick:Fan_On_Off_Status .
+
+bldg:CSF_DP a brick:Supply_Air_Differential_Pressure_Sensor .
+
+bldg:CSF_SPD a brick:Speed_Status .
+
+bldg:CSF_WAT a brick:Electrical_Power_Sensor .
+
+bldg:Cold_Deck a brick:Cold_Deck ;
+    brick:hasPart bldg:Cold_Deck_Supply_Fan,
+        bldg:Cooling_Coil ;
+    brick:hasPoint bldg:CSA_CFM,
+        bldg:CSA_HUMD,
+        bldg:CSA_SP,
+        bldg:CSA_SPSPT,
+        bldg:CSA_TEMP,
+        bldg:CSA_TEMPSPT,
+        bldg:CSF_DP .
+
+bldg:Cold_Deck_Supply_Fan a brick:Supply_Fan ;
+    brick:hasPoint bldg:CSF_CS,
+        bldg:CSF_SPD,
+        bldg:CSF_WAT .
+
+bldg:Cooling_Box_E a brick:Variable_Air_Volume_Box ;
+    brick:hasPoint bldg:VAVCFM_C_DM_E,
+        bldg:VAVCFM_C_E,
+        bldg:VAV_DMPR_C_E,
+        bldg:VAV_EAT_C_E,
+        bldg:VAV_SP_C_E .
+
+bldg:Cooling_Box_SA a brick:Variable_Air_Volume_Box ;
+    brick:hasPoint bldg:VAVCFM_C_DM_SA,
+        bldg:VAVCFM_C_SA,
+        bldg:VAV_DMPR_C_SA,
+        bldg:VAV_EAT_C_SA,
+        bldg:VAV_SP_C_SA .
+
+bldg:Cooling_Box_SB a brick:Variable_Air_Volume_Box ;
+    brick:hasPoint bldg:VAVCFM_C_DM_SB,
+        bldg:VAVCFM_C_SB,
+        bldg:VAV_DMPR_C_SB,
+        bldg:VAV_EAT_C_SB,
+        bldg:VAV_SP_C_SB .
+
+bldg:Cooling_Box_W a brick:Variable_Air_Volume_Box ;
+    brick:hasPoint bldg:VAVCFM_C_DM_W,
+        bldg:VAVCFM_C_W,
+        bldg:VAV_DMPR_C_W,
+        bldg:VAV_EAT_C_W,
+        bldg:VAV_SP_C_W .
+
+bldg:EA_DMPR a brick:Damper_Position_Sensor .
+
+bldg:EA_DMPR_DM a brick:Damper_Position_Command .
+
+bldg:Exhaust_Air_Damper a brick:Exhaust_Damper ;
+    brick:hasPoint bldg:EA_DMPR,
+        bldg:EA_DMPR_DM .
+
+bldg:HSA_CFM a brick:Supply_Air_Flow_Sensor .
+
+bldg:HSA_HUMD a brick:Supply_Air_Humidity_Sensor .
+
+bldg:HSA_SP a brick:Supply_Air_Static_Pressure_Sensor .
+
+bldg:HSA_SPSPT a brick:Supply_Air_Static_Pressure_Setpoint .
+
+bldg:HSA_TEMP a brick:Supply_Air_Temperature_Sensor .
+
+bldg:HSA_TEMPSPT a brick:Supply_Air_Temperature_Setpoint .
+
+bldg:HSF_CS a brick:Fan_On_Off_Status .
+
+bldg:HSF_DP a brick:Supply_Air_Differential_Pressure_Sensor .
+
+bldg:HSF_SPD a brick:Speed_Status .
+
+bldg:HSF_WAT a brick:Electrical_Power_Sensor .
+
+bldg:HWC_DAT a brick:Discharge_Air_Temperature_Sensor .
+
+bldg:HWC_EWT a brick:Entering_Water_Temperature_Sensor .
+
+bldg:HWC_LWT a brick:Leaving_Water_Temperature_Sensor .
+
+bldg:HWC_MWT a brick:Water_Temperature_Sensor .
+
+bldg:HWC_VLV a brick:Valve_Position_Sensor .
+
+bldg:HWC_VLV_DM a brick:Valve_Command .
+
+bldg:HWP_GPMC a brick:Water_Flow_Sensor .
+
+bldg:HWP_GPMT a brick:Water_Flow_Sensor .
+
+bldg:Heating_Box_E a brick:Variable_Air_Volume_Box ;
+    brick:hasPoint bldg:VAVCFM_H_DM_E,
+        bldg:VAVCFM_H_E,
+        bldg:VAV_DMPR_H_E,
+        bldg:VAV_EAT_H_E,
+        bldg:VAV_SP_H_E .
+
+bldg:Heating_Box_SA a brick:Variable_Air_Volume_Box ;
+    brick:hasPoint bldg:VAVCFM_H_DM_SA,
+        bldg:VAVCFM_H_SA,
+        bldg:VAV_DMPR_H_SA,
+        bldg:VAV_EAT_H_SA,
+        bldg:VAV_SP_H_SA .
+
+bldg:Heating_Box_SB a brick:Variable_Air_Volume_Box ;
+    brick:hasPoint bldg:VAVCFM_H_DM_SB,
+        bldg:VAVCFM_H_SB,
+        bldg:VAV_DMPR_H_SB,
+        bldg:VAV_EAT_H_SB,
+        bldg:VAV_SP_H_SB .
+
+bldg:Heating_Box_W a brick:Variable_Air_Volume_Box ;
+    brick:hasPoint bldg:VAVCFM_H_DM_W,
+        bldg:VAVCFM_H_W,
+        bldg:VAV_DMPR_H_W,
+        bldg:VAV_EAT_H_W,
+        bldg:VAV_SP_H_W .
+
+bldg:Hot_Deck a brick:Hot_Deck ;
+    brick:hasPart bldg:Heating_Coil,
+        bldg:Hot_Deck_Supply_Fan ;
+    brick:hasPoint bldg:HSA_CFM,
+        bldg:HSA_HUMD,
+        bldg:HSA_SP,
+        bldg:HSA_SPSPT,
+        bldg:HSA_TEMP,
+        bldg:HSA_TEMPSPT,
+        bldg:HSF_DP .
+
+bldg:Hot_Deck_Supply_Fan a brick:Supply_Fan ;
+    brick:hasPoint bldg:HSF_CS,
+        bldg:HSF_SPD,
+        bldg:HSF_WAT .
+
+bldg:MA_TEMP a brick:Mixed_Air_Temperature_Sensor .
+
+bldg:Mixing_Box_VAV_E a brick:VAV ;
+    brick:feeds bldg:Test_Room_E ;
+    brick:hasPart bldg:Cooling_Box_E,
+        bldg:Heating_Box_E ;
+    brick:hasPoint bldg:VAVCFM_T_E,
+        bldg:VAV_DAT_E .
+
+bldg:Mixing_Box_VAV_SA a brick:VAV ;
+    brick:feeds bldg:Test_Room_SA ;
+    brick:hasPart bldg:Cooling_Box_SA,
+        bldg:Heating_Box_SA ;
+    brick:hasPoint bldg:VAVCFM_T_SA,
+        bldg:VAV_DAT_SA .
+
+bldg:Mixing_Box_VAV_SB a brick:VAV ;
+    brick:feeds bldg:Test_Room_SB ;
+    brick:hasPart bldg:Cooling_Box_SB,
+        bldg:Heating_Box_SB ;
+    brick:hasPoint bldg:VAVCFM_T_SB,
+        bldg:VAV_DAT_SB .
+
+bldg:Mixing_Box_VAV_W a brick:VAV ;
+    brick:feeds bldg:Test_Room_W ;
+    brick:hasPart bldg:Cooling_Box_W,
+        bldg:Heating_Box_W ;
+    brick:hasPoint bldg:VAVCFM_T_W,
+        bldg:VAV_DAT_W .
+
+bldg:OA_CFM a brick:Outside_Air_Flow_Sensor .
+
+bldg:OA_DMPR a brick:Damper_Position_Sensor .
+
+bldg:OA_DMPR_DM a brick:Damper_Position_Command .
+
+bldg:OA_HUMD a brick:Outside_Air_Humidity_Sensor .
+
+bldg:OA_TEMP a brick:Outside_Air_Temperature_Sensor .
+
+bldg:Outdoor_Air_Damper a brick:Outside_Damper ;
+    brick:hasPoint bldg:OA_DMPR,
+        bldg:OA_DMPR_DM .
+
+bldg:RA_CFM a brick:Return_Air_Flow_Sensor .
+
+bldg:RA_DMPR a brick:Damper_Position_Sensor .
+
+bldg:RA_DMPR_DM a brick:Damper_Position_Command .
+
+bldg:RA_HUMD a brick:Return_Air_Humidity_Sensor .
+
+bldg:RA_TEMP a brick:Return_Air_Temperature_Sensor .
+
+bldg:RF_DP a brick:Return_Air_Differential_Pressure_Sensor .
+
+bldg:RF_SPD a brick:Speed_Status .
+
+bldg:RF_WAT a brick:Electrical_Power_Sensor .
+
+bldg:RMCLGSPT_E a brick:Zone_Air_Cooling_Temperature_Setpoint .
+
+bldg:RMCLGSPT_SA a brick:Zone_Air_Cooling_Temperature_Setpoint .
+
+bldg:RMCLGSPT_SB a brick:Zone_Air_Cooling_Temperature_Setpoint .
+
+bldg:RMCLGSPT_W a brick:Zone_Air_Cooling_Temperature_Setpoint .
+
+bldg:RMHTGSPT_E a brick:Zone_Air_Heating_Temperature_Setpoint .
+
+bldg:RMHTGSPT_SA a brick:Zone_Air_Heating_Temperature_Setpoint .
+
+bldg:RMHTGSPT_SB a brick:Zone_Air_Heating_Temperature_Setpoint .
+
+bldg:RMHTGSPT_W a brick:Zone_Air_Heating_Temperature_Setpoint .
+
+bldg:RM_TEMP_E a brick:Zone_Air_Temperature_Sensor .
+
+bldg:RM_TEMP_SA a brick:Zone_Air_Temperature_Sensor .
+
+bldg:RM_TEMP_SB a brick:Zone_Air_Temperature_Sensor .
+
+bldg:RM_TEMP_W a brick:Zone_Air_Temperature_Sensor .
+
+bldg:Recirculated_Air_Damper a brick:Return_Damper ;
+    brick:hasPoint bldg:RA_DMPR,
+        bldg:RA_DMPR_DM .
+
+bldg:Return_Fan a brick:Return_Fan ;
+    brick:hasPoint bldg:RF_SPD,
+        bldg:RF_WAT .
+
+bldg:SYS_CTL a brick:Occupied_Mode_Status .
+
+bldg:Test_Room_E a brick:HVAC_Zone ;
+    brick:hasPoint bldg:RMCLGSPT_E,
+        bldg:RMHTGSPT_E,
+        bldg:RM_TEMP_E .
+
+bldg:Test_Room_SA a brick:HVAC_Zone ;
+    brick:hasPoint bldg:RMCLGSPT_SA,
+        bldg:RMHTGSPT_SA,
+        bldg:RM_TEMP_SA .
+
+bldg:Test_Room_SB a brick:HVAC_Zone ;
+    brick:hasPoint bldg:RMCLGSPT_SB,
+        bldg:RMHTGSPT_SB,
+        bldg:RM_TEMP_SB .
+
+bldg:Test_Room_W a brick:HVAC_Zone ;
+    brick:hasPoint bldg:RMCLGSPT_W,
+        bldg:RMHTGSPT_W,
+        bldg:RM_TEMP_W .
+
+bldg:VAVCFM_C_DM_E a brick:Air_Flow_Demand_Setpoint .
+
+bldg:VAVCFM_C_DM_SA a brick:Air_Flow_Demand_Setpoint .
+
+bldg:VAVCFM_C_DM_SB a brick:Air_Flow_Demand_Setpoint .
+
+bldg:VAVCFM_C_DM_W a brick:Air_Flow_Demand_Setpoint .
+
+bldg:VAVCFM_C_E a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_C_SA a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_C_SB a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_C_W a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_H_DM_E a brick:Air_Flow_Demand_Setpoint .
+
+bldg:VAVCFM_H_DM_SA a brick:Air_Flow_Demand_Setpoint .
+
+bldg:VAVCFM_H_DM_SB a brick:Air_Flow_Demand_Setpoint .
+
+bldg:VAVCFM_H_DM_W a brick:Air_Flow_Demand_Setpoint .
+
+bldg:VAVCFM_H_E a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_H_SA a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_H_SB a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_H_W a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_T_E a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_T_SA a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_T_SB a brick:Air_Flow_Sensor .
+
+bldg:VAVCFM_T_W a brick:Air_Flow_Sensor .
+
+bldg:VAV_DAT_E a brick:Discharge_Air_Temperature_Sensor .
+
+bldg:VAV_DAT_SA a brick:Discharge_Air_Temperature_Sensor .
+
+bldg:VAV_DAT_SB a brick:Discharge_Air_Temperature_Sensor .
+
+bldg:VAV_DAT_W a brick:Discharge_Air_Temperature_Sensor .
+
+bldg:VAV_DMPR_C_E a brick:Damper_Position_Sensor .
+
+bldg:VAV_DMPR_C_SA a brick:Damper_Position_Sensor .
+
+bldg:VAV_DMPR_C_SB a brick:Damper_Position_Sensor .
+
+bldg:VAV_DMPR_C_W a brick:Damper_Position_Sensor .
+
+bldg:VAV_DMPR_H_E a brick:Damper_Position_Sensor .
+
+bldg:VAV_DMPR_H_SA a brick:Damper_Position_Sensor .
+
+bldg:VAV_DMPR_H_SB a brick:Damper_Position_Sensor .
+
+bldg:VAV_DMPR_H_W a brick:Damper_Position_Sensor .
+
+bldg:VAV_EAT_C_E a brick:Air_Temperature_Sensor .
+
+bldg:VAV_EAT_C_SA a brick:Air_Temperature_Sensor .
+
+bldg:VAV_EAT_C_SB a brick:Air_Temperature_Sensor .
+
+bldg:VAV_EAT_C_W a brick:Air_Temperature_Sensor .
+
+bldg:VAV_EAT_H_E a brick:Air_Temperature_Sensor .
+
+bldg:VAV_EAT_H_SA a brick:Air_Temperature_Sensor .
+
+bldg:VAV_EAT_H_SB a brick:Air_Temperature_Sensor .
+
+bldg:VAV_EAT_H_W a brick:Air_Temperature_Sensor .
+
+bldg:VAV_SP_C_E a brick:Static_Pressure_Sensor .
+
+bldg:VAV_SP_C_SA a brick:Static_Pressure_Sensor .
+
+bldg:VAV_SP_C_SB a brick:Static_Pressure_Sensor .
+
+bldg:VAV_SP_C_W a brick:Static_Pressure_Sensor .
+
+bldg:VAV_SP_H_E a brick:Static_Pressure_Sensor .
+
+bldg:VAV_SP_H_SA a brick:Static_Pressure_Sensor .
+
+bldg:VAV_SP_H_SB a brick:Static_Pressure_Sensor .
+
+bldg:VAV_SP_H_W a brick:Static_Pressure_Sensor .
+
+bldg:Cooling_Coil a brick:Chilled_Water_Coil ;
+    brick:hasPoint bldg:CHWC_DAT,
+        bldg:CHWC_EAH,
+        bldg:CHWC_EWT,
+        bldg:CHWC_LWT,
+        bldg:CHWC_MWT,
+        bldg:CHWC_VLV,
+        bldg:CHWC_VLV_DM .
+
+bldg:Heating_Coil a brick:Hot_Water_Coil ;
+    brick:hasPoint bldg:HWC_DAT,
+        bldg:HWC_EWT,
+        bldg:HWC_LWT,
+        bldg:HWC_MWT,
+        bldg:HWC_VLV,
+        bldg:HWC_VLV_DM .
+

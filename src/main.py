@@ -23,7 +23,7 @@ from utils.util_preprocessing import get_steady, preprocess
 logger = CustomLogger().get_logger()
 if __name__ == '__main__':
 
-    FOLDER = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
+    FOLDER = os.path.join("..", "data", "LBNL_FDD_Dataset_DDAHU_PQ")
     plot_flag = False
     ensure_dir(FOLDER)
 
@@ -47,7 +47,6 @@ if __name__ == '__main__':
             'diff_damper_oaf_threshold': 0.3
         }
 
-        n = 0  # number of check passed
         n_list = []  # list of check passed
         # fetch data depending on the folder and filename
         df = driver_data_fetch(FOLDER, filename)
@@ -72,65 +71,6 @@ if __name__ == '__main__':
 
         # IDENTIFY TRANSIENT
         df_clean = get_steady(df, config, plot_flag=plot_flag, filename=datasource)
-
-        # ############  TEMPERATURE BIAS SENSOR ############
-        # # scatter plot
-        # df_scatter_temp = df_clean.copy()
-        # # create hour from time and filter from 6 to 18
-        # df_scatter_temp['hour'] = df_scatter_temp['time'].dt.hour
-        # df_scatter_temp['day'] = df_scatter_temp['time'].dt.day
-        #
-        # df_scatter_temp = df_scatter_temp[
-        #     (df_scatter_temp['hour'] >= 6) &
-        #     (df_scatter_temp['hour'] <= 18) &
-        #     (df_scatter_temp['day'] != 7) &
-        #     (df_scatter_temp['day'] != 6) &
-        #     (df_scatter_temp['slope'] == 'steady') &
-        #     (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"]) &
-        #     (df_clean['oa_dmpr_sig_col'] < 1 - config["damper_cutoff"]) &
-        #     (df_clean['oat_col'] > 0) &
-        #     (df_clean['oat_col'] < 15)
-        #     ]
-        #
-        # # calculate mix - supply
-        # df_scatter_temp['sat_mat'] = np.abs(df_scatter_temp['sat_col'] - df_scatter_temp['mat_col'])
-        # # df_scatter_temp['rat_mat'] = df_scatter_temp['rat_col'] - df_scatter_temp['mat_col']
-        # temp_bias = df_scatter_temp['sat_mat'].mean()
-        # wandb.log({'TEMPERATURE BIAS': temp_bias})
-
-        # todo spostare alla fine
-        # if temp_bias > config['temperature_error']:
-        #     wandb.config.update({'check_bias_passed': False}, allow_val_change=True)
-        #     logger.error('check_bias_passed = False')
-        #
-        # else:
-        #     wandb.config.update({'check_bias_passed': True}, allow_val_change=True)
-        #     logger.info('check_bias_passed = True')
-
-        #
-        # df_scatter_temp = df_scatter_temp.melt(id_vars=['time', 'oat_col'])
-        # # remove duplicates
-        # df_scatter_temp = df_scatter_temp.drop_duplicates()
-        # p = px.scatter(df_scatter_temp, x='oat_col', y='value', color='variable',
-        #                hover_data=['time']
-        #                )
-        # p.add_vrect(x0=0, x1=15, col=1,
-        #             annotation_text="economixer temp",
-        #             fillcolor="grey", opacity=0.2, line_width=0)
-        # p.add_hline(y=0, line_width=2, line_dash="dot", line_color="black", opacity=0.5)
-        #
-        # p.update_layout(xaxis_title='Outdoor air temperature [°C]',
-        #                 yaxis_title='Temperature [°C]',
-        #
-        #                 legend=dict(
-        #                     orientation="h",
-        #                     yanchor="bottom",
-        #                     y=1.02,
-        #                     xanchor="right",
-        #                     x=1
-        #                 ))
-        #
-        # p.show()
 
         # MINIMUM OUTDOOR AIR REQUIREMENTS
 

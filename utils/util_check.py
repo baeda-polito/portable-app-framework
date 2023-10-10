@@ -27,7 +27,7 @@ def check_log_overall_result(result: list):
     Log the result of a check
     :param result: a list of boolean representing the result
     """
-    # transform eack bool into an emoji then print
+    # transform each bool into an emoji then print
     # true = ✅
     # false = ❌
     # none = ⚠️
@@ -42,7 +42,6 @@ def check_log_result(result: bool, check_name: str, message: ''):
     :param message: extra string detailing log
     :param result: boolean representing the result
     :param check_name: the name of the check
-    :param n: the number of the check passed to be updated
     """
     if result is True:
         logger.info(f'{check_name} = PASSED ✅ ' + message)
@@ -141,15 +140,15 @@ def check_damper(df, configuration, plot_flg=False):
         # How close is the outdoor-air fraction compared to the outdoor-air damper position signal?
         oaf_oa_dmpr_diff = np.abs(df['oaf'] - df['oa_dmpr_sig_col']).mean()
         if oaf_oa_dmpr_diff > configuration['diff_damper_oaf_threshold']:
-            return False, f'(oaf_oa_dmpr_diff = {round(oaf_oa_dmpr_diff, 3)}>' \
-                          f'{configuration["diff_damper_oaf_threshold"]}) ' \
-                          f'OAF deviates too much from damper position signal)'
+            return None, f'(oaf_oa_dmpr_diff = {round(oaf_oa_dmpr_diff, 3)}>' \
+                         f'{configuration["diff_damper_oaf_threshold"]}) ' \
+                         f'OAF deviates too much from damper position signal)'
         else:
             return True, f'(oaf_oa_dmpr_diff = {round(oaf_oa_dmpr_diff, 3)}<' \
                          f'{configuration["diff_damper_oaf_threshold"]})'
 
     else:
-        return False, f'(Not enough info)'
+        return None, f'(Not enough info)'
 
 
 def check_hc(df):
@@ -176,7 +175,7 @@ def check_valves(df, df_eco, configuration, plot_flg=False):
         if plot_flg:
             plot_valves(df, configuration)
         # 2) Does the cooling coil operate when the outdoor-air temperature is lower
-        # than the discharge- air temperature set point?
+        # than the discharge air temperature set point?
         cooling_coil_median_eco = df_eco[['cooling_sig_col']].median().values[0]
         if cooling_coil_median_eco > configuration["valves_cutoff"]:
             return False, f'(cooling_coil_median_eco = {round(cooling_coil_median_eco, 3)}) ' \
