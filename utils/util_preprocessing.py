@@ -86,7 +86,7 @@ def resample(df: pd.DataFrame, window: str = '15T') -> pd.DataFrame:
 
     # resample to the bigger available frequency of data
     df_resampled = df.resample(window).mean()
-    logger.warning(f'Resampling data to {window} interval.')
+    # logger.warning(f'Resampling data to {window} interval.')
 
     # else:
     #     raise ValueError('Data have a maximum time delta larger than the provided time window.')
