@@ -64,7 +64,7 @@ fahrenheit_to_celsius <- function(fahrenheit) {
 # How close is the outdoor air fraction compared to outdoor air damper position signal?
 # read parquet
 df <-
-  read_parquet("data/LBNL_FDD_Dataset_SDAHU_PQ/AHU_annual.parquet")
+  read_parquet("../data/coi_bias_-4_annual_clean.parquet")
 
 
 # resample to 15 min and calculate mean
@@ -104,7 +104,8 @@ df_plot_commands <- df %>%
     cols = c(OA_DMPR_DM, OAF),
     names_to = "variable",
     values_to = "value"
-  )%>% mutate(value = value*100)
+  ) %>%
+  mutate(value = value * 100)
 
 scalefactor <- 2
 
@@ -115,7 +116,7 @@ ggplot() +
     linewidth = 1,
     show.legend = T
   ) +
-  scale_color_brewer(palette = "Greens")+
+  scale_color_brewer(palette = "Greens") +
   geom_step(
     data = df_plot_commands,
     aes(
@@ -126,7 +127,7 @@ ggplot() +
     linewidth = 1,
     show.legend = T
   ) +
-  scale_color_brewer(palette = "Reds")+
+  scale_color_brewer(palette = "Reds") +
   geom_rect(
     data = df_plot_bands,
     aes(
@@ -140,13 +141,14 @@ ggplot() +
     show.legend = F
   ) +
   scale_fill_manual(values = c("TRUE" = "gray", "FALSE" = "white")) +  # Customize colors
-  mystyle() + theme(legend.position = "top") +
+  mystyle() +
+  theme(legend.position = "top") +
   scale_y_continuous(
     name = NULL,
     labels = function(x)
       paste0(x, " °C"),
     sec.axis = sec_axis(
-      ~ . * scalefactor,
+      ~. * scalefactor,
       labels = function(x)
         paste0(x, " %")
     )
@@ -156,15 +158,15 @@ ggplot() +
                    expand = c(0, 0))
 
 ggplot() +
-  geom_point(data = df %>% mutate(tag = ifelse(OA_DMPR_DM<0.09,"Low",ifelse(diff,"inaccurate","ok"))),
+  geom_point(data = df %>% mutate(tag = ifelse(OA_DMPR_DM < 0.09, "Low", ifelse(diff, "inaccurate", "ok"))),
              aes(y = OAF * 100, x = OA_DMPR_DM * 100, color = tag),
              show.legend = T, alpha = 0.2) +
-  mystyle() + 
+  mystyle() +
   theme(legend.position = "top") +
- 
-coord_equal() +
+
+  coord_equal() +
   scale_x_continuous(
-    name =  "Damper command",
+    name = "Damper command",
     labels = function(x)
       paste0(x, " %"),
   ) +
@@ -174,8 +176,6 @@ coord_equal() +
       paste0(x, " %"),
   )
 # scale_y_continuous("Temperature [°F]", sec.axis = sec_axis(~. * scalefactor, name = "Command [-]"))
-
-
 
 
 df <-
@@ -201,7 +201,6 @@ df <- df %>%
   )
 
 
-
 df_plot_temp <- df %>%
   filter(date == "2018-08-10") %>%
   tidyr::pivot_longer(
@@ -216,7 +215,8 @@ df_plot_commands <- df %>%
     cols = c(OA_DMPR_DM, OAF),
     names_to = "variable",
     values_to = "value"
-  )%>% mutate(value = value*100)
+  ) %>%
+  mutate(value = value * 100)
 
 scalefactor <- 2
 
@@ -238,13 +238,14 @@ ggplot() +
     show.legend = T
   ) +
   scale_fill_manual(values = c("TRUE" = "gray", "FALSE" = "white")) +  # Customize colors
-  mystyle() + theme(legend.position = "top") +
+  mystyle() +
+  theme(legend.position = "top") +
   scale_y_continuous(
     name = NULL,
     labels = function(x)
       paste0(x, " °C"),
     sec.axis = sec_axis(
-      ~ . * scalefactor,
+      ~. * scalefactor,
       labels = function(x)
         paste0(x, " %")
     )

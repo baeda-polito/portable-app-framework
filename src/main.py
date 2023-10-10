@@ -10,7 +10,10 @@
 #
 #
 # Notes:
+
 import os
+
+import pandas as pd
 
 from utils.logger import CustomLogger
 from utils.util import ensure_dir, list_files
@@ -23,11 +26,18 @@ from utils.util_preprocessing import get_steady, preprocess
 logger = CustomLogger().get_logger()
 if __name__ == '__main__':
 
-    FOLDER = os.path.join("..", "data", "LBNL_FDD_Dataset_DDAHU_PQ")
+    # create logger
+    logger = CustomLogger().get_logger()
+    # define folder with files
+    folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
+    # ensure the existence of the folder
+    ensure_dir(folder)
+    # set plot flag
     plot_flag = False
-    ensure_dir(FOLDER)
+    # list files in the folder
+    files = list_files(folder, file_formats=[".csv", ".parquet"])
 
-    files = list_files(FOLDER, file_formats=[".csv", ".parquet"])
+    dict_result = {}
 
     for filename in files:
         print('\n')
@@ -49,7 +59,7 @@ if __name__ == '__main__':
 
         n_list = []  # list of check passed
         # fetch data depending on the folder and filename
-        df = driver_data_fetch(FOLDER, filename)
+        df = driver_data_fetch(folder, filename)
 
         # VARIABLES CHECK
         df_varcheck = df.dropna(axis=1, how='all')
@@ -138,3 +148,9 @@ if __name__ == '__main__':
             plot_valves(df_valves, config, filename=datasource)
 
         check_log_overall_result(n_list)
+        # add row to result dataframe
+        dict_result[datasource] = n_list
+
+    df_result = pd.DataFrame.from_dict(dict_result, orient='index')
+    print(df_result)
+    df_result.to_csv(os.path.join("..", "data", "result.csv"))
