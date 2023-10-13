@@ -97,7 +97,6 @@ def driver_data_fetch(folder, filename) -> pd.DataFrame:
             except Exception as e:
                 logger.warning(f"Exception {e}")
                 pass
-
     elif 'skyspark' in folder:
         # load data
         df = pd.read_csv(os.path.join(folder, filename))
@@ -113,6 +112,25 @@ def driver_data_fetch(folder, filename) -> pd.DataFrame:
         df['oa_dmpr_sig_col'] = df['33-AHU-3 Outside Air Damper Command']
         # keep only some columns
         df = df[['time', 'satsp_col', 'sat_col', 'oat_col', 'rat_col', 'cooling_sig_col', 'heating_sig_col',
+                 'oa_dmpr_sig_col', 'mat_col']]
+    elif 'AHU_SX' in folder:
+        # load data
+        df = pd.read_parquet(os.path.join(folder, filename))
+        # Select columns and perform data transformations
+        df["time"] = pd.to_datetime(df["Date_hour"], format="%B %d. %Y %I:%M %p")
+        df['satsp_col'] = df['Indoor Air Temperature Setpoint']  # already in Celsius
+        df['sat_col'] = df['Supply Air Temperature']  # already in Celsius
+        df['oat_col'] = df['Outdoor Air Temperature']  # already in Celsius
+        df['rat_col'] = df['Return Air Temperature']  # already in Celsius
+        df['mat_col'] = np.nan
+        df['cooling_sig_col'] = df['Cooling coil water flow request']
+        df['heating_sig_col'] = df['Heating coil Water flow request']
+        df['oa_dmpr_sig_col'] = df['External Air damper control signal']
+        # keep only some columns
+        df = df[['time',
+                 'satsp_col',
+                 'sat_col',
+                 'oat_col', 'rat_col', 'cooling_sig_col', 'heating_sig_col',
                  'oa_dmpr_sig_col', 'mat_col']]
     else:
         raise ValueError('Unknown dataset')

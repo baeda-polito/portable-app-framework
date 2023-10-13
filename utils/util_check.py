@@ -69,8 +69,9 @@ def check_variables(df: pd.DataFrame):
         'heating_sig_col',
         'oa_dmpr_sig_col'
     ]
-    # remove if all the column is a zero (workaround)
+    # remove if all the column is a zero or nan (workaround)
     df = df.loc[:, (df != 0).any(axis=0)]
+    df = df.loc[:, (df != np.nan).any(axis=0)]
     available_variables = df.columns
     # todo depending on the available variables you can do some checks
     if not all([var in available_variables for var in required_variables]):
@@ -91,8 +92,18 @@ def check_sensor(df, configuration):
     :param df: the dataset containing the measured variables
     :param configuration: a dictionary of thresholds
     """
+
+    # drop columns if all na in the column or zero
+    df = df.loc[:, (df != 0).any(axis=0)]
+    # df = df.dropna(axis=1, how='all', inplace=True)
     stuck_var = []
-    for col in ['sat_col', 'oat_col', 'rat_col', 'mat_col']:
+
+    # I want to loop on temperature only if available
+    available_temperatures = [var for var in set(['sat_col', 'oat_col', 'rat_col', 'mat_col']) if var in df.columns]
+    available_control = [var for var in set(['cooling_sig_col', 'heating_sig_col', 'oa_dmpr_sig_col']) if
+                         var in df.columns]
+
+    for col in available_temperatures:
         try:
             stuck = True if check_low_variance(df, col,
                                                configuration["temperature_sensor_variance_threshold"]) else False
@@ -100,7 +111,7 @@ def check_sensor(df, configuration):
         except KeyError:
             pass
     # control signals check
-    for col in ['cooling_sig_col', 'heating_sig_col', 'oa_dmpr_sig_col']:
+    for col in available_control:
         try:
             stuck = True if check_low_variance(df, col, configuration["control_sensor_variance_threshold"]) else False
             stuck_var.append(col) if stuck else None

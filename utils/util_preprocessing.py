@@ -131,7 +131,12 @@ def preprocess(df, configuration: dict):
     for col in df.columns:
         try:
 
-            if col in ['sat_col', 'oat_col', 'rat_col', 'mat_col']:
+            if df['mat_col'].isnull().values.all():
+                temp_iterate = ['sat_col', 'oat_col', 'rat_col']
+            else:
+                temp_iterate = ['sat_col', 'oat_col', 'rat_col', 'mat_col']
+
+            if col in temp_iterate:
 
                 # wandb.configuration.update({'check_sensor_passed': True}, allow_val_change=True)
                 # logger.info('check_sensor_passed = True')
