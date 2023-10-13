@@ -23,13 +23,12 @@ from utils.util_driver import driver_data_fetch
 from utils.util_plot import plot_damper, plot_valves
 from utils.util_preprocessing import get_steady, preprocess
 
-logger = CustomLogger().get_logger()
 if __name__ == '__main__':
 
     # create logger
     logger = CustomLogger().get_logger()
     # define folder with files
-    folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
+    folder = os.path.join("..", "data", "LBNL_FDD_Dataset_DDAHU_PQ")
     # ensure the existence of the folder
     ensure_dir(folder)
     # set plot flag
@@ -52,7 +51,8 @@ if __name__ == '__main__':
             'valves_cutoff': 0.01,
             'damper_cutoff': 0.0,
             'temperature_error': 1,
-            'sensor_variance_threshold': 0.01,
+            'temperature_sensor_variance_threshold': 0.01,
+            'control_sensor_variance_threshold': 0.01,
             'damper_min_oa_threshold': 0.3,
             'diff_damper_oaf_threshold': 0.3
         }
@@ -93,7 +93,7 @@ if __name__ == '__main__':
         if plot_flag:
             plot_damper(df_damper_min, config, filename=datasource)
 
-        ############ FREEZE PROTECTION ############
+        # FREEZE PROTECTION
 
         # damper_frozen = df_clean['oa_dmpr_sig_col'][df_clean['mat_col'] < 4].median()
         #
@@ -108,7 +108,7 @@ if __name__ == '__main__':
             (df_clean['heating_sig_col'] < config["valves_cutoff"]) &
             (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"]) &
             (df_clean['oat_col'] < df_clean['rat_col'])
-            # when the outdoor-air temperature is less than the return-air
+            # when the outdoor-air temperature is less than the return-airq
             # temperature and the AHU is in cooling mode, it is favorable to economize.
             ]
 
@@ -150,6 +150,8 @@ if __name__ == '__main__':
         check_log_overall_result(n_list)
         # add row to result dataframe
         dict_result[datasource] = n_list
+
+        # todo Delta T check across valves check
 
     df_result = pd.DataFrame.from_dict(dict_result, orient='index')
     print(df_result)

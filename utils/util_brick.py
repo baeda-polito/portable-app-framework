@@ -66,6 +66,7 @@ class BrickGraph(object):
     High-level interface for interacting with Brick graphs using rdflib
     """
 
+    # noinspection PyPep8
     def __init__(self, load: str = None):
         """
         Different way to load brick in graph

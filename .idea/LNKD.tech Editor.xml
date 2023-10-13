@@ -13,6 +13,16 @@
             <Visibility />
           </value>
         </entry>
+        <entry key="SHACL_DATA">
+          <value>
+            <Visibility />
+          </value>
+        </entry>
+        <entry key="SHACL_SHAPES">
+          <value>
+            <Visibility />
+          </value>
+        </entry>
       </map>
     </option>
   </component>

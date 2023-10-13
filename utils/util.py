@@ -55,14 +55,6 @@ def ensure_dir(dirname: str) -> None:
         # logger.info(f'{dirname} created successfully')
 
 
-def ensure_files(files: list) -> None:
-    """
-    Ensure that a directory exists. If it does not, create it.
-    :param files: a list of files within directory
-    :return: None
-    """
-
-
 def list_files(dirname: str, file_formats=None) -> list:
     """
     Given a folder lists files within matching format

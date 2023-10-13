@@ -53,6 +53,7 @@ def check_log_result(result: bool, check_name: str, message: ''):
         raise Exception('The result of the check is not a boolean')
 
 
+# noinspection PyUnresolvedReferences
 def check_variables(df: pd.DataFrame):
     """
     Check if the required variables are present in the dataset
@@ -93,13 +94,21 @@ def check_sensor(df, configuration):
     stuck_var = []
     for col in ['sat_col', 'oat_col', 'rat_col', 'mat_col']:
         try:
-            stuck = True if check_low_variance(df, col, configuration["sensor_variance_threshold"]) else False
+            stuck = True if check_low_variance(df, col,
+                                               configuration["temperature_sensor_variance_threshold"]) else False
+            stuck_var.append(col) if stuck else None
+        except KeyError:
+            pass
+    # control signals check
+    for col in ['cooling_sig_col', 'heating_sig_col', 'oa_dmpr_sig_col']:
+        try:
+            stuck = True if check_low_variance(df, col, configuration["control_sensor_variance_threshold"]) else False
             stuck_var.append(col) if stuck else None
         except KeyError:
             pass
 
     if stuck_var.__len__() > 0:
-        return False, f'(check the sensors {list(stuck_var)})'
+        return None, f'(Possible sensor freeze/stuck {list(stuck_var)})'
     else:
         return True, ''
 

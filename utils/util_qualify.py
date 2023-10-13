@@ -27,7 +27,7 @@ class BasicValidationInterface:
     https://github.com/gtfierro/shapes/blob/main/verify.py
     """
 
-    def __init__(self, graph_path: str, manifest_path: str, load: str = None):
+    def __init__(self, graph_path: str, manifest_path: str):
         # use the wrapper BrickGraph to initialize the graph
         self.graph = BrickGraph()
         # load the ttl file

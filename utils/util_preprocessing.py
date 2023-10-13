@@ -78,7 +78,7 @@ def resample(df: pd.DataFrame, window: str = '15T') -> pd.DataFrame:
     :return df_resampled: The resampled dataframe.
     """
     # calculate the minimum interval rounded to closer 5 minute
-    median_interval = df.index.to_series().diff().median().round("1min")
+    # median_interval = df.index.to_series().diff().median().round("1min")
     # logger.info(f'Median timestep in dataset: {median_interval}')
 
     # the aggregation must be higher than the maximum timedelta in the data
@@ -103,21 +103,21 @@ def check_low_variance(df: pd.DataFrame, col: str, threshold: float = 0.01) -> b
     """
     column_values = df[col]
     unique_values = column_values.unique()
+    variance = column_values.var()
 
     if len(unique_values) == 1:
-        logger.info(f"The column '{col}' has only one unique value.")
-
-    variance = column_values.var()
-    mean = column_values.mean()
-
-    if variance > threshold:
+        # Only one unique value for column so the signal is fixed to certain value -> the variable has low variance
+        # logger.info(f"The column '{col}' has only one unique value.")
+        return True
+    elif variance > threshold:
         # logger.info(f"The column '{col}' has acceptable variance ({variance:.4f}>{threshold}).")
         return False
     else:
-        logger.error(f"Possible sensor freeze/stuck on '{col}' (var {variance:.4f}<{threshold}).")
+        # logger.error(f"Possible sensor freeze/stuck on '{col}' (var {variance:.4f}<{threshold}).")
         return True
 
 
+# noinspection PyTypeChecker
 def preprocess(df, configuration: dict):
     """
     This function preprocesses the dataframe according to the configuration file.
@@ -162,11 +162,6 @@ def preprocess(df, configuration: dict):
                     logger.warning(f'Dropping {len(outliers)} outliers in {col}\n{outliers}')
                     # stl_result.plot().show()
                     df.loc[outliers.index, col] = None
-
-                # variance = df[col].var()
-                # if variance < 0.01:
-                #     print(f'column {col} has variance {variance} and will be dropped')
-                #     df[col] = None
 
             elif col in ['cooling_sig_col', 'heating_sig_col', 'oa_dmpr_sig_col']:
                 # find outliers

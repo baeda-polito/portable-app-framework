@@ -7,7 +7,8 @@
 # Path:         utils
 #
 # Script Description:
-# This script contains the logger class. Load the Custom logger in your file to access to customized logger configuration
+# This script contains the logger class. Load the Custom logger in your file
+# to access to customized logger configuration
 # Example code:
 #
 # from utils.logger import CustomLogger
