@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # ensure the existence of the folder
     ensure_dir(folder)
     # set plot flag
-    plot_flag = False
+    plot_flag = True
     # list files in the folder
     files = list_files(folder, file_formats=[".csv", ".parquet"])
 

@@ -127,6 +127,8 @@ def preprocess(df, configuration: dict):
     # df['time'] = pd.to_datetime(df['Datetime']).dt.floor(f'{config["aggregation"]}min')
     # df = df.groupby('time').mean().reset_index()
     df = resample(df=df, window=f'{configuration["aggregation"]}T')
+    # resample and eventually fill with linear interpolation
+    df = linear_interpolation(df)
 
     for col in df.columns:
         try:
@@ -169,6 +171,8 @@ def preprocess(df, configuration: dict):
                     df.loc[outliers.index, col] = None
 
             elif col in ['cooling_sig_col', 'heating_sig_col', 'oa_dmpr_sig_col']:
+                # fill na with zeros if necessary
+                df[col] = df[col].fillna(0)
                 # find outliers
                 normalize_01(df, col)
             else:
