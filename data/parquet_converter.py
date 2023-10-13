@@ -7,7 +7,7 @@ import pyarrow.parquet as pq
 from utils.util import list_files, ensure_dir
 
 if __name__ == '__main__':
-    directory = "LBNL_FDD_Dataset_DDAHU"
+    directory = "AHU_SX"
     ensure_dir(directory)
     ensure_dir(directory + "_PQ")
 

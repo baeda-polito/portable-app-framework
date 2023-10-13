@@ -28,7 +28,9 @@ if __name__ == '__main__':
     # create logger
     logger = CustomLogger().get_logger()
     # define folder with files
-    folder = os.path.join("..", "data", "LBNL_FDD_Dataset_DDAHU_PQ")
+    # folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
+    # folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
+    folder = os.path.join("..", "data", "MZVAV")
     # ensure the existence of the folder
     ensure_dir(folder)
     # set plot flag
@@ -75,15 +77,10 @@ if __name__ == '__main__':
         # PREPROCESSING
         df = preprocess(df, config)
 
-        # HISTOGRAM OF ALL VARIABLES
-        # df_hist = df.melt(id_vars='time')
-        # plot_histogram(df_hist)
-
         # IDENTIFY TRANSIENT
         df_clean = get_steady(df, config, plot_flag=plot_flag, filename=datasource)
 
         # MINIMUM OUTDOOR AIR REQUIREMENTS
-
         df_damper_min = df_clean[
             (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"])
         ]
@@ -127,7 +124,6 @@ if __name__ == '__main__':
         check_log_result(result, 'check_hc', message)
 
         # VALVES CHECK
-        # plot valves when working
         df_valves = df_clean.melt(
             id_vars=['dt', 'time', 'oat_col', 'slope'],
             value_vars=['cooling_sig_col', 'heating_sig_col']
@@ -150,8 +146,6 @@ if __name__ == '__main__':
         check_log_overall_result(n_list)
         # add row to result dataframe
         dict_result[datasource] = n_list
-
-        # todo Delta T check across valves check
 
     df_result = pd.DataFrame.from_dict(dict_result, orient='index')
     print(df_result)
