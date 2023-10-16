@@ -18,7 +18,7 @@ import pandas as pd
 from utils.logger import CustomLogger
 from utils.util import ensure_dir, list_files
 from utils.util_check import check_damper, check_hc, check_log_result, check_min_oa, check_sensor, check_valves, \
-    check_variables, check_log_overall_result
+    check_variables, check_log_overall_result, check_freeze_protection
 from utils.util_driver import driver_data_fetch
 from utils.util_plot import plot_damper, plot_valves
 from utils.util_preprocessing import get_steady, preprocess
@@ -85,20 +85,20 @@ if __name__ == '__main__':
         df_damper_min = df_clean[
             (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"])
         ]
-        result, message = check_min_oa(df_damper_min, config)
+        result, message, damper_min = check_min_oa(df_damper_min, config)
         n_list.append(result)
         check_log_result(result, 'check_min_oa', message)
         if plot_flag:
             plot_damper(df_damper_min, config, filename=datasource)
 
         # FREEZE PROTECTION
-
-        # damper_frozen = df_clean['oa_dmpr_sig_col'][df_clean['mat_col'] < 4].median()
-        #
-        # if damper_frozen > config["damper_cutoff"]:
-        #     logger.error(f'check_freeze_protection_passed = False (median damper position = {damper_frozen})')
-        # else:
-        #     logger.info(f'check_freeze_protection_passed = True (median damper position = {damper_frozen})')
+        df_freeze = df_clean[
+            (df_clean['oat_col'] < 4.4) &
+            (df_clean['slope'] == 'steady')
+            ]
+        result, message = check_freeze_protection(df_freeze, config, damper_min)
+        n_list.append(result)
+        check_log_result(result, 'check_freeze_protection', message)
 
         # DAMPER CHECK
         df_damper = df_clean[

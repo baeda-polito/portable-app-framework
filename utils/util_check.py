@@ -140,9 +140,30 @@ def check_min_oa(df, configuration):
         damper_min = df['oa_dmpr_sig_col'][df['oa_dmpr_sig_col'] < 0.4].median()
 
         if damper_min > configuration['damper_min_oa_threshold']:
-            return False, f'(damper_min = {round(damper_min, 3)}) - Verify the minimum ventilation'
+            return False, f'(damper_min = {round(damper_min, 3)}) - Verify the minimum ventilation', damper_min
         else:
-            return True, f'(damper_min = {round(damper_min, 3)})'
+            return True, f'(damper_min = {round(damper_min, 3)})', damper_min
+
+
+def check_freeze_protection(df, configuration, damper_min):
+    """
+    Check if when the outdoor-air damper should be locked out to the minimum position for freeze prevention
+    when the outdoor-air temperature is below 40oF, and the outdoor-air dampers should be completely closed
+    if the mixed-air temperature becomes lower than 40oF. Given that from the previous check it is possible
+    to automatically extract the minimum OA we can check that in such conditions the damper is at minimum or closed
+
+    :param df: the dataset containing the measured variables
+    :param configuration: a dictionary of thresholds
+    """
+    
+    # Gets the median value of the outdoor air damper when the mixed air temperature is below 40oF
+    # and the outdoor air damper is not closed
+    damper_frozen = df['oa_dmpr_sig_col'][df['oa_dmpr_sig_col'] > 0].median()
+
+    if damper_frozen < damper_min * 1.2:
+        return True, f'Damper at minimum or lower ({damper_frozen} <= {round(damper_min, 3)})'
+    else:
+        return Warning, f'Freeze protection not activated ({damper_frozen} > {round(damper_min, 3)})'
 
 
 def check_damper(df, configuration, plot_flg=False):

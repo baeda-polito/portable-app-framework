@@ -187,6 +187,8 @@ def preprocess(df, configuration: dict):
     # calculate optional variables if necessary
     if df["mat_col"].isnull().values.all():
         df["mat_col"] = df["oaf"] * df["oat_col"] + (1 - df["oaf"]) * df["rat_col"]
+
+    df = linear_interpolation(df)
     df["dt"] = df["sat_col"] - df["mat_col"]
     df['time'] = df.index
     return df

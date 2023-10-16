@@ -125,6 +125,7 @@ def plot_valves(df, configuration: dict, filename=None):
     :param configuration: a dictionary of thresholds
     :return:
     """
+    df.dropna(inplace=True)
     p = px.scatter(df,
                    x='value',
                    y='dt',
