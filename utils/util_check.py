@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 from utils.logger import CustomLogger
-from utils.util_plot import plot_damper, plot_valves
+from utils.util_plot import plot_damper
 from utils.util_preprocessing import check_low_variance
 
 logger = CustomLogger().get_logger()
@@ -95,12 +95,11 @@ def check_sensor(df, configuration):
 
     # drop columns if all na in the column or zero
     df = df.loc[:, (df != 0).any(axis=0)]
-    # df = df.dropna(axis=1, how='all', inplace=True)
     stuck_var = []
 
     # I want to loop on temperature only if available
-    available_temperatures = [var for var in set(['sat_col', 'oat_col', 'rat_col', 'mat_col']) if var in df.columns]
-    available_control = [var for var in set(['cooling_sig_col', 'heating_sig_col', 'oa_dmpr_sig_col']) if
+    available_temperatures = [var for var in {'sat_col', 'oat_col', 'rat_col', 'mat_col'} if var in df.columns]
+    available_control = [var for var in {'cooling_sig_col', 'heating_sig_col', 'oa_dmpr_sig_col'} if
                          var in df.columns]
 
     for col in available_temperatures:
@@ -145,17 +144,17 @@ def check_min_oa(df, configuration):
             return True, f'(damper_min = {round(damper_min, 3)})', damper_min
 
 
-def check_freeze_protection(df, configuration, damper_min):
+def check_freeze_protection(df, damper_min):
     """
     Check if when the outdoor-air damper should be locked out to the minimum position for freeze prevention
     when the outdoor-air temperature is below 40oF, and the outdoor-air dampers should be completely closed
     if the mixed-air temperature becomes lower than 40oF. Given that from the previous check it is possible
     to automatically extract the minimum OA we can check that in such conditions the damper is at minimum or closed
 
+    :param damper_min: the minimum outdoor air damper position
     :param df: the dataset containing the measured variables
-    :param configuration: a dictionary of thresholds
     """
-    
+
     # Gets the median value of the outdoor air damper when the mixed air temperature is below 40oF
     # and the outdoor air damper is not closed
     damper_frozen = df['oa_dmpr_sig_col'][df['oa_dmpr_sig_col'] > 0].median()
@@ -203,24 +202,21 @@ def check_hc(df):
         return True, ''
 
 
-def check_valves(df, df_eco, configuration, plot_flg=False):
+def check_valves(df, df_eco, configuration):
     """
     Check if the v
-    :param plot_flg: whether to plot or not
     :param df: dataset with variables
     :param df_eco: dataset in economizer mode
     :param configuration: dictionary of thresholds
     """
     if not df.empty and not df_eco.empty:
-
-        if plot_flg:
-            plot_valves(df, configuration)
+        # todo review check
         # 2) Does the cooling coil operate when the outdoor-air temperature is lower
         # than the discharge air temperature set point?
         cooling_coil_median_eco = df_eco[['cooling_sig_col']].median().values[0]
         if cooling_coil_median_eco > configuration["valves_cutoff"]:
-            return False, f'(cooling_coil_median_eco = {round(cooling_coil_median_eco, 3)}) ' \
-                          f'cooling coil is modulating in eco mode)'
+            return None, f'(cooling_coil_median_eco = {round(cooling_coil_median_eco, 3)}) ' \
+                         f'cooling coil is modulating in eco mode)'
 
         else:
             return True, ''

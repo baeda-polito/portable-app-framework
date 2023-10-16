@@ -29,13 +29,13 @@ if __name__ == '__main__':
     logger = CustomLogger().get_logger()
     # define folder with files
     # folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
-    # folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
+    folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
     # folder = os.path.join("..", "data", "MZVAV_PQ")
-    folder = os.path.join("..", "data", "AHU_SX_PQ")
+    # folder = os.path.join("..", "data", "AHU_SX_PQ")
     # ensure the existence of the folder
     ensure_dir(folder)
     # set plot flag
-    plot_flag = True
+    plot_flag = False
     # list files in the folder
     files = list_files(folder, file_formats=[".csv", ".parquet"])
 

@@ -67,7 +67,7 @@ def driver_data_fetch(folder, filename) -> pd.DataFrame:
                  'oa_dmpr_sig_col', 'mat_col']]
     elif 'MZVAV' in folder:
         # load data
-        df = pd.read_csv(os.path.join(folder, filename))
+        df = pd.read_parquet(os.path.join(folder, filename))
         # Select columns and perform data transformations
         df["time"] = pd.to_datetime(df["Datetime"], format="%m/%d/%Y %H:%M")
         df["AHU: Outdoor Air Temperature"] = pd.to_numeric(df["AHU: Outdoor Air Temperature"])
