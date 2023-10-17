@@ -187,7 +187,7 @@ def remove_cols(remove_flag: bool, df: pd.DataFrame, cols: list) -> pd.DataFrame
         return df
 
 
-class APAR_OperationalModes:
+class APAROperationalModes:
     """
     Define operational modes according to APAR definition.
 
@@ -195,7 +195,7 @@ class APAR_OperationalModes:
     - 2	Cooling with outdoor air 	                MODE 2 (Cooling with outdoor air )
     - 3	Mechanical cooling with 100 % outdoor air 	MODE 3 (Mechanical cooling with 100 % outdoor air )
     - 4	Mechanical cooling with minimum outdoor air MODE 4 (Mechanical cooling with minimum outdoor air )
-    - 5	Unknown 	                                MODE 5 (Unknown )
+    - 5	Unknown 	                                MODE 5 (Unknown)
     - 0	All	                                        MODE 0 (All)
 
     """
@@ -204,362 +204,30 @@ class APAR_OperationalModes:
             self,
             oa_dmpr_sig_col: str,  # Outdoor air damper position sensor
             oat_col: str,  # Outdoor air temperature
-            # heating_sig_col: str,  # Heating coil position sensor
+            heating_sig_col: str,  # Heating coil position sensor
             cooling_sig_col: str,  # Cooling coil position sensor
+            sys_ctl_col: str,  # System control status ON/OFF
             fan_vfd_speed_col: str,  # Supply fan speed
             troubleshoot=False,  # Troubleshoot mode
-    ):
-
-        self.oa_dmpr_sig_col = oa_dmpr_sig_col
-        self.oat_col = oat_col
-        # self.heating_sig_col = heating_sig_col
-        self.cooling_sig_col = cooling_sig_col
-        self.fan_vfd_speed_col = fan_vfd_speed_col
-        self.troubleshoot = troubleshoot
-
-    def apply(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Performs analytics logic
-        :param df: Original dataframe
-        :return: Dataframe with fault tag
-        """
-
-        # copy to avoid warnings
-        df1 = df.copy()
-
-        # eventually normalize from 0-1 outdoor air damper position sensor
-        if df1[self.oa_dmpr_sig_col].max() > 1:
-            df1[self.oa_dmpr_sig_col] /= 100
-        if df1[self.cooling_sig_col].max() > 1:
-            df1[self.cooling_sig_col] /= 100
-        if df1[self.fan_vfd_speed_col].max() > 1:
-            df1[self.fan_vfd_speed_col] /= 100
-
-        # create a operating mode column by default unknown
-        # MODE 5 (Unknown)
-        df1['operating_mode'] = None
-
-        '''
-        Define Operational Mode (OM) ON/OFF in different ways
-        1) Based on calendar schedule
-        2) Based on fan speed (arbitrary threshold)
-        3) Based on fan speed (data driven threshold)
-        4) Based on cooling coil valve position and fan speed
-        '''
-
-        # 2) Based on fan speed (arbitrary threshold)
-        df1['operating_mode'] = np.where(
-            (df1[self.fan_vfd_speed_col] > 0.1),
-            'OM_ON', 'OM_OFF')
-
-        '''
-        Define Operational Mode (OM) Economizer (OM_2_ECO) : 
-        
-        1) The AHU operates in economizer mode when outdoor air temperature is between 33.8°F and 60°F. 
-        In this mode, the OA damper modulates in sequence with the RA damper to maintain a 55°F mixed air temperature 
-        setpoint. Once the OA damper is greater than 100% open, the cooling coil valve shall be enabled to maintain 
-        supply air temperature setpoint.
-        2) Cooling valve closed and damper modulating
-        
-        '''
-
-        # df1['operating_mode'] = np.where(
-        #     (df1['operating_mode'] == 'OM_ON') &
-        #     (df1[self.oat_col] >= 33.8) &
-        #     (df1[self.oat_col] <= 60),
-        #     'OM_ECO', df1['operating_mode'])
-
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON') &
-            (df1[self.cooling_sig_col] < 0.05) &  # valve closed
-            (df1[self.oa_dmpr_sig_col] < 1 - 0.05) &  # max damper
-            # (df1[self.oa_dmpr_sig_col] > 0.1 + 0.05) # the minimum is not always kown
-            (df1[self.oat_col] >= 33.8) &
-            (df1[self.oat_col] <= 60),
-            'OM_2_ECO', df1['operating_mode'])
-
-        '''
-        Define Operational Mode (OM) Cooling with outdoor air (OM_3_OUT) : 
-        1) Cooling valve closed and damper open 100%
-        '''
-
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON') &
-            (df1[self.cooling_sig_col] < 0.05) &  # valve closed
-            (df1[self.oa_dmpr_sig_col] > 1 - 0.05),  # max damper
-            'OM_3_OUT', df1['operating_mode'])
-
-        '''
-        Define Operational Mode (OM) Mechanical cooling with minimum outdoor air (OM_4_MIN) :
-        '''
-
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON') &
-            (df1[self.cooling_sig_col] > 0.05) &  # valve modulating
-            (df1[self.oa_dmpr_sig_col] < 0.1 + 0.05) &  # min damper + epsilon
-            (df1[self.oa_dmpr_sig_col] > 0.1 - 0.05),  # min damper - epsilon
-            'OM_4_MIN', df1['operating_mode'])
-
-        '''
-        Define Operational Mode (OM) 5 Unknown when is on and all the others do not apply
-        '''
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON'),
-            'OM_5_UNKWN', df1['operating_mode'])
-
-        return df1
-
-    @staticmethod
-    def print_summary(df: pd.DataFrame) -> None:
-        """
-        Print summary of the operational modes
-        :param df: dataframe with the operational modes
-        :return:
-        """
-        # summarize
-        # create column with only 1
-        df_modes_grouped = df.copy()
-        df_modes_grouped['count'] = 1
-        df_modes_grouped = df_modes_grouped.groupby('operating_mode')['count'].count().reset_index()
-        # sort by fault descending
-        df_modes_grouped = df_modes_grouped.sort_values(by='count', ascending=False)
-        # transform to percentage
-        df_modes_grouped['percentage'] = round(df_modes_grouped['count'] / df_modes_grouped['count'].sum() * 100, 2)
-        # drop count
-        df_modes_grouped = df_modes_grouped.drop(columns=['count'])
-        # print formatted dataframe
-        df_modes_grouped = df_modes_grouped.rename(
-            columns={'operating_mode': 'Operating Mode', 'percentage': 'Time [%]'}
-        )
-        print(df_modes_grouped.to_string(index=False))
-
-    def plot(self, df: pd.DataFrame) -> None:
-        """
-        Plots histograms for each variable used for the determination of the operating mode
-        :param df: Original dataframe
-        :return plt: Plot
-        """
-        # create a figure with subplots
-
-        df_long = df.melt(
-            id_vars=['operating_mode'],
-            value_vars=[self.cooling_sig_col, self.fan_vfd_speed_col, self.oa_dmpr_sig_col],
-            var_name='variable', value_name='values'
-        )
-
-        g = seaborn.FacetGrid(df_long, row="variable", col="operating_mode", hue="variable", aspect=2)
-        g.map_dataframe(seaborn.histplot, x="values", binwidth=0.05, alpha=0.5)
-        # add x ticks every 10
-        for ax in g.axes.flat:
-            ax.xaxis.set_major_locator(ticker.MultipleLocator(0.1))
-
-        g.add_legend()
-        plt.show()
-
-
-class APAR_OperationalModes_noFan:
-    """
-    Define operational modes according to APAR definition.
-
-    - 1	Heating	                                    MODE 1 (Heating)
-    - 2	Cooling with outdoor air 	                MODE 2 (Cooling with outdoor air )
-    - 3	Mechanical cooling with 100 % outdoor air 	MODE 3 (Mechanical cooling with 100 % outdoor air )
-    - 4	Mechanical cooling with minimum outdoor air MODE 4 (Mechanical cooling with minimum outdoor air )
-    - 5	Unknown 	                                MODE 5 (Unknown )
-    - 0	All	                                        MODE 0 (All)
-
-    """
-
-    def __init__(
-            self,
-            oa_dmpr_sig_col: str,  # Outdoor air damper position sensor
-            oat_col: str,  # Outdoor air temperature
-            # heating_sig_col: str,  # Heating coil position sensor
-            cooling_sig_col: str,  # Cooling coil position sensor
-            troubleshoot=False,  # Troubleshoot mode
-    ):
-
-        self.oa_dmpr_sig_col = oa_dmpr_sig_col
-        self.oat_col = oat_col
-        # self.heating_sig_col = heating_sig_col
-        self.cooling_sig_col = cooling_sig_col
-        self.troubleshoot = troubleshoot
-
-    def apply(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Performs analytics logic
-        :param df: Original dataframe
-        :return: Dataframe with fault tag
-        """
-
-        # copy to avoid warnings
-        df1 = df.copy()
-
-        # eventually normalize from 0-1 outdoor air damper position sensor
-        if df1[self.oa_dmpr_sig_col].max() > 1:
-            df1[self.oa_dmpr_sig_col] /= 100
-        if df1[self.cooling_sig_col].max() > 1:
-            df1[self.cooling_sig_col] /= 100
-
-        # create a operating mode column by default unknown
-        # MODE 5 (Unknown)
-        df1['operating_mode'] = None
-
-        '''
-        Define Operational Mode (OM) ON/OFF in different ways
-        1) Based on calendar schedule
-        2) Based on fan speed (arbitrary threshold)
-        3) Based on fan speed (data driven threshold)
-        4) Based on cooling coil valve position and fan speed
-        '''
-
-        # 2) Based on fan speed (arbitrary threshold)
-        df1['operating_mode'] = 'OM_ON'
-        logger.warning('No info on fan to define on off')
-
-        '''
-        Define Operational Mode (OM) Economizer (OM_2_ECO) : 
-
-        1) The AHU operates in economizer mode when outdoor air temperature is between 33.8°F and 60°F. 
-        In this mode, the OA damper modulates in sequence with the RA damper to maintain a 55°F mixed air temperature 
-        setpoint. Once the OA damper is greater than 100% open, the cooling coil valve shall be enabled to maintain 
-        supply air temperature setpoint.
-        2) Cooling valve closed and damper modulating
-
-        '''
-
-        # df1['operating_mode'] = np.where(
-        #     (df1['operating_mode'] == 'OM_ON') &
-        #     (df1[self.oat_col] >= 33.8) &
-        #     (df1[self.oat_col] <= 60),
-        #     'OM_ECO', df1['operating_mode'])
-
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON') &
-            (df1[self.cooling_sig_col] < 0.05) &  # valve closed
-            (df1[self.oa_dmpr_sig_col] < 1 - 0.05) &  # max damper
-            # (df1[self.oa_dmpr_sig_col] > 0.1 + 0.05) # the minimum is not always kown
-            (df1[self.oat_col] >= 33.8) &
-            (df1[self.oat_col] <= 60),
-            'OM_2_ECO', df1['operating_mode'])
-
-        '''
-        Define Operational Mode (OM) Cooling with outdoor air (OM_3_OUT) : 
-        1) Cooling valve closed and damper open 100%
-        '''
-
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON') &
-            (df1[self.cooling_sig_col] < 0.05) &  # valve closed
-            (df1[self.oa_dmpr_sig_col] > 1 - 0.05),  # max damper
-            'OM_3_OUT', df1['operating_mode'])
-
-        '''
-        Define Operational Mode (OM) Mechanical cooling with minimum outdoor air (OM_4_MIN) :
-        '''
-
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON') &
-            (df1[self.cooling_sig_col] > 0.05) &  # valve modulating
-            (df1[self.oa_dmpr_sig_col] < 0.1 + 0.05) &  # min damper + epsilon todo find minimum damper
-            (df1[self.oa_dmpr_sig_col] > 0.1 - 0.05),  # min damper - epsilon
-            'OM_4_MIN', df1['operating_mode'])
-
-        '''
-        Define Operational Mode (OM) 5 Unknown when is on and all the others do not apply
-        '''
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON'),
-            'OM_5_UNKWN', df1['operating_mode'])
-
-        return df1
-
-    @staticmethod
-    def print_summary(df: pd.DataFrame) -> None:
-        """
-        Print summary of the operational modes
-        :param df: dataframe with the operational modes
-        :return:
-        """
-        # summarize
-        # create column with only 1
-        df_modes_grouped = df.copy()
-        df_modes_grouped['count'] = 1
-        df_modes_grouped = df_modes_grouped.groupby('operating_mode')['count'].count().reset_index()
-        # sort by fault descending
-        df_modes_grouped = df_modes_grouped.sort_values(by='count', ascending=False)
-        # transform to percentage
-        df_modes_grouped['percentage'] = round(df_modes_grouped['count'] / df_modes_grouped['count'].sum() * 100, 2)
-        # drop count
-        df_modes_grouped = df_modes_grouped.drop(columns=['count'])
-        # print formatted dataframe
-        df_modes_grouped = df_modes_grouped.rename(
-            columns={'operating_mode': 'Operating Mode', 'percentage': 'Time [%]'}
-        )
-        print(df_modes_grouped.to_string(index=False))
-
-    def plot(self, df: pd.DataFrame) -> None:
-        """
-        Plots histograms for each variable used for the determination of the operating mode
-        :param df: Original dataframe
-        :return plt: Plot
-        """
-        # create a figure with subplots
-
-        df_long = df.melt(
-            id_vars=['operating_mode'],
-            value_vars=[self.cooling_sig_col, self.oa_dmpr_sig_col],
-            var_name='variable', value_name='values'
-        )
-
-        g = seaborn.FacetGrid(df_long, row="variable", col="operating_mode", hue="variable", aspect=2)
-        g.map_dataframe(seaborn.histplot, x="values", binwidth=0.05, alpha=0.5)
-        # add x ticks every 10
-        for ax in g.axes.flat:
-            ax.xaxis.set_major_locator(ticker.MultipleLocator(0.1))
-
-        g.add_legend()
-        plt.show()
-
-
-class APAR_OperationalModes_Parameters:
-    """
-    Define operational modes according to APAR definition.
-
-    - 1	Heating	                                    MODE 1 (Heating)
-    - 2	Cooling with outdoor air 	                MODE 2 (Cooling with outdoor air )
-    - 3	Mechanical cooling with 100 % outdoor air 	MODE 3 (Mechanical cooling with 100 % outdoor air )
-    - 4	Mechanical cooling with minimum outdoor air MODE 4 (Mechanical cooling with minimum outdoor air )
-    - 5	Unknown 	                                MODE 5 (Unknown )
-    - 0	All	                                        MODE 0 (All)
-
-    """
-
-    def __init__(
-            self,
-            oa_dmpr_sig_col: str,  # Outdoor air damper position sensor
-            oat_col: str,  # Outdoor air temperature
-            # heating_sig_col: str,  # Heating coil position sensor
-            cooling_sig_col: str,  # Cooling coil position sensor
-            fan_vfd_speed_col: str,  # Fan speed
             fan_threshold: float = 0.01,  # Fan speed threshold
             valve_threshold: float = 0.05,  # Valve threshold
             damper_threshold: float = 0.05,  # Valve threshold
             eco_mode_temp_min: float = 33.8,  # Minimum temperature for eco mode
             eco_mode_temp_max: float = 60,  # Maximum temperature for eco mode
             si=False,  # SI units
-            troubleshoot=False,  # Troubleshoot mode
     ):
-
+        # assign variables to class
         self.oa_dmpr_sig_col = oa_dmpr_sig_col
         self.oat_col = oat_col
-        # self.heating_sig_col = heating_sig_col
-        self.fan_vfd_speed_col = fan_vfd_speed_col
+        self.heating_sig_col = heating_sig_col
         self.cooling_sig_col = cooling_sig_col
+        self.sys_ctl_col = sys_ctl_col
+        self.fan_vfd_speed_col = fan_vfd_speed_col
+        # assign threshold to class
         self.valve_threshold = valve_threshold
         self.fan_threshold = fan_threshold
         self.damper_threshold = damper_threshold
-        # convert if needed
+        # convert units if needed
         if si:
             self.eco_mode_temp_min = fahrenheit_to_celsius(eco_mode_temp_min)
             self.eco_mode_temp_max = fahrenheit_to_celsius(eco_mode_temp_max)
@@ -581,6 +249,9 @@ class APAR_OperationalModes_Parameters:
         # eventually normalize from 0-1 outdoor air damper position sensor
         df1 = normalize_01(df1, self.oa_dmpr_sig_col)
         df1 = normalize_01(df1, self.cooling_sig_col)
+        df1 = normalize_01(df1, self.heating_sig_col)
+        df1 = normalize_01(df1, self.fan_vfd_speed_col)
+        df1 = normalize_01(df1, self.sys_ctl_col)
 
         # create a operating mode column by default unknown
         # MODE 5 (Unknown)
@@ -589,14 +260,16 @@ class APAR_OperationalModes_Parameters:
         '''
         Define Operational Mode (OM) ON/OFF in different ways
         1) Based on calendar schedule
-        2) Based on fan speed (arbitrary threshold)
-        3) Based on fan speed (data driven threshold)
-        4) Based on cooling coil valve position and fan speed
+        2) Based on system ON/OFF signal if available
+        3) Based on fan speed (arbitrary threshold)
+        4) Based on fan speed (data driven threshold)
+        5) Based on cooling coil valve position and fan speed
+        
+        In this case we use system ON/OFF status
         '''
 
-        # 2) Based on fan speed (arbitrary threshold)
         df1['operating_mode'] = np.where(
-            (df1[self.fan_vfd_speed_col] > self.fan_threshold),
+            (df1[self.sys_ctl_col] != 0),  # this condition prevents aggregation values different from 1
             'OM_ON', 'OM_OFF')
 
         '''
@@ -691,7 +364,7 @@ class APAR_OperationalModes_Parameters:
 
         df_long = df.melt(
             id_vars=['operating_mode'],
-            value_vars=[self.cooling_sig_col, self.oa_dmpr_sig_col],
+            value_vars=[self.cooling_sig_col, self.fan_vfd_speed_col, self.oa_dmpr_sig_col],
             var_name='variable', value_name='values'
         )
 

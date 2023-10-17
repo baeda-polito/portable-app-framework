@@ -12,7 +12,7 @@
 # Notes:
 import os
 
-from apar import APAR01
+from apar import APAR01, APAROperationalModes
 from utils.logger import CustomLogger
 from utils.util import ensure_dir, list_files
 from utils.util_driver import driver_data_fetch
@@ -34,18 +34,24 @@ if __name__ == '__main__':
     for filename in files:
         print(filename)
         # fetch data depending on the folder and filename
-        df = driver_data_fetch(folder, filename)
-        print(df.head())
-
-        _fc = APAR01(
-            sat_col='sat_col',
-            mat_col='mat_col',
-            mode=['OM_1_HTG']
+        df = driver_data_fetch(folder, filename, full=True)
+        # define operational rules
+        _om = APAROperationalModes(
+            oa_dmpr_sig_col='oa_dmpr_sig_col',
+            oat_col='oat_col',
+            heating_sig_col='heating_sig_col',
+            cooling_sig_col='cooling_sig_col',
+            sys_ctl_col='sys_ctl_col',
+            fan_vfd_speed_col='fan_vfd_speed_col'
         )
 
-        # return a whole new dataframe with fault flag as new col
-        df1 = _fc.apply(df)
+        df1 = _om.apply(df)
+        _om.print_summary(df1)
 
+        # apply rule
+        df2 = APAR01(sat_col='sat_col', mat_col='mat_col', mode=['OM_1_HTG']).apply(df1)
+
+        # summarize
     # load dataframe
     # apply apar
     # get result
