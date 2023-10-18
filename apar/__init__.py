@@ -214,7 +214,7 @@ class APAROperationalModes:
             damper_threshold: float = 0.05,  # Valve threshold
             eco_mode_temp_min: float = 33.8,  # Minimum temperature for eco mode
             eco_mode_temp_max: float = 60,  # Maximum temperature for eco mode
-            si=False,  # SI units
+            si=True,  # SI units
     ):
         # assign variables to class
         self.oa_dmpr_sig_col = oa_dmpr_sig_col
@@ -389,7 +389,7 @@ class APAR01:
             sat_col: str,  # Tsa (supply air temperature)
             mode: list,  # Operational mode that apply
             troubleshoot=False,  # Troubleshoot mode
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t', 'dt_sf'])
         self.e_t = param_list['e_t']
@@ -453,7 +453,7 @@ class APAR05:
             oat_col: str,  # T_oa (outside air temperature)
             satsp_col: str,  # T_sa,s (supply air temperature setpoint)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t', 'dt_sf'])
         self.e_t = param_list['e_t']
@@ -492,7 +492,7 @@ class APAR06:
             sat_col: str,  # T_sa (supply air temperature)
             rat_col: str,  # T_ra (return air temperature)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t', 'dt_rf'])
         self.e_t = param_list['e_t']
@@ -531,7 +531,7 @@ class APAR07:
             sat_col: str,  # T_sa (supply air temperature)
             mat_col: str,  # T_ma (mixed air temperature)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t', 'dt_sf'])
         self.e_t = param_list['e_t']
@@ -570,7 +570,7 @@ class APAR08:
             oat_col: str,  # T_oa (outside air temperature)
             satsp_col: str,  # T_sa,s (supply air temperature setpoint)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t', 'dt_sf'])
         self.e_t = param_list['e_t']
@@ -609,7 +609,7 @@ class APAR10:
             oat_col: str,  # T_oa (outside air temperature)
             mat_col: str,  # T_ma (mixed air temperature)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t'])
         self.e_t = param_list['e_t']
@@ -647,7 +647,7 @@ class APAR11:
             sat_col: str,  # T_sa (supply air temperature)
             mat_col: str,  # T_ma (mixed air temperature)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t', 'dt_sf'])
         self.e_t = param_list['e_t']
@@ -686,7 +686,7 @@ class APAR12:
             sat_col: str,  # T_sa (supply air temperature)
             rat_col: str,  # T_ra (return air temperature)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t', 'dt_rf'])
         self.e_t = param_list['e_t']
@@ -726,7 +726,7 @@ class APAR13:
             satsp_col: str,  # T_sa,s (supply air temperature setpoint)
             mode: list,  # Operational mode that apply
             cooling_sig_col: str,  # u_cc (normalized heating coil valve control signal [0,1])
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_cc', 'e_t'])
         self.e_cc = param_list['e_cc']
@@ -768,7 +768,7 @@ class APAR14:
             cooling_sig_col: str,  # u_cc (normalized heating coil valve control signal [0,1])
             mode: list,  # Operational mode that apply
             troubleshoot=False,  # Troubleshoot mode
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_cc'])
         self.e_cc = param_list['e_cc']
@@ -804,7 +804,7 @@ class APAR16:
             sat_col: str,  # T_sa (supply air temperature)
             mat_col: str,  # T_ma (mixed air temperature)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t', 'dt_sf'])
         self.e_t = param_list['e_t']
@@ -843,7 +843,7 @@ class APAR17:
             sat_col: str,  # T_sa (supply air temperature)
             rat_col: str,  # T_ra (return air temperature)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t', 'dt_rf'])
         self.e_t = param_list['e_t']
@@ -883,7 +883,7 @@ class APAR19:
             satsp_col: str,  # T_sa,s (supply air temperature setpoint)
             mode: list,  # Operational mode that apply
             cooling_sig_col: str,  # u_cc (normalized heating coil valve control signal [0,1])
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_cc', 'e_t'])
         self.e_cc = param_list['e_cc']
@@ -924,7 +924,7 @@ class APAR20:
             cooling_sig_col: str,  # u_cc (normalized heating coil valve control signal [0,1])
             mode: list,  # Operational mode that apply
             troubleshoot=False,  # Troubleshoot mode
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_cc'])
         self.e_cc = param_list['e_cc']
@@ -962,7 +962,7 @@ class APAR24:
             cooling_sig_col: str,  # u_cc (normalized heating coil valve control signal [0,1])
             mode: list,  # Operational mode that apply
             troubleshoot=False,  # Troubleshoot mode
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_d', 'e_cc'])
         self.e_d = param_list['e_d']
@@ -1004,7 +1004,7 @@ class APAR25:
             sat_col: str,  # T_sa (supply air temperature)
             satsp_col: str,  # T_sa,s (supply air temperature setpoint)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t'])
         self.e_t = param_list['e_t']
@@ -1048,7 +1048,7 @@ class APAR26:
             rat_col: str,  # T_ra (return air temperature)
             mode: list,  # Operational mode that apply
             oat_col: str,  # T_oa (outside air temperature)
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t'])
         self.e_t = param_list['e_t']
@@ -1086,7 +1086,7 @@ class APAR27:
             rat_col: str,  # T_ra (return air temperature)
             oat_col: str,  # T_oa (outside air temperature)
             mode: list,  # Operational mode that apply
-            si=False,  # International system?
+            si=True,  # International system?
     ):
         param_list = get_apar_params(si=si, param_list=['e_t'])
         self.e_t = param_list['e_t']

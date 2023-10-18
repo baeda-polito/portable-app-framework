@@ -46,8 +46,7 @@ if __name__ == '__main__':
             heating_sig_col='heating_sig_col',
             cooling_sig_col='cooling_sig_col',
             sys_ctl_col='sys_ctl_col',
-            fan_vfd_speed_col='fan_vfd_speed_col',
-            si=True
+            fan_vfd_speed_col='fan_vfd_speed_col'
         )
 
         df_om = _om.apply(df_resampled)
@@ -56,8 +55,7 @@ if __name__ == '__main__':
         _rules = {
             # APAR01(sat_col='sat_col', mat_col='mat_col', mode=['OM_1_HTG']),
             # APAR05(satsp_col='satsp_col', oat_col='oat_col', mode=['OM_2_ECO'])
-            APAR19(satsp_col='satsp_col', sat_col='sat_col', cooling_sig_col='cooling_sig_col', mode=['OM_4_MIN'],
-                   si=True)
+            APAR19(satsp_col='satsp_col', sat_col='sat_col', cooling_sig_col='cooling_sig_col', mode=['OM_4_MIN'])
         }
 
         dict_result_single_datasource = {
