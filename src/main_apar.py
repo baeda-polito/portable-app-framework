@@ -49,9 +49,6 @@ if __name__ == '__main__':
         _om.print_summary(df1)
 
         # apply rule
-        df2 = APAR01(sat_col='sat_col', mat_col='mat_col', mode=['OM_1_HTG']).apply(df1)
-
-        # summarize
-    # load dataframe
-    # apply apar
-    # get result
+        _rule = APAR01(sat_col='sat_col', mat_col='mat_col', mode=['OM_1_HTG'])
+        df2 = _rule.apply(df1)
+        _rule.plot(df2)
