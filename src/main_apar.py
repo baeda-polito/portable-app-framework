@@ -12,10 +12,13 @@
 # Notes:
 import os
 
+import pandas as pd
+
 from apar import APAR01, APAROperationalModes
 from utils.logger import CustomLogger
 from utils.util import ensure_dir, list_files
 from utils.util_driver import driver_data_fetch
+from utils.util_preprocessing import resample
 
 if __name__ == '__main__':
     # create logger
@@ -30,11 +33,13 @@ if __name__ == '__main__':
     # list files in the folder
     files = list_files(folder, file_formats=[".csv", ".parquet"])
 
-    dict_result = {}
+    global_result = []
     for filename in files:
         print(filename)
         # fetch data depending on the folder and filename
-        df = driver_data_fetch(folder, filename, full=True)
+        df_original = driver_data_fetch(folder, filename, full=True)
+        df_resampled = resample(df=df_original, window='15T')
+
         # define operational rules
         _om = APAROperationalModes(
             oa_dmpr_sig_col='oa_dmpr_sig_col',
@@ -45,10 +50,35 @@ if __name__ == '__main__':
             fan_vfd_speed_col='fan_vfd_speed_col'
         )
 
-        df1 = _om.apply(df)
-        _om.print_summary(df1)
+        df_om = _om.apply(df_resampled)
+        modes_grouped = _om.print_summary(df_om)
 
-        # apply rule
-        _rule = APAR01(sat_col='sat_col', mat_col='mat_col', mode=['OM_1_HTG'])
-        df2 = _rule.apply(df1)
-        _rule.plot(df2)
+        _rules = {
+            APAR01(sat_col='sat_col', mat_col='mat_col', mode=['OM_1_HTG'])
+        }
+
+        dict_result_single_datasource = {
+            'datasource': filename.split('.')[0],
+            **dict(zip(modes_grouped['Operating Mode'], modes_grouped['Time [%]']))
+        }
+
+        for _rule in _rules:
+            df_rule = _rule.apply(df_om)
+
+            # calculate the percentage of time in a certain operational mode in which the rue is 1
+            # filter dataset on OM
+            df_rule_filtered_om = df_rule[df_rule['operating_mode'].isin(_rule.mode)]
+            # find how many 1 are there in the rule as percentage
+            try:
+                percentage_faulty_om = (df_rule_filtered_om[_rule.rule_name].sum() / len(df_rule_filtered_om)) * 100
+            except ZeroDivisionError:
+                percentage_faulty_om = None
+
+            dict_result_single_datasource[_rule.rule_name] = percentage_faulty_om
+
+        # append result for all apar on single dataframe to overall dataframe
+        global_result.append(dict_result_single_datasource)
+
+    # transform to dataframe and save result to data
+    df_result = pd.DataFrame(global_result)
+    df_result.to_csv(os.path.join('..', 'results', 'result.csv'), index=False)

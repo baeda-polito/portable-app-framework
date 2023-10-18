@@ -331,7 +331,7 @@ class APAROperationalModes:
         return df1
 
     @staticmethod
-    def print_summary(df: pd.DataFrame) -> None:
+    def print_summary(df: pd.DataFrame) -> pd.DataFrame:
         """
         Print summary of the operational modes
         :param df: dataframe with the operational modes
@@ -352,7 +352,7 @@ class APAROperationalModes:
         df_modes_grouped = df_modes_grouped.rename(
             columns={'operating_mode': 'Operating Mode', 'percentage': 'Time [%]'}
         )
-        print(df_modes_grouped.to_string(index=False))
+        return df_modes_grouped
 
     def plot(self, df: pd.DataFrame) -> None:
         """
