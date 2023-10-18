@@ -395,7 +395,7 @@ class APAR01:
         self.e_t = param_list['e_t']
         self.dt_sf = param_list['dt_sf']  # usually not present in datasets
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.sat_col = sat_col
         self.mat_col = mat_col
         self.troubleshoot = troubleshoot
@@ -459,7 +459,7 @@ class APAR05:
         self.e_t = param_list['e_t']
         self.dt_sf = param_list['dt_sf']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.satsp_col = satsp_col
         self.oat_col = oat_col
 
@@ -498,7 +498,7 @@ class APAR06:
         self.e_t = param_list['e_t']
         self.dt_rf = param_list['dt_rf']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.sat_col = sat_col
         self.rat_col = rat_col
 
@@ -537,7 +537,7 @@ class APAR07:
         self.e_t = param_list['e_t']
         self.dt_sf = param_list['dt_sf']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.sat_col = sat_col
         self.mat_col = mat_col
 
@@ -576,7 +576,7 @@ class APAR08:
         self.e_t = param_list['e_t']
         self.dt_sf = param_list['dt_sf']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.oat_col = oat_col
         self.satsp_col = satsp_col
 
@@ -614,7 +614,7 @@ class APAR10:
         param_list = get_apar_params(si=si, param_list=['e_t'])
         self.e_t = param_list['e_t']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.oat_col = oat_col
         self.mat_col = mat_col
 
@@ -653,7 +653,7 @@ class APAR11:
         self.e_t = param_list['e_t']
         self.dt_sf = param_list['dt_sf']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.sat_col = sat_col
         self.mat_col = mat_col
 
@@ -692,7 +692,7 @@ class APAR12:
         self.e_t = param_list['e_t']
         self.dt_rf = param_list['dt_rf']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.sat_col = sat_col
         self.rat_col = rat_col
 
@@ -732,7 +732,7 @@ class APAR13:
         self.e_cc = param_list['e_cc']
         self.e_t = param_list['e_t']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.cooling_sig_col = cooling_sig_col
         self.sat_col = sat_col
         self.satsp_col = satsp_col
@@ -773,7 +773,7 @@ class APAR14:
         param_list = get_apar_params(si=si, param_list=['e_cc'])
         self.e_cc = param_list['e_cc']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.cooling_sig_col = cooling_sig_col
         self.troubleshoot = troubleshoot
 
@@ -810,7 +810,7 @@ class APAR16:
         self.e_t = param_list['e_t']
         self.dt_sf = param_list['dt_sf']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.sat_col = sat_col
         self.mat_col = mat_col
 
@@ -849,7 +849,7 @@ class APAR17:
         self.e_t = param_list['e_t']
         self.dt_rf = param_list['dt_rf']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.sat_col = sat_col
         self.rat_col = rat_col
 
@@ -889,7 +889,7 @@ class APAR19:
         self.e_cc = param_list['e_cc']
         self.e_t = param_list['e_t']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.cooling_sig_col = cooling_sig_col
         self.sat_col = sat_col
         self.satsp_col = satsp_col
@@ -929,7 +929,7 @@ class APAR20:
         param_list = get_apar_params(si=si, param_list=['e_cc'])
         self.e_cc = param_list['e_cc']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.cooling_sig_col = cooling_sig_col
         self.troubleshoot = troubleshoot
 
@@ -969,7 +969,7 @@ class APAR24:
         self.e_cc = param_list['e_cc']
         self.mode = mode
 
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.mix_damper_sig_col = mix_damper_sig_col
         self.cooling_sig_col = cooling_sig_col
         self.troubleshoot = troubleshoot
@@ -1009,7 +1009,7 @@ class APAR25:
         param_list = get_apar_params(si=si, param_list=['e_t'])
         self.e_t = param_list['e_t']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.sat_col = sat_col
         self.satsp_col = satsp_col
 
@@ -1053,7 +1053,7 @@ class APAR26:
         param_list = get_apar_params(si=si, param_list=['e_t'])
         self.e_t = param_list['e_t']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.mat_col = mat_col
         self.rat_col = rat_col
         self.oat_col = oat_col
@@ -1091,7 +1091,7 @@ class APAR27:
         param_list = get_apar_params(si=si, param_list=['e_t'])
         self.e_t = param_list['e_t']
         self.mode = mode
-        self.rule_name = f"fault_{type(self).__name__}"  # get class name
+        self.rule_name = type(self).__name__  # get class name
         self.mat_col = mat_col
         self.rat_col = rat_col
         self.oat_col = oat_col
