@@ -16,7 +16,7 @@ from apar import *
 from utils.logger import CustomLogger
 from utils.util import ensure_dir, list_files
 from utils.util_driver import driver_data_fetch
-from utils.util_preprocessing import resample
+from utils.util_preprocessing import resample, get_steady
 
 if __name__ == '__main__':
     # create logger
@@ -37,7 +37,8 @@ if __name__ == '__main__':
 
         # fetch data depending on the folder and filename
         df_original = driver_data_fetch(folder, filename, full=True)
-        df_resampled = resample(df=df_original, window='15T')
+        df_resampled = resample(df=df_original, window='5T')
+        df_clean = get_steady(df_resampled, {'transient_cutoff': 0.01}, filename=filename)
 
         # define operational rules
         _om = APAROperationalModes(
@@ -49,13 +50,38 @@ if __name__ == '__main__':
             fan_vfd_speed_col='fan_vfd_speed_col'
         )
 
-        df_om = _om.apply(df_resampled)
+        df_om = _om.apply(df_clean)
         modes_grouped = _om.print_summary(df_om)
 
         _rules = {
+            # Operational Mode 1 - Heating
             # APAR01(sat_col='sat_col', mat_col='mat_col', mode=['OM_1_HTG']),
-            # APAR05(satsp_col='satsp_col', oat_col='oat_col', mode=['OM_2_ECO'])
-            APAR19(satsp_col='satsp_col', sat_col='sat_col', cooling_sig_col='cooling_sig_col', mode=['OM_4_MIN'])
+
+            # Operational mode 2 - Economizer
+            APAR05(oat_col='oat_col', satsp_col='satsp_col', mode=['OM_2_ECO']),
+            APAR06(sat_col='sat_col', rat_col='rat_col', mode=['OM_2_ECO']),
+            APAR07(sat_col='sat_col', mat_col='mat_col', mode=['OM_2_ECO']),
+
+            # Operational mode 3 - Outdoor air
+            APAR08(oat_col='oat_col', satsp_col='satsp_col', mode=['OM_3_OUT']),
+            APAR10(oat_col='oat_col', mat_col='mat_col', mode=['OM_3_OUT']),
+            APAR11(sat_col='sat_col', mat_col='mat_col', mode=['OM_3_OUT']),
+            APAR12(sat_col='sat_col', rat_col='rat_col', mode=['OM_3_OUT']),
+            APAR13(cooling_sig_col='cooling_sig_col', sat_col='sat_col', satsp_col='satsp_col', mode=['OM_3_OUT']),
+            APAR14(cooling_sig_col='cooling_sig_col', mode=['OM_3_OUT']),
+
+            # Operational mode 4 - Minimum outdoor air
+            APAR16(sat_col='sat_col', mat_col='mat_col', mode=['OM_4_MIN']),
+            APAR17(sat_col='sat_col', rat_col='rat_col', mode=['OM_4_MIN']),
+            APAR19(cooling_sig_col='cooling_sig_col', sat_col='sat_col', satsp_col='satsp_col', mode=['OM_4_MIN']),
+            APAR20(cooling_sig_col='cooling_sig_col', mode=['OM_4_MIN']),
+
+            # Operational mode 5 - Unknown
+
+            # Operational mode 0 - All
+            APAR25(sat_col='sat_col', satsp_col='satsp_col', mode=['ALL']),
+            APAR26(mat_col='mat_col', rat_col='rat_col', oat_col='oat_col', mode=['ALL']),
+            APAR27(mat_col='mat_col', rat_col='rat_col', oat_col='oat_col', mode=['ALL'])
         }
 
         dict_result_single_datasource = {
@@ -71,10 +97,10 @@ if __name__ == '__main__':
             # calculate the percentage of time in a certain operational mode in which the rue is 1
             df_rule_filtered_om = df_rule[df_rule['operating_mode'].isin(_rule.mode)]
             # find how many 1 are there in the rule as percentage
-            try:
-                percentage_faulty_om = (df_rule_filtered_om[_rule.rule_name].sum() / len(df_rule_filtered_om)) * 100
-            except ZeroDivisionError:
+            if len(df_rule_filtered_om) == 0:
                 percentage_faulty_om = None
+            else:
+                percentage_faulty_om = (df_rule_filtered_om[_rule.rule_name].sum() / len(df_rule_filtered_om)) * 100
 
             dict_result_single_datasource[_rule.rule_name] = percentage_faulty_om
 
@@ -83,4 +109,6 @@ if __name__ == '__main__':
 
     # transform to dataframe and save result to data
     df_result = pd.DataFrame(global_result)
+    # sort columns apar from 01 to 27
+    df_result = df_result.reindex(sorted(df_result.columns), axis=1)
     df_result.to_csv(os.path.join('..', 'results', 'result.csv'), index=False)

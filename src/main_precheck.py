@@ -3,7 +3,7 @@
 # Email:        roberto.chiosa@polito.it
 #
 # Created:      15/09/23
-# Script Name:  main.py
+# Script Name:  main_precheck.py
 # Path:         src
 #
 # Script Description:

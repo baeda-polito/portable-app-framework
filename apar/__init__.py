@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -37,23 +35,28 @@ def exclude_operating_modes(rule_name: str, df: pd.DataFrame, operating_modes: l
         df[rule_name] = df[rule_name] * df['operating_mode'].isin(operating_modes).astype(int).values
 
     # exclude transient
-    # APAR suggest mode swith cdelay of 60 min meaning that we should not consider the first 60 min after mode change
-    # In our case we define a windoe of timestamps after each mode change to exclude
+    # use column transient if df['slope'] == 'transient' then set rule to 0 else keep the value
+    df[rule_name] = df[rule_name] * (1 - df['slope'].isin(['transient']).astype(int).values)
 
-    # calculate the minimum interval
-    max_interval = df.index.to_series().diff().max().round("5min")
-    window_size = timedelta(hours=1) // max_interval
-
-    # Check for inequality with the previous five rows
-    result = df['operating_mode'].ne(df['operating_mode'].shift()).rolling(window=window_size).apply(
-        lambda x: x.sum() > 0)
-    # transform NaN in 0
-    result = result.fillna(0)
-    # add mode_switch result to dataframe
-    df['mode_switch'] = result.astype(int).values
-    # if mode_swithc is 1 then set rule to 0 else keep the value
-    df[rule_name] = df[rule_name] * (1 - df['mode_switch'])
-    logger.warning(f"Excluding detection {window_size} timesteps after each mode change")
+    # # APAR suggest mode swith cdelay of 60 min meaning that we should not consider the first 60 min after mode change
+    # # In our case we define a windoe of timestamps after each mode change to exclude
+    #
+    # # calculate the minimum interval
+    # max_interval = df.index.to_series().diff().max().round("5min")
+    # window_size = timedelta(hours=1) // max_interval
+    #
+    # # Check for inequality with the previous five rows
+    # result = df['operating_mode'].ne(df['operating_mode'].shift()).rolling(window=window_size).apply(
+    #     lambda x: x.sum() > 0)
+    # # transform NaN in 0
+    # result = result.fillna(0)
+    # # add mode_switch result to dataframe
+    # df['mode_switch'] = result.astype(int).values
+    # # todo al posto del mode switch usa transiente per escludere
+    #
+    # # if mode_swithc is 1 then set rule to 0 else keep the value
+    # df[rule_name] = df[rule_name] * (1 - df['mode_switch'])
+    # logger.warning(f"Excluding detection {window_size} timesteps after each mode change")
 
     # if any fault warning
     if df[rule_name].sum() > 0:
@@ -212,6 +215,7 @@ class APAROperationalModes:
             fan_threshold: float = 0.01,  # Fan speed threshold
             valve_threshold: float = 0.05,  # Valve threshold
             damper_threshold: float = 0.05,  # Valve threshold
+            damper_minimum: float = 0.1,  # Damper minimum opening in eco mode
             eco_mode_temp_min: float = 33.8,  # Minimum temperature for eco mode
             eco_mode_temp_max: float = 60,  # Maximum temperature for eco mode
             si=True,  # SI units
@@ -227,6 +231,7 @@ class APAROperationalModes:
         self.valve_threshold = valve_threshold
         self.fan_threshold = fan_threshold
         self.damper_threshold = damper_threshold
+        self.damper_minimum = damper_minimum
         # convert units if needed
         if si:
             self.eco_mode_temp_min = fahrenheit_to_celsius(eco_mode_temp_min)
@@ -244,18 +249,18 @@ class APAROperationalModes:
         """
 
         # copy to avoid warnings
-        df1 = df.copy()
+        df_om = df.copy()
 
         # eventually normalize from 0-1 outdoor air damper position sensor
-        df1 = normalize_01(df1, self.oa_dmpr_sig_col)
-        df1 = normalize_01(df1, self.cooling_sig_col)
-        df1 = normalize_01(df1, self.heating_sig_col)
-        df1 = normalize_01(df1, self.fan_vfd_speed_col)
-        df1 = normalize_01(df1, self.sys_ctl_col)
+        df_om = normalize_01(df_om, self.oa_dmpr_sig_col)
+        df_om = normalize_01(df_om, self.cooling_sig_col)
+        df_om = normalize_01(df_om, self.heating_sig_col)
+        df_om = normalize_01(df_om, self.fan_vfd_speed_col)
+        df_om = normalize_01(df_om, self.sys_ctl_col)
 
         # create a operating mode column by default unknown
         # MODE 5 (Unknown)
-        df1['operating_mode'] = None
+        df_om['operating_mode'] = None
 
         '''
         Define Operational Mode (OM) ON/OFF in different ways
@@ -268,8 +273,8 @@ class APAROperationalModes:
         In this case we use system ON/OFF status
         '''
 
-        df1['operating_mode'] = np.where(
-            (df1[self.sys_ctl_col] != 0),  # this condition prevents aggregation values different from 1
+        df_om['operating_mode'] = np.where(
+            (df_om[self.sys_ctl_col] != 0),  # this condition prevents aggregation values different from 1
             'OM_ON', 'OM_OFF')
 
         '''
@@ -279,56 +284,54 @@ class APAROperationalModes:
         In this mode, the OA damper modulates in sequence with the RA damper to maintain a 55°F mixed air temperature 
         setpoint. Once the OA damper is greater than 100% open, the cooling coil valve shall be enabled to maintain 
         supply air temperature setpoint.
+        
+        df_om['operating_mode'] = np.where(
+            (df_om['operating_mode'] == 'OM_ON') &
+            (df_om[self.oat_col] >= 33.8) &
+            (df_om[self.oat_col] <= 60),
+            'OM_ECO', df_om['operating_mode'])
+            
         2) Cooling valve closed and damper modulating
-
         '''
 
-        # df1['operating_mode'] = np.where(
-        #     (df1['operating_mode'] == 'OM_ON') &
-        #     (df1[self.oat_col] >= 33.8) &
-        #     (df1[self.oat_col] <= 60),
-        #     'OM_ECO', df1['operating_mode'])
-
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON') &
-            (df1[self.cooling_sig_col] < self.valve_threshold) &  # valve closed
-            (df1[self.oa_dmpr_sig_col] < 1 - self.damper_threshold) &  # max damper
-            (df1[self.oa_dmpr_sig_col] > self.damper_threshold) &  # not closed
-            # (df1[self.oa_dmpr_sig_col] > 0.1 + 0.05) # the minimum is not always kown
-            (df1[self.oat_col] >= self.eco_mode_temp_min) &
-            (df1[self.oat_col] <= self.eco_mode_temp_max),
-            'OM_2_ECO', df1['operating_mode'])
+        df_om['operating_mode'] = np.where(
+            (df_om['operating_mode'] == 'OM_ON') &
+            (df_om[self.cooling_sig_col] < self.valve_threshold) &  # valve closed
+            (df_om[self.oa_dmpr_sig_col] < 1 - self.damper_threshold) &  # max damper
+            (df_om[self.oa_dmpr_sig_col] > self.damper_threshold) &  # not closed
+            (df_om[self.oa_dmpr_sig_col] > self.damper_minimum + self.damper_threshold),
+            'OM_2_ECO', df_om['operating_mode'])
 
         '''
         Define Operational Mode (OM) Cooling with outdoor air (OM_3_OUT) : 
         1) Cooling valve closed and damper open 100%
         '''
 
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON') &
-            (df1[self.cooling_sig_col] < self.valve_threshold) &  # valve closed
-            (df1[self.oa_dmpr_sig_col] > 1 - self.damper_threshold),  # max damper
-            'OM_3_OUT', df1['operating_mode'])
+        df_om['operating_mode'] = np.where(
+            (df_om['operating_mode'] == 'OM_ON') &
+            (df_om[self.cooling_sig_col] < self.valve_threshold) &  # cooling valve closed
+            (df_om[self.oa_dmpr_sig_col] > 1 - self.damper_threshold),  # damper to maximum position
+            'OM_3_OUT', df_om['operating_mode'])
 
         '''
         Define Operational Mode (OM) Mechanical cooling with minimum outdoor air (OM_4_MIN) :
         '''
 
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON') &
-            (df1[self.cooling_sig_col] > self.valve_threshold) &  # valve modulating
-            (df1[self.oa_dmpr_sig_col] < 0.1 + self.damper_threshold) &  # min damper + epsilon todo find minimum damper
-            (df1[self.oa_dmpr_sig_col] > 0.1 - self.damper_threshold),  # min damper - epsilon
-            'OM_4_MIN', df1['operating_mode'])
+        df_om['operating_mode'] = np.where(
+            (df_om['operating_mode'] == 'OM_ON') &
+            (df_om[self.cooling_sig_col] > self.valve_threshold) &  # valve modulating
+            (df_om[self.oa_dmpr_sig_col] < self.damper_minimum + self.damper_threshold) &  # min damper + epsilon
+            (df_om[self.oa_dmpr_sig_col] > self.damper_minimum - self.damper_threshold),  # min damper - epsilon
+            'OM_4_MIN', df_om['operating_mode'])
 
         '''
         Define Operational Mode (OM) 5 Unknown when is on and all the others do not apply
         '''
-        df1['operating_mode'] = np.where(
-            (df1['operating_mode'] == 'OM_ON'),
-            'OM_5_UNKWN', df1['operating_mode'])
+        df_om['operating_mode'] = np.where(
+            (df_om['operating_mode'] == 'OM_ON'),
+            'OM_5_UNKWN', df_om['operating_mode'])
 
-        return df1
+        return df_om
 
     @staticmethod
     def print_summary(df: pd.DataFrame) -> pd.DataFrame:
@@ -442,6 +445,10 @@ class APAR01:
 
         return fig
 
+
+# todo APAR02
+# todo APAR03
+# todo APAR04
 
 class APAR05:
     """
@@ -598,6 +605,8 @@ class APAR08:
 
         return df1
 
+
+# todo APAR09
 
 class APAR10:
     """
@@ -794,6 +803,9 @@ class APAR14:
         return df1
 
 
+# todo APAR15
+
+
 class APAR16:
     """
     Supply air temp should be less than return air temp.Tsa>Tra-∆Trf+εt
@@ -871,6 +883,8 @@ class APAR17:
 
         return df1
 
+
+# todo APAR18
 
 class APAR19:
     """
@@ -950,6 +964,10 @@ class APAR20:
 
         return df1
 
+
+# todo APAR21
+# todo APAR22
+# todo APAR23
 
 class APAR24:
     """
