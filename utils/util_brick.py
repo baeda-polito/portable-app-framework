@@ -1,15 +1,17 @@
-# Author:       Roberto Chiosa
-# Copyright:    Roberto Chiosa, © 2023
-# Email:        roberto.chiosa@pinvision.it
-#
-# Created:      27/09/23
-# Script Name:  util_brick.py
-# Path:         utils
-#
-# Script Description:
-#
-#
-# Notes:
+"""
+Author:       Roberto Chiosa
+Copyright:    Roberto Chiosa, © 2023
+Email:        roberto.chiosa@polito.it
+
+Created:      27/09/23
+Script Name:  util_brick.py
+Path:         utils
+
+Script Description:
+
+
+Notes:
+"""
 
 import brickschema
 import pandas as pd
@@ -17,6 +19,14 @@ from rdflib import URIRef, Variable
 
 
 def parse_results(results, full_uri=False, df=True, no_prefix=False):
+    """
+    Parse the results of a SPARQL query
+    :param results:
+    :param full_uri:
+    :param df:
+    :param no_prefix:
+    :return:
+    """
     m = {
         'https://brickschema.org/schema/Brick': 'brick',
         'http://www.w3.org/1999/02/22-rdf-syntax-ns': 'rdf',
@@ -70,11 +80,20 @@ class BrickGraph(object):
     def __init__(self, load: str = None):
         """
         Different way to load brick in graph
-            1) Load from package:             Graph(load_brick_nightly=True) -> getting occasional URL errors for this.
-            4) Load from package and file:    Graph(load_brick_nightly=True).serialize('Brick_nightly.ttl', format='ttl')
-            2) Load from local file:          Graph().load_file('../data/libraries/Brick-nightly.ttl')
-            3) Load from local file:          Graph().parse('../data/libraries/Brick-nightly.ttl', format='ttl')
-            4) Load from online:              Graph().parse("https://github.com/BrickSchema/Brick/releases/download/nightly/Brick.ttl", format="ttl")
+            1) Load from package:
+            Graph(load_brick_nightly=True) -> getting occasional URL errors for this.
+
+            2) Load from package and file:
+            Graph(load_brick_nightly=True).serialize('Brick_nightly.ttl', format='ttl')
+
+            3) Load from local file:
+            Graph().load_file('../data/libraries/Brick-nightly.ttl')
+
+            4) Load from local file:
+            Graph().parse('../data/libraries/Brick-nightly.ttl', format='ttl')
+
+            5) Load from online:
+            Graph().parse("https://github.com/BrickSchema/Brick/releases/download/nightly/Brick.ttl", format="ttl")
         """
         if load == "nightly":
             # load nightly version

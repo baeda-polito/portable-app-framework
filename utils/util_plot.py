@@ -1,15 +1,18 @@
-# Author:       Roberto Chiosa
-# Copyright:    Roberto Chiosa, © 2023
-# Email:        roberto.chiosa@polito.it
-#
-# Created:      15/09/23
-# Script Name:  util_plot.py
-# Path:         utils
-#
-# Script Description:
-#
-#
-# Notes:
+"""
+Author:       Roberto Chiosa
+Copyright:    Roberto Chiosa, © 2023
+Email:        roberto.chiosa@polito.it
+
+Created:      15/09/23
+Script Name:  util_plot.py
+Path:         utils
+
+Script Description:
+
+
+Notes:
+"""
+
 import os
 
 import plotly.express as px

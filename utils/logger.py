@@ -1,29 +1,30 @@
-# Author:       Roberto Chiosa
-# Copyright:    Roberto Chiosa, © 2023
-# Email:        roberto.chiosa@polito.it
-#
-# Created:      23/02/23
-# Script Name:  logger.py
-# Path:         utils
-#
-# Script Description:
-# This script contains the logger class. Load the Custom logger in your file
-# to access to customized logger configuration
-# Example code:
-#
-# from utils.logger import CustomLogger
-#
-# if __name__ == "__main__":
-#     logger = CustomLogger().get_logger()
-#     logger.info("Hello World")
-#
-# Notes: https://docs.python.org/3/howto/logging.html
-# https://realpython.com/python-logging/
-# https://towardsdatascience.com/why-and-how-to-set-up-logging-for-python-projects-bcdd4a374c7a
-# https://github.com/Husseinjd/keras-tensorflow-template
-# https://github.com/MrGemy95/Tensorflow-Project-Template
-# https://coderzcolumn.com/tutorials/python/logging-config-simple-guide-to-configure-loggers-from-dictionary-and-config-files-in-python
+"""
+Author:       Roberto Chiosa
+Copyright:    Roberto Chiosa, © 2023
+Email:        roberto.chiosa@polito.it
 
+Created:      23/02/23
+Script Name:  logger.py
+Path:         utils
+
+Script Description:
+This script contains the logger class. Load the Custom logger in your file
+to access to customized logger configuration
+Example code:
+
+from utils.logger import CustomLogger
+
+if __name__ == "__main__":
+    logger = CustomLogger().get_logger()
+    logger.info("Hello World")
+
+Notes: https://docs.python.org/3/howto/logging.html
+https://realpython.com/python-logging/
+https://towardsdatascience.com/why-and-how-to-set-up-logging-for-python-projects-bcdd4a374c7a
+https://github.com/Husseinjd/keras-tensorflow-template
+https://github.com/MrGemy95/Tensorflow-Project-Template
+https://coderzcolumn.com/tutorials/python/logging-config-simple-guide-to-configure-loggers-from-dictionary-and-config-files-in-python
+"""
 
 import logging.config
 import os
@@ -34,8 +35,8 @@ class ColoredFormatter(logging.Formatter):
     Colored formatter
     """
 
-    def __init__(self, fmt=None, datefmt=None, style='%'):
-        super().__init__(fmt, datefmt, style)
+    def __init__(self, fmt=None, date_format=None, style='%'):
+        super().__init__(fmt, date_format, style)
         self.COLORS = {
             'DEBUG': '\u001b[37;1m',
             'INFO': '\u001b[32;1m',
@@ -111,7 +112,7 @@ class CustomLogger:
             # fmt='%(asctime)s [%(levelname)s] (%(funcName)s) %(message)s',
             fmt='%(asctime)s [%(levelname)s] (%(filename)s > %(funcName)s) %(message)s',
             # fmt='%(asctime)s [%(levelname)s] (%(filename)s > %(funcName)s > line %(lineno)d) %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
+            date_format='%Y-%m-%d %H:%M:%S'
         )
         console_handler.setFormatter(console_formatter)
 

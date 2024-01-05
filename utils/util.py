@@ -1,15 +1,17 @@
-# Author:       Roberto Chiosa
-# Copyright:    Roberto Chiosa, © 2023
-# Email:        roberto.chiosa@polito.it
-#
-# Created:      24/02/23
-# Script Name:  util.py
-# Path:         utils
-#
-# Script Description:
-# This script contains some utility functions used throughout the project.
-#
-# Notes:
+"""
+Author:       Roberto Chiosa
+Copyright:    Roberto Chiosa, © 2023
+Email:        roberto.chiosa@polito.it
+
+Created:      24/02/23
+Script Name:  util.py
+Path:         utils
+
+Script Description:
+This script contains some utility functions used throughout the project.
+
+Notes:
+"""
 
 import json
 import os
@@ -43,29 +45,29 @@ def load_file(path: str, yaml_type=False):
     return file
 
 
-def ensure_dir(dirname: str) -> None:
+def ensure_dir(directory_name: str) -> None:
     """
     Ensure that a directory exists. If it does not, create it.
-    :param dirname: The directory to ensure.
+    :param directory_name: The directory to ensure.
     :return: None
     """
-    dirname = Path(dirname)
-    if not dirname.is_dir():
-        dirname.mkdir(parents=True)
-        # logger.info(f'{dirname} created successfully')
+    directory_name = Path(directory_name)
+    if not directory_name.is_dir():
+        directory_name.mkdir(parents=True)
+        # logger.info(f'{directory_name} created successfully')
 
 
-def list_files(dirname: str, file_formats=None) -> list:
+def list_files(directory_name: str, file_formats=None) -> list:
     """
     Given a folder lists files within matching format
-    :param dirname: The directory that contains the files
+    :param directory_name: The directory that contains the files
     :param file_formats: The file formats to look for
     :return: list of files names
     """
     if file_formats is None:
         file_formats = [".csv", ".parquet"]
 
-    files = [file for file in os.listdir(dirname) if
+    files = [file for file in os.listdir(directory_name) if
              any(file.endswith(file_format) for file_format in file_formats)]
 
     if len(files) == 0:
@@ -98,5 +100,12 @@ def write_json(content, filename: str):
 
 
 def fahrenheit_to_celsius(fahrenheit):
+    """
+    Converts °F to °C degrees.
+    :param fahrenheit: Temperature in °F
+    :return: Temperature in °C
+    :example:
+    >>> fahrenheit_to_celsius(32)
+    """
     celsius = (fahrenheit - 32) * (5 / 9)
     return celsius

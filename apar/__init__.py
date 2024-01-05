@@ -38,8 +38,8 @@ def exclude_operating_modes(rule_name: str, df: pd.DataFrame, operating_modes: l
     # use column transient if df['slope'] == 'transient' then set rule to 0 else keep the value
     df[rule_name] = df[rule_name] * (1 - df['slope'].isin(['transient']).astype(int).values)
 
-    # # APAR suggest mode swith cdelay of 60 min meaning that we should not consider the first 60 min after mode change
-    # # In our case we define a windoe of timestamps after each mode change to exclude
+    # # APAR suggest mode switch delay of 60 min meaning that we should not consider the first 60 min after mode change
+    # # In our case we define a window of timestamps after each mode change to exclude
     #
     # # calculate the minimum interval
     # max_interval = df.index.to_series().diff().max().round("5min")
@@ -54,9 +54,9 @@ def exclude_operating_modes(rule_name: str, df: pd.DataFrame, operating_modes: l
     # df['mode_switch'] = result.astype(int).values
     # # todo al posto del mode switch usa transiente per escludere
     #
-    # # if mode_swithc is 1 then set rule to 0 else keep the value
+    # # if mode_switch is 1 then set rule to 0 else keep the value
     # df[rule_name] = df[rule_name] * (1 - df['mode_switch'])
-    # logger.warning(f"Excluding detection {window_size} timesteps after each mode change")
+    # logger.warning(f"Excluding detection {window_size} timestamps after each mode change")
 
     # if any fault warning
     if df[rule_name].sum() > 0:
@@ -95,7 +95,7 @@ def exclude_operating_modes(rule_name: str, df: pd.DataFrame, operating_modes: l
         # plt.tight_layout()
         # # remove box from style
         # seaborn.despine(bottom=True)
-        # # show gridline on all subplots
+        # # show gridlines on all subplots
         # # plt.show()
     else:
         logger.info(f"No Faults found for {rule_name}")
@@ -126,7 +126,7 @@ def exclude_operating_modes(rule_name: str, df: pd.DataFrame, operating_modes: l
         # plt.tight_layout()
         # # remove box from style
         # seaborn.despine(bottom=True)
-        # # show gridline on all subplots
+        # # show gridlines on all subplots
         # plt.show()
 
     return df
@@ -143,7 +143,7 @@ def get_apar_params(si: bool = False, param_list: list = None) -> dict:
         # imperial units
         params_dict = {
             'e_t': 2,  # threshold for errors in temperature measurements
-            'e_f': 0.3,  # threshold parameter accounting for errors related to airflows
+            'e_f': 0.3,  # threshold parameter accounting for errors related to airflow
             'e_hc': 0.1,  # threshold parameter for the heating coil valve control signal
             'e_cc': 0.1,  # threshold parameter for the cooling coil valve control signal
             'e_d': 0.02,  # threshold parameter for the mixing box damper control signal
@@ -154,7 +154,7 @@ def get_apar_params(si: bool = False, param_list: list = None) -> dict:
         # °F error threshold parameters
         params_dict = {
             'e_t': 3.6,  # threshold for errors in temperature measurements
-            'e_f': 0.3,  # threshold parameter accounting for errors related to airflows
+            'e_f': 0.3,  # threshold parameter accounting for errors related to airflow
             'e_hc': 0.02,  # threshold parameter for the heating coil valve control signal
             'e_cc': 0.02,  # threshold parameter for the cooling coil valve control signal
             'e_d': 0.02,  # threshold parameter for the mixing box damper control signal
@@ -930,7 +930,7 @@ class APAR19:
 
 class APAR20:
     """
-    Cooling coil valve command is fully open. If cooling load increases, supply air temp will drift from setpoint. |ucc – 1| ≤ εcc
+    Cooling coil valve command is fully open. If cooling load increases, SAT will drift from setpoint. |ucc – 1| ≤ εcc
     """
 
     def __init__(
@@ -1042,7 +1042,7 @@ class APAR25:
         df1 = df.copy()
 
         if check_low_variance(df, self.sat_col):
-            # if stuck sensor all faluty independent to OM
+            # if stuck sensor all faulty independent to OM
             df1[self.rule_name] = 1
         else:
             # check rule and operational mode

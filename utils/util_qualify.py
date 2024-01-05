@@ -1,15 +1,17 @@
-# Author:       Roberto Chiosa
-# Copyright:    Roberto Chiosa, © 2023
-# Email:        roberto.chiosa@pinvision.it
-#
-# Created:      27/09/23
-# Script Name:  util_qualify.py
-# Path:         utils
-#
-# Script Description:
-#
-#
-# Notes:
+"""
+Author:       Roberto Chiosa
+Copyright:    Roberto Chiosa, © 2023
+Email:        roberto.chiosa@polito.it
+
+Created:      27/09/23
+Script Name:  util_qualify.py
+Path:         utils
+
+Script Description:
+
+
+Notes:
+"""
 
 from buildingmotif import BuildingMOTIF
 from buildingmotif.dataclasses import Model, Library

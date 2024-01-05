@@ -1,16 +1,17 @@
-# Author:       Roberto Chiosa
-# Copyright:    Roberto Chiosa, © 2023
-# Email:        roberto.chiosa@polito.it
-#
-# Created:      15/09/23
-# Script Name:  main_precheck.py
-# Path:         src
-#
-# Script Description:
-#
-#
-# Notes:
+"""
+Author:       Roberto Chiosa
+Copyright:    Roberto Chiosa, © 2023
+Email:        roberto.chiosa@polito.it
 
+Created:      15/09/23
+Script Name:  main_precheck.py
+Path:         src
+
+Script Description:
+
+
+Notes:
+"""
 import os
 
 import pandas as pd
@@ -42,7 +43,7 @@ if __name__ == '__main__':
     dict_result = {}
 
     for filename in files:
-        print('\n')
+        print(f'\n########### {filename} ###########')
         # extract information from filename
         datasource = filename.split('.')[0]
 
@@ -96,7 +97,7 @@ if __name__ == '__main__':
             (df_clean['oat_col'] < 4.4) &
             (df_clean['slope'] == 'steady')
             ]
-        result, message = check_freeze_protection(df_freeze, config, damper_min)
+        result, message = check_freeze_protection(df_freeze, damper_min)
         n_list.append(result)
         check_log_result(result, 'check_freeze_protection', message)
 

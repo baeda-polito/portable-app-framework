@@ -1,15 +1,17 @@
-# Author:       Roberto Chiosa
-# Copyright:    Roberto Chiosa, © 2023
-# Email:        roberto.chiosa@pinvision.it
-#
-# Created:      17/10/23
-# Script Name:  main_apar.py
-# Path:         src
-#
-# Script Description:
-#
-#
-# Notes:
+"""
+Author:       Roberto Chiosa
+Copyright:    Roberto Chiosa, © 2023
+Email:        roberto.chiosa@polito.it
+
+Created:      17/10/23
+Script Name:  main_apar.py
+Path:         src
+
+Script Description:
+
+
+Notes:
+"""
 import os
 
 from apar import *
@@ -34,7 +36,7 @@ if __name__ == '__main__':
 
     global_result = []
     for filename in files:
-
+        print(f'\n########### {filename} ###########')
         # fetch data depending on the folder and filename
         df_original = driver_data_fetch(folder, filename, full=True)
         df_resampled = resample(df=df_original, window='5T')
@@ -53,7 +55,7 @@ if __name__ == '__main__':
         df_om = _om.apply(df_clean)
         modes_grouped = _om.print_summary(df_om)
 
-        _rules = {
+        _rules = [
             # Operational Mode 1 - Heating
             # APAR01(sat_col='sat_col', mat_col='mat_col', mode=['OM_1_HTG']),
 
@@ -82,7 +84,7 @@ if __name__ == '__main__':
             APAR25(sat_col='sat_col', satsp_col='satsp_col', mode=['ALL']),
             APAR26(mat_col='mat_col', rat_col='rat_col', oat_col='oat_col', mode=['ALL']),
             APAR27(mat_col='mat_col', rat_col='rat_col', oat_col='oat_col', mode=['ALL'])
-        }
+        ]
 
         dict_result_single_datasource = {
             'family': folder_name,

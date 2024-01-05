@@ -1,15 +1,18 @@
-# Author:       Roberto Chiosa
-# Copyright:    Roberto Chiosa, © 2023
-# Email:        roberto.chiosa@polito.it
-#
-# Created:      24/04/23
-# Script Name:  preprocessing.py
-# Path:         utils
-#
-# Script Description:
-# This script contains the available preprocessing functions defined in the yaml file.
-#
-# Notes:
+"""
+Author:       Roberto Chiosa
+Copyright:    Roberto Chiosa, © 2023
+Email:        roberto.chiosa@polito.it
+
+Created:      24/04/23
+Script Name:  preprocessing.py
+Path:         utils
+
+Script Description:
+This script contains the available preprocessing functions defined in the yaml file.
+
+Notes:
+"""
+
 import numpy as np
 import pandas as pd
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -44,7 +47,8 @@ def linear_interpolation(df: pd.DataFrame) -> pd.DataFrame:
     # are there any na in the dataset?
     if df.isna().sum().sum() > 0:
         logger.warning('Linear interpolating NaN.')
-        df_interpolated = df.interpolate(limit_direction='both', limit=5)
+
+        df_interpolated = df.infer_objects(copy=False).interpolate(limit_direction='both', limit=5)
     else:
         # logger.info('No NaN values to interpolate.')
         df_interpolated = df

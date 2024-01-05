@@ -1,1 +1,1 @@
-# afdd-framework
+# Anomaly detection and diagnosis framework
