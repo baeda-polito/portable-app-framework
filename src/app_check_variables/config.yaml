@@ -7,6 +7,3 @@ details:
   email: roberto.chiosa@polito.it
   created_at: 2024-01-01
 
-analyze_functions:
-  - check_variables
-

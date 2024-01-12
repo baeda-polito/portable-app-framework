@@ -108,25 +108,3 @@ class Application:
         fetch_data = self.data.loc[:, self.data.columns.isin(fetch_metadata.keys())]
 
         self.res = ApplicationData(data=fetch_data, metadata=fetch_metadata)
-
-    def clean(self):
-        """
-        Clean data
-        """
-        self.res.data = self.res.data.dropna(axis=1, how='all')
-
-    def analyze(self):
-        """
-        The purpose of this component is to perform the actual analysis of the data.
-
-        The output of the "analyze" component is a set of timeseries dataframes
-        containing the results of the analysis. The application developer can choose to save these results to the
-        timeseries database, or to perform additional analysis on the results in the aggregate component.
-        """
-        # run all the functions contained in the yaml configuration
-        for function in self.analyze_functions:
-            self.logger.info(f'Analyzing data using function "{function}"')
-            # # get the function name
-            # fn = getattr(analyze, function)
-            # # execute the function
-            # self.res = fn(self, self.res)

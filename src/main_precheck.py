@@ -68,21 +68,15 @@ if __name__ == '__main__':
         ##################
         df = driver_data_fetch(folder, filename)
         graph = rdflib.Graph()
-        ##################
+
+        # VARIABLES CHECK
         app_folder = 'app_check_variables'
         app = Application(data=df, metadata=graph, config_folder=app_folder)
         app.fetch()
-        app.clean()
-        app.analyze()
-        check_log_result(app.res.result, app_folder, app.res.message)
-        ##################
-
-        result, message = app.res.result, app.res.message
-        # VARIABLES CHECK
-        df_varcheck = df.dropna(axis=1, how='all')
-        result, message = check_variables(df_varcheck)
+        app.res.data = app.data.dropna(axis=1, how='all')  # clean
+        result, message = check_variables(app.data)  # analyze
         n_list.append(result)
-        check_log_result(result, 'check_variables', message)
+        check_log_result(result, app_folder, message)
 
         # STUCK TEMPERATURE SENSOR VARIABLE
         result, message = check_sensor(df, config)
