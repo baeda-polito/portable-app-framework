@@ -15,9 +15,11 @@ Notes:
 import os
 
 import pandas as pd
+import rdflib
 
 from utils.logger import CustomLogger
 from utils.util import ensure_dir, list_files
+from utils.util_app import Application
 from utils.util_check import check_damper, check_hc, check_log_result, check_min_oa, check_sensor, check_valves, \
     check_variables, check_log_overall_result, check_freeze_protection
 from utils.util_driver import driver_data_fetch
@@ -62,9 +64,20 @@ if __name__ == '__main__':
         }
 
         n_list = []  # list of check passed
-        # fetch data depending on the folder and filename
-        df = driver_data_fetch(folder, filename)
 
+        ##################
+        df = driver_data_fetch(folder, filename)
+        graph = rdflib.Graph()
+        ##################
+        app_folder = 'app_check_variables'
+        app = Application(data=df, metadata=graph, config_folder=app_folder)
+        app.fetch()
+        app.clean()
+        app.analyze()
+        check_log_result(app.res.result, app_folder, app.res.message)
+        ##################
+
+        result, message = app.res.result, app.res.message
         # VARIABLES CHECK
         df_varcheck = df.dropna(axis=1, how='all')
         result, message = check_variables(df_varcheck)
