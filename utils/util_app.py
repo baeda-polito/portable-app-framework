@@ -84,11 +84,11 @@ class Application:
 
         try:
             self.logger.info(f'Validating the ttl file on manifest.ttl')
-            BVI = BasicValidationInterface(
+            basic_validation = BasicValidationInterface(
                 graph=self.metadata,
                 manifest=self.manifest,
             )
-            BVI.validate()
+            basic_validation.validate()
 
             # BMI = BuildingMotifValidationInterface(
             #     graph_path=self.graph_path,

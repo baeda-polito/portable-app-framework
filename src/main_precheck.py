@@ -79,6 +79,9 @@ if __name__ == '__main__':
         app_folder = 'app_check_variables'
         app = Application(data=df, metadata=graph, config_folder=app_folder)
         app.qualify()
+        app.fetch()
+        n_list.append(True)
+        check_log_result(True, app_folder, '')
 
         # STUCK TEMPERATURE SENSOR VARIABLE
         result, message = check_sensor(df, config)
