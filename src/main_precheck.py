@@ -14,14 +14,14 @@ Notes:
 """
 import os
 
+import brickschema
 import pandas as pd
-import rdflib
 
 from utils.logger import CustomLogger
 from utils.util import ensure_dir, list_files
 from utils.util_app import Application
 from utils.util_check import check_damper, check_hc, check_log_result, check_min_oa, check_sensor, check_valves, \
-    check_variables, check_log_overall_result, check_freeze_protection
+    check_log_overall_result, check_freeze_protection
 from utils.util_plot import plot_damper, plot_valves
 from utils.util_preprocessing import get_steady, preprocess
 
@@ -72,17 +72,13 @@ if __name__ == '__main__':
         ##################
         # df = driver_data_fetch(folder, filename)
         df = pd.read_parquet(os.path.join(folder, filename))
-        graph = rdflib.Graph().parse(
+        graph = brickschema.Graph().parse(
             os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU", "LBNL_FDD_Data_Sets_SDAHU_ttl.ttl"))
 
         # VARIABLES CHECK
         app_folder = 'app_check_variables'
         app = Application(data=df, metadata=graph, config_folder=app_folder)
-        app.fetch()
-        app.res.data = app.res.data.dropna(axis=1, how='all')  # clean
-        result, message = check_variables(app.res.data)  # analyze
-        n_list.append(result)
-        check_log_result(result, app_folder, message)
+        app.qualify()
 
         # STUCK TEMPERATURE SENSOR VARIABLE
         result, message = check_sensor(df, config)

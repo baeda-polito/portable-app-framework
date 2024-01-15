@@ -12,13 +12,12 @@ Script Description:
 
 Notes:
 """
-
+import rdflib
 from buildingmotif import BuildingMOTIF
 from buildingmotif.dataclasses import Model, Library
 from rdflib import Namespace
 
 from utils.logger import CustomLogger
-from utils.util_brick import BrickGraph
 
 logger = CustomLogger().get_logger()
 
@@ -29,22 +28,10 @@ class BasicValidationInterface:
     https://github.com/gtfierro/shapes/blob/main/verify.py
     """
 
-    def __init__(self, graph_path: str, manifest_path: str):
+    def __init__(self, graph: rdflib.Graph, manifest: str):
         # use the wrapper BrickGraph to initialize the graph
-        self.graph = BrickGraph()
-        # load the ttl file
-        self.graph.load_file(graph_path)
-        # load all the manifests
-        self.graph.load_file(manifest_path)
-        self.graph_path = graph_path
-
-    def describe(self) -> None:
-        """
-        Describe the graph
-        :return: print the graph description
-        """
-        # describe the ttl file
-        self.graph.describe()
+        self.graph = graph
+        self.graph.parse(manifest, format='ttl')
 
     def validate(self) -> None:
         """
@@ -52,8 +39,8 @@ class BasicValidationInterface:
         :return: print the validation report
         """
         # validate
-        valid, report_graph, report = self.graph.graph.validate()
-        logger.warning(f"[Brick] Model <{self.graph_path}> is valid? {valid}")
+        valid, report_graph, report = self.graph.validate()
+        logger.warning(f"[Brick] Is valid? {valid}")
         if not valid:
             print("-" * 79)
             print(report)

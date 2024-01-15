@@ -18,6 +18,7 @@ from rdflib import URIRef, Literal
 
 from utils.logger import CustomLogger
 from utils.util import load_file
+from utils.util_qualify import BasicValidationInterface
 
 
 class ApplicationData:
@@ -62,7 +63,7 @@ class Application:
         else:
             config_file = load_file(os.path.join(config_folder, 'config.yaml'), yaml_type=True)
             self.details = config_file['details']
-            self.manifest = load_file(os.path.join(config_folder, 'manifest.ttl'))
+            self.manifest = os.path.join(config_folder, 'manifest.ttl')
             self.query = load_file(os.path.join(config_folder, 'query.rq'))
 
     def qualify(self) -> None:
@@ -83,12 +84,11 @@ class Application:
 
         try:
             self.logger.info(f'Validating the ttl file on manifest.ttl')
-            # BVI = BasicValidationInterface(
-            #     graph_path=self.graph_path,
-            #     manifest_path=manifest_path,
-            # )
-            # BVI.describe()
-            # BVI.validate()
+            BVI = BasicValidationInterface(
+                graph=self.metadata,
+                manifest=self.manifest,
+            )
+            BVI.validate()
 
             # BMI = BuildingMotifValidationInterface(
             #     graph_path=self.graph_path,
