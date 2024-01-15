@@ -1,0 +1,30 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX brick: <https://brickschema.org/schema/Brick#>
+PREFIX bldg: <http://bldg-59#>
+SELECT  ?cooling_sig_col ?oat_col# ?heating_sig_col
+WHERE {
+    ?equip a brick:AHU .
+    ?equip brick:hasPart ?cooling_coil. # ?heating_coil,
+    ?equip brick:hasPoint ?oat_col.
+
+    ?oat rdf:type brick:Outside_Air_Temperature_Sensor .
+
+    ?cooling_coil           rdf:type        brick:Cooling_Coil .
+    ?cooling_coil           brick:hasPoint  ?cooling_sig_col .
+    ?cooling_sig_col        rdf:type        brick:Valve_Position_Command .
+
+    #    ?heating_coil           rdf:type        brick:Heating_Coil .
+    #    ?heating_coil           brick:hasPoint  ?heating_sig_col .
+    #    ?heating_sig_col        rdf:type        brick:Valve_Position_Command .
+
+}
+
+#fetch_metadata = {
+#'satsp_col': 'satsp_col',
+#'sat_col': 'sat_col',
+#'oat_col': 'oat_col',
+#'rat_col': 'rat_col',
+#'cooling_sig_col': 'cooling_sig_col',
+#'heating_sig_col': 'heating_sig_col',
+#'oa_dmpr_sig_col': 'oa_dmpr_sig_col'
+#}

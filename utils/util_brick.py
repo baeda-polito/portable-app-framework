@@ -97,7 +97,7 @@ class BrickGraph(object):
         """
         if load == "nightly":
             # load nightly version
-            self.graph = brickschema.Graph(load_brick_nightly=True).serialize('../data/libraries/Brick-nightly.ttl',
+            self.graph = brickschema.Graph(load_brick_nightly=True).serialize('../config/libraries/Brick-nightly.ttl',
                                                                               format='ttl')
         elif load == "latest":
             # load latest stable version

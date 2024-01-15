@@ -22,7 +22,6 @@ from utils.util import ensure_dir, list_files
 from utils.util_app import Application
 from utils.util_check import check_damper, check_hc, check_log_result, check_min_oa, check_sensor, check_valves, \
     check_variables, check_log_overall_result, check_freeze_protection
-from utils.util_driver import driver_data_fetch
 from utils.util_plot import plot_damper, plot_valves
 from utils.util_preprocessing import get_steady, preprocess
 
@@ -30,18 +29,23 @@ if __name__ == '__main__':
 
     # create logger
     logger = CustomLogger().get_logger()
+
     # define folder with files
-    # folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
     folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
+    # folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
     # folder = os.path.join("..", "data", "MZVAV_PQ")
     # folder = os.path.join("..", "data", "AHU_SX_PQ")
+
     # ensure the existence of the folder
     ensure_dir(folder)
+
     # set plot flag
     plot_flag = False
+
     # list files in the folder
     files = list_files(folder, file_formats=[".csv", ".parquet"])
 
+    # Define dictionary to collect results
     dict_result = {}
 
     for filename in files:
@@ -66,15 +70,17 @@ if __name__ == '__main__':
         n_list = []  # list of check passed
 
         ##################
-        df = driver_data_fetch(folder, filename)
-        graph = rdflib.Graph()
+        # df = driver_data_fetch(folder, filename)
+        df = pd.read_parquet(os.path.join(folder, filename))
+        graph = rdflib.Graph().parse(
+            os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU", "LBNL_FDD_Data_Sets_SDAHU_ttl.ttl"))
 
         # VARIABLES CHECK
         app_folder = 'app_check_variables'
         app = Application(data=df, metadata=graph, config_folder=app_folder)
         app.fetch()
-        app.res.data = app.data.dropna(axis=1, how='all')  # clean
-        result, message = check_variables(app.data)  # analyze
+        app.res.data = app.res.data.dropna(axis=1, how='all')  # clean
+        result, message = check_variables(app.res.data)  # analyze
         n_list.append(result)
         check_log_result(result, app_folder, message)
 

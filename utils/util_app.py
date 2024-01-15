@@ -14,6 +14,8 @@ Notes:
 """
 import os
 
+from rdflib import URIRef, Literal
+
 from utils.logger import CustomLogger
 from utils.util import load_file
 
@@ -43,10 +45,13 @@ class Application:
         self.data = data
         self.metadata = metadata
         self.res = None
-        # The config folder should contain
-        # - config.yaml
-        # - manifest.yaml
-        # - query.ttl
+        '''
+        The config folder should be structured as follows
+        . <NAME>
+        ├── config.yaml
+        ├── manifest.ttl
+        └── query.rq
+        '''
 
         if os.path.join(config_folder, 'config.yaml') is None:
             raise FileNotFoundError('config.yaml not found')
@@ -57,7 +62,6 @@ class Application:
         else:
             config_file = load_file(os.path.join(config_folder, 'config.yaml'), yaml_type=True)
             self.details = config_file['details']
-            self.analyze_functions = config_file['analyze_functions']
             self.manifest = load_file(os.path.join(config_folder, 'manifest.ttl'))
             self.query = load_file(os.path.join(config_folder, 'query.rq'))
 
@@ -76,7 +80,23 @@ class Application:
         Notes: https://github.com/flaand/demand_response_controls_library/blob/flaand-dev/examples/boptest/BOPTest_interface_zone_temp_shift_shed_price.py
 
         """
-        pass
+
+        try:
+            self.logger.info(f'Validating the ttl file on manifest.ttl')
+            # BVI = BasicValidationInterface(
+            #     graph_path=self.graph_path,
+            #     manifest_path=manifest_path,
+            # )
+            # BVI.describe()
+            # BVI.validate()
+
+            # BMI = BuildingMotifValidationInterface(
+            #     graph_path=self.graph_path,
+            #     manifest_path=manifest_path,
+            # )
+            # BMI.validate()
+        except Exception as e:
+            self.logger.error(f'Error during the validation of the manifest: {e}')
 
     def fetch(self):
         """
@@ -93,18 +113,42 @@ class Application:
 
         :return: The data
         """
-        # todo fetch metadata grom provided graph
-        fetch_metadata = {
-            'satsp_col': 'satsp_col',
-            'sat_col': 'sat_col',
-            'oat_col': 'oat_col',
-            'rat_col': 'rat_col',
-            'cooling_sig_col': 'cooling_sig_col',
-            'heating_sig_col': 'heating_sig_col',
-            'oa_dmpr_sig_col': 'oa_dmpr_sig_col'
+        self.logger.info(f'Fetching metadata based on sparql query')
+        # Perform query on rdf graph
+        query_results = self.metadata.query(self.query)
+
+        # todo considerare di spostare tutto in brick utility
+        # Convert the query results to the desired JSON format
+        head_vars = [str(var) for var in query_results.vars]
+        # Convert FrozenBindings to JSON format
+        bindings_list = []
+        for binding in query_results.bindings:
+            binding_dict = {}
+            for var in head_vars:
+                try:
+                    value = binding[var]
+                    value_dict = {
+                        'type': 'uri' if isinstance(value, URIRef) else 'literal' if isinstance(value,
+                                                                                                Literal) else None,
+                        'value': str(value),
+                    }
+                    binding_dict[var] = value_dict
+                except KeyError:
+                    pass
+            bindings_list.append(binding_dict)
+
+        json_results = {
+            'head': {'vars': head_vars},
+            'results': {'bindings': bindings_list}
         }
-        # todo fetch data from provided data by filtering
-        # get columns with metadata matching df_fetch_metadata
-        fetch_data = self.data.loc[:, self.data.columns.isin(fetch_metadata.keys())]
+
+        # From the result i need to fetch the corresponding column in data
+        fetch_metadata = {}
+        for item in json_results['results']['bindings'][0].items():
+            fetch_metadata[item[0]] = item[1]['value'].split('#')[1]
+
+        fetch_data = self.data.loc[:, self.data.columns.isin(fetch_metadata.values())]
+        # todo remove when in production, remap to convention
+        fetch_data.columns = fetch_metadata.keys()
 
         self.res = ApplicationData(data=fetch_data, metadata=fetch_metadata)
