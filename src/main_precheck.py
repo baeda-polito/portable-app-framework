@@ -22,6 +22,7 @@ from utils.util import ensure_dir, list_files
 from utils.util_app import Application
 from utils.util_check import check_damper, check_hc, check_log_result, check_min_oa, check_sensor, check_valves, \
     check_log_overall_result, check_freeze_protection
+from utils.util_driver import driver_data_fetch
 from utils.util_plot import plot_damper, plot_valves
 from utils.util_preprocessing import get_steady, preprocess
 
@@ -70,31 +71,47 @@ if __name__ == '__main__':
         n_list = []  # list of check passed
 
         ##################
-        # df = driver_data_fetch(folder, filename)
-        df = pd.read_parquet(os.path.join(folder, filename))
+        df = driver_data_fetch(folder, filename)
+        # df = pd.read_parquet(os.path.join(folder, filename))
         graph = brickschema.Graph().parse(
             os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU", "LBNL_FDD_Data_Sets_SDAHU_ttl.ttl"))
 
-        # VARIABLES CHECK
+        # APP: VARIABLES CHECK
         app_folder = 'app_check_variables'
         app = Application(data=df, metadata=graph, config_folder=app_folder)
         app.qualify()
         app.fetch()
-        n_list.append(True)
-        check_log_result(True, app_folder, '')
+        app.res.result, app.res.message = True, ''
+        n_list.append(app.res.result)
+        check_log_result(app.res.result, app_folder, app.res.message)
 
-        # STUCK TEMPERATURE SENSOR VARIABLE
-        result, message = check_sensor(df, config)
+        # APP: STUCK TEMPERATURE SENSOR VARIABLE
+        app_folder = 'app_check_sensor'
+        app = Application(data=df, metadata=graph, config_folder=app_folder)
+        app.qualify()
+        app.fetch()
+        result, message = check_sensor(app.res.data, config)
         n_list.append(result)
-        check_log_result(result, 'check_sensor', message)
+        check_log_result(result, app_folder, message)
 
-        # PREPROCESSING
-        df = preprocess(df, config)
+        # APP: PREPROCESSING
+        app_folder = 'app_preprocessing'
+        app = Application(data=df, metadata=graph, config_folder=app_folder)
+        app.qualify()
+        app.fetch()
+        app.res.data = preprocess(app.res.data, config)
+        app.res.data = get_steady(app.res.data, config, plot_flag=plot_flag, filename=datasource)
+        df_clean = app.res.data
 
-        # IDENTIFY TRANSIENT
-        df_clean = get_steady(df, config, plot_flag=plot_flag, filename=datasource)
+        # APP: MINIMUM OUTDOOR AIR REQUIREMENTS
+        app_folder = 'app_check_min_oa'
+        app = Application(data=df, metadata=graph, config_folder=app_folder)
+        app.qualify()
+        app.fetch()
+        result, message = check_sensor(app.res.data, config)
+        n_list.append(result)
+        check_log_result(result, app_folder, message)
 
-        # MINIMUM OUTDOOR AIR REQUIREMENTS
         df_damper_min = df_clean[
             (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"])
         ]
@@ -104,7 +121,7 @@ if __name__ == '__main__':
         if plot_flag:
             plot_damper(df_damper_min, config, filename=datasource)
 
-        # FREEZE PROTECTION
+        # APP: FREEZE PROTECTION
         df_freeze = df_clean[
             (df_clean['oat_col'] < 4.4) &
             (df_clean['slope'] == 'steady')
@@ -113,7 +130,7 @@ if __name__ == '__main__':
         n_list.append(result)
         check_log_result(result, 'check_freeze_protection', message)
 
-        # DAMPER CHECK
+        # APP: DAMPER CHECK
         df_damper = df_clean[
             (df_clean['cooling_sig_col'] < config["valves_cutoff"]) &
             (df_clean['heating_sig_col'] < config["valves_cutoff"]) &

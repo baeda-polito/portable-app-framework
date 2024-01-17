@@ -214,17 +214,17 @@ def get_steady(df, configuration: dict, plot_flag: bool = False, filename=None):
         np.gradient(df_steady['cooling_sig_col']),
         df_steady.index,
         name='slope_cooling')
-    slope_heating = pd.Series(
-        np.gradient(df_steady['heating_sig_col']),
-        df_steady.index,
-        name='slope_heating')
+    # slope_heating = pd.Series(
+    #     np.gradient(df_steady['heating_sig_col']),
+    #     df_steady.index,
+    #     name='slope_heating')
     slope_damper = pd.Series(
         np.gradient(df_steady['oa_dmpr_sig_col']),
         df_steady.index,
         name='slope_damper')
 
     # join slopes to unique slope series keeping the max value
-    slope = pd.concat([slope_cooling, slope_damper, slope_heating], axis=1)
+    slope = pd.concat([slope_cooling, slope_damper], axis=1)
     slope = slope.abs().max(axis=1)
     # concatenate slope to df_damper
     df_steady = pd.concat([df_steady, slope], axis=1)

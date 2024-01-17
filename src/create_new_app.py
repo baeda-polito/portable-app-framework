@@ -14,6 +14,7 @@ Notes:
 """
 import os
 import sys
+from datetime import datetime
 
 if __name__ == '__main__':
     """
@@ -21,16 +22,17 @@ if __name__ == '__main__':
     :param app_name:
     """
     app_name = sys.argv[1]
+    app_name_pretty = app_name.replace('-', ' ').title()
     os.mkdir(app_name)
     # create file
     with open(os.path.join(app_name, 'config.yaml'), 'w') as f:
         f.write(f"""details:
-  name: Check Variables
-  description: Checks if a certain AHU has the required variables
+  name: {app_name_pretty}
+  description: 
   version: 1.0
   author: Roberto Chiosa
   email: roberto.chiosa@polito.it
-  created_at: 2024-01-01
+  created_at: {datetime.now().strftime("%Y-%m-%d")}
         """)
     with open(os.path.join(app_name, 'query.rq'), 'w') as f:
         f.write("""SELECT ?point ?component ?type WHERE {

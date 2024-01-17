@@ -38,14 +38,22 @@ def driver_data_fetch(folder: str, filename: str, full: bool = False) -> pd.Data
         df = pd.read_parquet(os.path.join(folder, filename))
         # Select columns and perform data transformations
         df["time"] = df['Datetime']
-        df['heating_sig_col'] = np.zeros(len(df))
-        df['satsp_col'] = fahrenheit_to_celsius(df['SA_TEMPSPT'])
-        df['sat_col'] = fahrenheit_to_celsius(df['SA_TEMP'])
-        df['oat_col'] = fahrenheit_to_celsius(df['OA_TEMP'])
-        df['rat_col'] = fahrenheit_to_celsius(df['RA_TEMP'])
-        df['mat_col'] = fahrenheit_to_celsius(df['MA_TEMP'])
-        df['cooling_sig_col'] = df['CHWC_VLV_DM']
-        df['oa_dmpr_sig_col'] = df['OA_DMPR_DM']
+        # df['heating_sig_col'] = np.zeros(len(df))
+        # df['satsp_col'] = fahrenheit_to_celsius(df['SA_TEMPSPT'])
+        # df['sat_col'] = fahrenheit_to_celsius(df['SA_TEMP'])
+        # df['oat_col'] = fahrenheit_to_celsius(df['OA_TEMP'])
+        # df['rat_col'] = fahrenheit_to_celsius(df['RA_TEMP'])
+        # df['mat_col'] = fahrenheit_to_celsius(df['MA_TEMP'])
+        # df['cooling_sig_col'] = df['CHWC_VLV_DM']
+        # df['oa_dmpr_sig_col'] = df['OA_DMPR_DM']
+
+        df['SA_TEMPSPT'] = fahrenheit_to_celsius(df['SA_TEMPSPT'])
+        df['SA_TEMP'] = fahrenheit_to_celsius(df['SA_TEMP'])
+        df['OA_TEMP'] = fahrenheit_to_celsius(df['OA_TEMP'])
+        df['RA_TEMP'] = fahrenheit_to_celsius(df['RA_TEMP'])
+        df['MA_TEMP'] = fahrenheit_to_celsius(df['MA_TEMP'])
+        df['CHWC_VLV_DM'] = df['CHWC_VLV_DM']
+        df['OA_DMPR_DM'] = df['OA_DMPR_DM']
 
         if full:
             # return fan control signal and system on of status to define OM in APAR application
@@ -55,8 +63,12 @@ def driver_data_fetch(folder: str, filename: str, full: bool = False) -> pd.Data
                      'oa_dmpr_sig_col', 'mat_col', 'fan_vfd_speed_col', 'sys_ctl_col']]
         else:
             # keep only some columns
-            df = df[['time', 'satsp_col', 'sat_col', 'oat_col', 'rat_col', 'cooling_sig_col', 'heating_sig_col',
-                     'oa_dmpr_sig_col', 'mat_col']]
+            # df = df[['time', 'satsp_col', 'sat_col', 'oat_col', 'rat_col', 'cooling_sig_col', 'heating_sig_col',
+            #          'oa_dmpr_sig_col', 'mat_col']]
+
+            df = df[['time', 'SA_TEMPSPT', 'SA_TEMP', 'OA_TEMP', 'RA_TEMP', 'MA_TEMP', 'CHWC_VLV_DM', 'OA_DMPR_DM']]
+
+
     elif 'DDAHU' in folder:
         # load data
         df = pd.read_parquet(os.path.join(folder, filename))

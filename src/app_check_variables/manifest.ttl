@@ -6,7 +6,7 @@
 
 :
     a owl:Ontology .
-
+# todo discussione su come fare le shape nel paper framework
 
 :ahu
     a              sh:NodeShape ;
