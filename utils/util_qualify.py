@@ -40,7 +40,7 @@ class BasicValidationInterface:
         """
         # validate
         valid, report_graph, report = self.graph.validate()
-        logger.warning(f"[Brick] Is valid? {valid}")
+        logger.debug(f"[Brick] Is valid? {valid}")
         if not valid:
             print("-" * 79)
             print(report)

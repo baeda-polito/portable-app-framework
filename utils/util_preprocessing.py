@@ -32,7 +32,7 @@ def normalize_01(df: pd.DataFrame, col: str) -> pd.DataFrame:
     """
     if df[col].max() > 1:
         df[col] /= 100
-        logger.warning(f'Reducing {col} to [0-1]')
+        logger.debug(f'Reducing {col} to [0-1]')
 
     return df
 
@@ -46,7 +46,7 @@ def linear_interpolation(df: pd.DataFrame) -> pd.DataFrame:
 
     # are there any na in the dataset?
     if df.isna().sum().sum() > 0:
-        logger.warning('Linear interpolating NaN.')
+        logger.debug('Linear interpolating NaN.')
 
         df_interpolated = df.infer_objects(copy=False).interpolate(limit_direction='both', limit=5)
     else:
@@ -65,7 +65,7 @@ def drop_na(df: pd.DataFrame) -> pd.DataFrame:
 
     # are there any na in the dataset?
     if df.isna().sum().sum() > 0:
-        # logger.warning('Dropping NaN.')
+        # logger.debug('Dropping NaN.')
         df_clean = df.dropna()
     else:
         # logger.info('No NaN values to drop.')
@@ -90,7 +90,7 @@ def resample(df: pd.DataFrame, window: str = '15T') -> pd.DataFrame:
 
     # resample to the bigger available frequency of data
     df_resampled = df.resample(window).mean()
-    # logger.warning(f'Resampling data to {window} interval.')
+    # logger.debug(f'Resampling data to {window} interval.')
 
     # else:
     #     raise ValueError('Data have a maximum time delta larger than the provided time window.')
@@ -170,11 +170,11 @@ def preprocess(df, configuration: dict):
                 if 0 < len(outliers) < 20:
                     # limit the number of outliers to first 10 sort
                     outliers = outliers.sort_values(ascending=False).head(10)
-                    logger.warning(f'Dropping {len(outliers)} outliers in {col}\n{outliers}')
+                    logger.debug(f'Dropping {len(outliers)} outliers in {col}\n{outliers}')
                     # stl_result.plot().show()
                     df.loc[outliers.index, col] = None
 
-            elif col in ['cooling_sig_col', 'heating_sig_col', 'oa_dmpr_sig_col']:
+            elif col in ['cooling_sig_col', 'oa_dmpr_sig_col']:  # 'heating_sig_col',
                 # fill na with zeros if necessary
                 df[col] = df[col].fillna(0)
                 # find outliers

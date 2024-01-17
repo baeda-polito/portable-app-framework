@@ -45,7 +45,8 @@ class Application:
         # The graph_path and datasource are external to the configuration file.
         self.data = data
         self.metadata = metadata
-        self.res = None
+        self.res = ApplicationData()
+
         '''
         The config folder should be structured as follows
         . <NAME>
@@ -83,7 +84,7 @@ class Application:
         """
 
         try:
-            self.logger.info(f'Validating the ttl file on manifest.ttl')
+            self.logger.debug(f'Validating the ttl file on manifest.ttl')
             basic_validation = BasicValidationInterface(
                 graph=self.metadata,
                 manifest=self.manifest,
@@ -113,7 +114,7 @@ class Application:
 
         :return: The data
         """
-        self.logger.info(f'Fetching metadata based on sparql query')
+        self.logger.debug(f'Fetching metadata based on sparql query')
         # Perform query on rdf graph
         query_results = self.metadata.query(self.query)
 

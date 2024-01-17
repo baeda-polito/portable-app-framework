@@ -32,7 +32,7 @@ def driver_data_fetch(folder: str, filename: str, full: bool = False) -> pd.Data
     :param full: if True, fan control signal is returned
     :return: the parsed dataframe with the required columns for the analysis
     """
-    logger.info(f'Loading {filename}')
+    logger.debug(f'Loading {filename}')
     if 'SDAHU' in folder:
         # load data
         df = pd.read_parquet(os.path.join(folder, filename))

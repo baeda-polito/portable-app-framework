@@ -125,12 +125,13 @@ def check_sensor(df, configuration):
         return True, ''
 
 
-def check_min_oa(df, configuration):
+def check_min_oa(df, configuration, plot_flag=True):
     """
     Check if the minimum outdoor air is respected.
     Is the minimum outdoor-air damper position reasonable (between 10% and 20%)?
     NB trim under 50% and find median
     
+    :param plot_flag:
     :param df: the dataset containing the measured variables
     :param configuration: a dictionary of thresholds
     """
@@ -138,6 +139,9 @@ def check_min_oa(df, configuration):
     df = df[
         (df['oa_dmpr_sig_col'] > configuration["damper_cutoff"])
     ]
+
+    if plot_flag:
+        plot_damper(df, configuration, filename=configuration['datasource'])
 
     if df.shape[0] == 0:
         logger.info('check_min_oa_passed = None (Not enough data)')
@@ -168,7 +172,7 @@ def check_freeze_protection(df, damper_min):
     if damper_frozen < damper_min * 1.2:
         return True, f'Damper at minimum or lower ({damper_frozen} <= {round(damper_min, 3)})'
     else:
-        return Warning, f'Freeze protection not activated ({damper_frozen} > {round(damper_min, 3)})'
+        return None, f'Freeze protection not activated ({damper_frozen} > {round(damper_min, 3)})'
 
 
 def check_damper(df, configuration, plot_flg=False):

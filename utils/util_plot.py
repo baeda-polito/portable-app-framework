@@ -51,8 +51,8 @@ def plot_timeseries_transient(df, configuration: dict, filename=None):
     # add cooling signal
     p.add_scatter(x=df['time'], y=df['cooling_sig_col'], name='cooling signal',
                   mode='lines')
-    p.add_scatter(x=df['time'], y=df['heating_sig_col'], name='heating signal',
-                  mode='lines')
+    # p.add_scatter(x=df['time'], y=df['heating_sig_col'], name='heating signal',
+    #               mode='lines')
     p.add_scatter(x=df['time'], y=df['oa_dmpr_sig_col'], name='damper signal',
                   mode='lines')
     p.update_layout(xaxis_title='Time',

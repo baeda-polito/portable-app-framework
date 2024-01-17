@@ -20,10 +20,9 @@ import pandas as pd
 from utils.logger import CustomLogger
 from utils.util import ensure_dir, list_files
 from utils.util_app import Application
-from utils.util_check import check_damper, check_hc, check_log_result, check_min_oa, check_sensor, check_valves, \
-    check_log_overall_result, check_freeze_protection
+from utils.util_check import check_log_result, check_min_oa, check_sensor, check_log_overall_result, \
+    check_freeze_protection
 from utils.util_driver import driver_data_fetch
-from utils.util_plot import plot_valves
 from utils.util_preprocessing import get_steady, preprocess
 
 if __name__ == '__main__':
@@ -41,7 +40,7 @@ if __name__ == '__main__':
     ensure_dir(folder)
 
     # set plot flag
-    plot_flag = False
+    plot_flag = True
 
     # list files in the folder
     files = list_files(folder, file_formats=[".csv", ".parquet"])
@@ -78,95 +77,98 @@ if __name__ == '__main__':
 
         # APP: VARIABLES CHECK
         app_folder = 'app_check_variables'
-        app = Application(data=df, metadata=graph, config_folder=app_folder)
-        app.qualify()
-        app.fetch()
-        app.res.result, app.res.message = True, ''
-        n_list.append(app.res.result)
-        check_log_result(app.res.result, app_folder, app.res.message)
+        app_check_variables = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_check_variables.qualify()
+        app_check_variables.fetch()
+        app_check_variables.res.result, app_check_variables.res.message = True, ''
+        n_list.append(app_check_variables.res.result)
+        check_log_result(app_check_variables.res.result, app_folder, app_check_variables.res.message)
 
         # APP: STUCK TEMPERATURE SENSOR VARIABLE
         app_folder = 'app_check_sensor'
-        app = Application(data=df, metadata=graph, config_folder=app_folder)
-        app.qualify()
-        app.fetch()
-        result, message = check_sensor(app.res.data, config)
-        n_list.append(result)
-        check_log_result(result, app_folder, message)
+        app_check_sensor = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_check_sensor.qualify()
+        app_check_sensor.fetch()
+        app_check_sensor.res.result, app_check_sensor.res.message = check_sensor(app_check_sensor.res.data, config)
+        n_list.append(app_check_sensor.res.result)
+        check_log_result(app_check_sensor.res.result, app_folder, app_check_sensor.res.message)
 
         # APP: PREPROCESSING
         app_folder = 'app_preprocessing'
-        app = Application(data=df, metadata=graph, config_folder=app_folder)
-        app.qualify()
-        app.fetch()
-        app.res.data = preprocess(app.res.data, config)
-        app.res.data = get_steady(app.res.data, config, plot_flag=plot_flag, filename=datasource)
-        df_clean = app.res.data
+        app_preprocessing = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_preprocessing.qualify()
+        app_preprocessing.fetch()
+        app_preprocessing.res.data = preprocess(app_preprocessing.res.data, config)
+        app_preprocessing.res.data = get_steady(app_preprocessing.res.data, config, plot_flag=plot_flag,
+                                                filename=datasource)
+        df_clean = app_preprocessing.res.data
 
         # APP: MINIMUM OUTDOOR AIR REQUIREMENTS
         app_folder = 'app_check_min_oa'
-        app = Application(data=df, metadata=graph, config_folder=app_folder)
-        app.qualify()
-        app.fetch()
-        result, message, damper_min = check_min_oa(app.res.data, config)
-        n_list.append(result)
-        check_log_result(result, app_folder, message)
-
-        # if plot_flag:
-        #         plot_damper(df_damper_min, config, filename=datasource)
+        app_check_min_oa = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_check_min_oa.qualify()
+        app_check_min_oa.res.data = df_clean  # speed up the process instead of fetching again
+        app_check_min_oa.res.result, app_check_min_oa.res.message, damper_min = check_min_oa(app_check_min_oa.res.data,
+                                                                                             config, plot_flag)
+        n_list.append(app_check_min_oa.res.result)
+        check_log_result(app_check_min_oa.res.result, app_folder, app_check_min_oa.res.message)
 
         # APP: FREEZE PROTECTION
-        df_freeze = df_clean[
+        app_folder = 'app_check_freeze'
+        app_check_freeze = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_check_freeze.qualify()
+        app_check_freeze.res.data = df_clean[
             (df_clean['oat_col'] < 4.4) &
             (df_clean['slope'] == 'steady')
-            ]
-        result, message = check_freeze_protection(df_freeze, damper_min)
-        n_list.append(result)
-        check_log_result(result, 'check_freeze_protection', message)
+            ]  # speed up the process instead of fetching again
+        app_check_freeze.res.result, app_check_freeze.res.message = check_freeze_protection(app_check_freeze.res.data,
+                                                                                            damper_min)
+        n_list.append(app_check_freeze.res.result)
+        check_log_result(app_check_freeze.res.result, app_folder, app_check_freeze.res.message)
 
-        # APP: DAMPER CHECK
-        df_damper = df_clean[
-            (df_clean['cooling_sig_col'] < config["valves_cutoff"]) &
-            (df_clean['heating_sig_col'] < config["valves_cutoff"]) &
-            (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"]) &
-            (df_clean['oat_col'] < df_clean['rat_col'])
-            # when the outdoor-air temperature is less than the return-airq
-            # temperature and the AHU is in cooling mode, it is favorable to economize.
-            ]
-
-        result, message = check_damper(df_damper, config)
-        n_list.append(result)
-        check_log_result(result, 'check_damper', message)
-
-        # H/C CHECK
-        df_hc = df_clean[
-            (df_clean['cooling_sig_col'] > config["valves_cutoff"]) &
-            (df_clean['heating_sig_col'] > config["valves_cutoff"])
-            ]
-
-        result, message = check_hc(df_hc)
-        n_list.append(result)
-        check_log_result(result, 'check_hc', message)
-
-        # VALVES CHECK
-        df_valves = df_clean.melt(
-            id_vars=['dt', 'time', 'oat_col', 'slope'],
-            value_vars=['cooling_sig_col', 'heating_sig_col']
-        )
-
-        df_valves = df_valves[df_valves['value'] > config["valves_cutoff"]]
-
-        df_valves_eco = df_clean[
-            (df_clean['oat_col'] < df_clean['satsp_col'])
-            # when the outdoor-air temperature is less than the return-air temperature
-            # and the AHU is in cooling mode, it is favorable to economize.
-        ]
-
-        result, message = check_valves(df_valves, df_valves_eco, config)
-        n_list.append(result)
-        check_log_result(result, 'check_valves', message)
-        if plot_flag:
-            plot_valves(df_valves, config, filename=datasource)
+        # # APP: DAMPER CHECK
+        # df_damper = df_clean[
+        #     (df_clean['cooling_sig_col'] < config["valves_cutoff"]) &
+        #     (df_clean['heating_sig_col'] < config["valves_cutoff"]) &
+        #     (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"]) &
+        #     (df_clean['oat_col'] < df_clean['rat_col'])
+        #     # when the outdoor-air temperature is less than the return-airq
+        #     # temperature and the AHU is in cooling mode, it is favorable to economize.
+        #     ]
+        #
+        # result, message = check_damper(df_damper, config)
+        # n_list.append(result)
+        # check_log_result(result, 'check_damper', message)
+        #
+        # # H/C CHECK
+        # df_hc = df_clean[
+        #     (df_clean['cooling_sig_col'] > config["valves_cutoff"]) &
+        #     (df_clean['heating_sig_col'] > config["valves_cutoff"])
+        #     ]
+        #
+        # result, message = check_hc(df_hc)
+        # n_list.append(result)
+        # check_log_result(result, 'check_hc', message)
+        #
+        # # VALVES CHECK
+        # df_valves = df_clean.melt(
+        #     id_vars=['dt', 'time', 'oat_col', 'slope'],
+        #     value_vars=['cooling_sig_col', 'heating_sig_col']
+        # )
+        #
+        # df_valves = df_valves[df_valves['value'] > config["valves_cutoff"]]
+        #
+        # df_valves_eco = df_clean[
+        #     (df_clean['oat_col'] < df_clean['satsp_col'])
+        #     # when the outdoor-air temperature is less than the return-air temperature
+        #     # and the AHU is in cooling mode, it is favorable to economize.
+        # ]
+        #
+        # result, message = check_valves(df_valves, df_valves_eco, config)
+        # n_list.append(result)
+        # check_log_result(result, 'check_valves', message)
+        # if plot_flag:
+        #     plot_valves(df_valves, config, filename=datasource)
 
         check_log_overall_result(n_list)
         # add row to result dataframe
