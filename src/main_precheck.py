@@ -23,7 +23,7 @@ from utils.util_app import Application
 from utils.util_check import check_damper, check_hc, check_log_result, check_min_oa, check_sensor, check_valves, \
     check_log_overall_result, check_freeze_protection
 from utils.util_driver import driver_data_fetch
-from utils.util_plot import plot_damper, plot_valves
+from utils.util_plot import plot_valves
 from utils.util_preprocessing import get_steady, preprocess
 
 if __name__ == '__main__':
@@ -108,18 +108,12 @@ if __name__ == '__main__':
         app = Application(data=df, metadata=graph, config_folder=app_folder)
         app.qualify()
         app.fetch()
-        result, message = check_sensor(app.res.data, config)
+        result, message, damper_min = check_min_oa(app.res.data, config)
         n_list.append(result)
         check_log_result(result, app_folder, message)
 
-        df_damper_min = df_clean[
-            (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"])
-        ]
-        result, message, damper_min = check_min_oa(df_damper_min, config)
-        n_list.append(result)
-        check_log_result(result, 'check_min_oa', message)
-        if plot_flag:
-            plot_damper(df_damper_min, config, filename=datasource)
+        # if plot_flag:
+        #         plot_damper(df_damper_min, config, filename=datasource)
 
         # APP: FREEZE PROTECTION
         df_freeze = df_clean[

@@ -135,6 +135,10 @@ def check_min_oa(df, configuration):
     :param configuration: a dictionary of thresholds
     """
 
+    df = df[
+        (df['oa_dmpr_sig_col'] > configuration["damper_cutoff"])
+    ]
+
     if df.shape[0] == 0:
         logger.info('check_min_oa_passed = None (Not enough data)')
     else:
