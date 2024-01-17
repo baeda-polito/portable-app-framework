@@ -15,10 +15,10 @@ Notes:
 import os
 
 from apar import *
-from utils.logger import CustomLogger
-from utils.util import ensure_dir, list_files
-from utils.util_driver import driver_data_fetch
-from utils.util_preprocessing import resample, get_steady
+from app.utils.logger import CustomLogger
+from app.utils.util import ensure_dir, list_files
+from app.utils.util_driver import driver_data_fetch
+from app.utils.util_preprocessing import resample, get_steady
 
 if __name__ == '__main__':
     # create logger
@@ -113,4 +113,4 @@ if __name__ == '__main__':
     df_result = pd.DataFrame(global_result)
     # sort columns apar from 01 to 27
     df_result = df_result.reindex(sorted(df_result.columns), axis=1)
-    df_result.to_csv(os.path.join('..', 'results', 'result.csv'), index=False)
+    df_result.to_csv(os.path.join('results', 'result.csv'), index=False)

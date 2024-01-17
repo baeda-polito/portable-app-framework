@@ -15,9 +15,9 @@ Notes:
 import numpy as np
 import pandas as pd
 
-from utils.logger import CustomLogger
-from utils.util_plot import plot_damper
-from utils.util_preprocessing import check_low_variance
+from .logger import CustomLogger
+from .util_plot import plot_damper
+from .util_preprocessing import check_low_variance
 
 logger = CustomLogger().get_logger()
 

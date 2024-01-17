@@ -24,7 +24,6 @@
     <inspection_tool class="AndroidLintAnnotationProcessorOnCompilePath" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAppBundleLocaleChanges" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAppCompatCustomView" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintAppCompatMethod" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAppCompatResource" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAppIndexingService" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAppLinkUrlError" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -672,7 +671,7 @@
     <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <Languages>
         <language minSize="60" name="JavaScript" />
-        <language minSize="131" name="Python" />
+        <language minSize="516" name="Python" />
       </Languages>
     </inspection_tool>
     <inspection_tool class="DuplicatedDataProviderNames" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -1138,7 +1137,6 @@
     <inspection_tool class="LateinitVarOverridesLateinitVar" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="LatexAbsolutePath" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="LatexAvoidEqnarray" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="LatexBibinputsRelativePath" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="LatexCdot" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="LatexCiteBeforePeriod" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="LatexCollapseCite" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1927,7 +1925,6 @@
     <inspection_tool class="SqlWithoutWhereInspection" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="StatefulEp" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="StaticInitializerReferencesSubClass" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="StaticPseudoFunctionalStyleMethod" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="StreamToLoop" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="StringBufferReplaceableByString" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="StringBufferReplaceableByStringBuilder" enabled="false" level="WARNING" enabled_by_default="false" />

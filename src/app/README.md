@@ -29,7 +29,7 @@ from utils.util_app import Application
 app = Application(
     data=pd.DataFrame(),
     metadata=brickschema.Graph(),
-    config_folder='path/to/app/folder'
+    app_name='path/to/app/folder'
 )
 app.qualify()
 app.fetch()

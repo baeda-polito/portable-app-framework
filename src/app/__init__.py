@@ -16,9 +16,9 @@ import os
 
 from rdflib import URIRef, Literal
 
-from utils.logger import CustomLogger
-from utils.util import load_file
-from utils.util_qualify import BasicValidationInterface
+from .utils.logger import CustomLogger
+from .utils.util import load_file
+from .utils.util_qualify import BasicValidationInterface
 
 
 class ApplicationData:
@@ -39,7 +39,7 @@ class Application:
     Application class
     """
 
-    def __init__(self, data=None, metadata=None, config_folder=None):
+    def __init__(self, data=None, metadata=None, app_name=None):
         # Class specific logger
         self.logger = CustomLogger().get_logger()
         # The graph_path and datasource are external to the configuration file.
@@ -55,17 +55,17 @@ class Application:
         └── query.rq
         '''
 
-        if os.path.join(config_folder, 'config.yaml') is None:
+        if os.path.join('app', app_name, 'config.yaml') is None:
             raise FileNotFoundError('config.yaml not found')
-        elif os.path.join(config_folder, 'manifest.yaml') is None:
+        elif os.path.join('app', app_name, 'manifest.yaml') is None:
             raise FileNotFoundError('manifest.yaml not found')
-        elif os.path.join(config_folder, 'query.ttl') is None:
+        elif os.path.join('app', app_name, 'query.ttl') is None:
             raise FileNotFoundError('query.ttl not found')
         else:
-            config_file = load_file(os.path.join(config_folder, 'config.yaml'), yaml_type=True)
+            config_file = load_file(os.path.join('app', app_name, 'config.yaml'), yaml_type=True)
             self.details = config_file['details']
-            self.manifest = os.path.join(config_folder, 'manifest.ttl')
-            self.query = load_file(os.path.join(config_folder, 'query.rq'))
+            self.manifest = os.path.join('app', app_name, 'manifest.ttl')
+            self.query = load_file(os.path.join('app', app_name, 'query.rq'))
 
     def qualify(self) -> None:
         """

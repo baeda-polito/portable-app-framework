@@ -17,13 +17,13 @@ import os
 import brickschema
 import pandas as pd
 
-from utils.logger import CustomLogger
-from utils.util import ensure_dir, list_files
-from utils.util_app import Application
-from utils.util_check import check_log_result, check_min_oa, check_sensor, check_log_overall_result, \
+from app import Application
+from app.utils.logger import CustomLogger
+from app.utils.util import ensure_dir, list_files
+from app.utils.util_check import check_log_result, check_min_oa, check_sensor, check_log_overall_result, \
     check_freeze_protection
-from utils.util_driver import driver_data_fetch
-from utils.util_preprocessing import get_steady, preprocess
+from app.utils.util_driver import driver_data_fetch
+from app.utils.util_preprocessing import get_steady, preprocess
 
 if __name__ == '__main__':
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     logger = CustomLogger().get_logger()
 
     # define folder with files
-    folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
+    folder = os.path.join("data", "LBNL_FDD_Dataset_SDAHU_PQ")
     # folder = os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU_PQ")
     # folder = os.path.join("..", "data", "MZVAV_PQ")
     # folder = os.path.join("..", "data", "AHU_SX_PQ")
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     ensure_dir(folder)
 
     # set plot flag
-    plot_flag = True
+    plot_flag = False
 
     # list files in the folder
     files = list_files(folder, file_formats=[".csv", ".parquet"])
@@ -73,11 +73,10 @@ if __name__ == '__main__':
         df = driver_data_fetch(folder, filename)
         # df = pd.read_parquet(os.path.join(folder, filename))
         graph = brickschema.Graph().parse(
-            os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU", "LBNL_FDD_Data_Sets_SDAHU_ttl.ttl"))
+            os.path.join("data", "LBNL_FDD_Dataset_SDAHU", "LBNL_FDD_Data_Sets_SDAHU_ttl.ttl"))
 
         # APP: VARIABLES CHECK
-        app_folder = os.path.join('..', 'app', 'app_check_variables')
-        app_check_variables = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_check_variables = Application(data=df, metadata=graph, app_name='app_check_variables')
         app_check_variables.qualify()
         app_check_variables.fetch()
         app_check_variables.res.result, app_check_variables.res.message = True, ''
@@ -89,8 +88,7 @@ if __name__ == '__main__':
         )
 
         # APP: STUCK TEMPERATURE SENSOR VARIABLE
-        app_folder = os.path.join('..', 'app', 'app_check_sensor')
-        app_check_sensor = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_check_sensor = Application(data=df, metadata=graph, app_name='app_check_sensor')
         app_check_sensor.qualify()
         app_check_sensor.fetch()
         app_check_sensor.res.result, app_check_sensor.res.message = check_sensor(app_check_sensor.res.data, config)
@@ -102,8 +100,7 @@ if __name__ == '__main__':
         )
 
         # APP: PREPROCESSING
-        app_folder = os.path.join('..', 'app', 'app_preprocessing')
-        app_preprocessing = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_preprocessing = Application(data=df, metadata=graph, app_name='app_preprocessing')
         app_preprocessing.qualify()
         app_preprocessing.fetch()
         app_preprocessing.res.data = preprocess(app_preprocessing.res.data, config)
@@ -112,8 +109,7 @@ if __name__ == '__main__':
         df_clean = app_preprocessing.res.data
 
         # APP: MINIMUM OUTDOOR AIR REQUIREMENTS
-        app_folder = os.path.join('..', 'app', 'app_check_min_oa')
-        app_check_min_oa = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_check_min_oa = Application(data=df, metadata=graph, app_name='app_check_min_oa')
         app_check_min_oa.qualify()
         app_check_min_oa.res.data = df_clean  # speed up the process instead of fetching again
         app_check_min_oa.res.result, app_check_min_oa.res.message, damper_min = check_min_oa(app_check_min_oa.res.data,
@@ -126,8 +122,7 @@ if __name__ == '__main__':
         )
 
         # APP: FREEZE PROTECTION
-        app_folder = os.path.join('..', 'app', 'app_check_freeze')
-        app_check_freeze = Application(data=df, metadata=graph, config_folder=app_folder)
+        app_check_freeze = Application(data=df, metadata=graph, app_name='app_check_freeze')
         app_check_freeze.qualify()
         app_check_freeze.res.data = df_clean[
             (df_clean['oat_col'] < 4.4) &
@@ -192,4 +187,4 @@ if __name__ == '__main__':
 
     df_result = pd.DataFrame.from_dict(dict_result, orient='index')
     print(df_result)
-    df_result.to_csv(os.path.join("..", "results", "result.csv"))
+    df_result.to_csv(os.path.join("results", "result.csv"))

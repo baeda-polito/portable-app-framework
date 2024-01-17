@@ -17,7 +17,7 @@ from buildingmotif import BuildingMOTIF
 from buildingmotif.dataclasses import Model, Library
 from rdflib import Namespace
 
-from utils.logger import CustomLogger
+from .logger import CustomLogger
 
 logger = CustomLogger().get_logger()
 

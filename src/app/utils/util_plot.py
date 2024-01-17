@@ -36,7 +36,7 @@ def plot_histogram(df, filename=None):
     # wandb.log({'VARIABLES DISTRIBUTIONS': p})
     p.update_layout(xaxis_title='', yaxis_title='')
 
-    p.write_html(os.path.join('..', 'results', f'{filename}_HISTOGRAM.html'))
+    p.write_html(os.path.join('results', f'{filename}_HISTOGRAM.html'))
 
 
 def plot_timeseries_transient(df, configuration: dict, filename=None):
@@ -68,7 +68,7 @@ def plot_timeseries_transient(df, configuration: dict, filename=None):
                 annotation_text="transient_cutoff", annotation_position="left",
                 fillcolor="grey", opacity=0.5, line_width=0)
     # p.show()
-    p.write_html(os.path.join('..', 'results', f'{filename}_TRANSIENT.html'))
+    p.write_html(os.path.join('results', f'{filename}_TRANSIENT.html'))
 
 
 def plot_damper(df, configuration: dict, filename=None):
@@ -117,7 +117,7 @@ def plot_damper(df, configuration: dict, filename=None):
                       '<br><br>y = %{y:.2f}%<br>x = %{x:.2f}%<br>%{customdata[2]}<br>'
                       'Outdoor air temperature: %{customdata[1]:.2f}°C')
 
-    p.write_html(os.path.join('..', 'results', f'{filename}_DAMPER.html'))
+    p.write_html(os.path.join('results', f'{filename}_DAMPER.html'))
 
 
 def plot_valves(df, configuration: dict, filename=None):
@@ -169,4 +169,4 @@ def plot_valves(df, configuration: dict, filename=None):
                       '<br><br>y = %{y:.2f}<br>x = %{x:.2f}%<br>%{customdata[2]}'
                       '<br>Outdoor air temperature: %{customdata[1]:.2f}°C')
 
-    p.write_html(os.path.join('..', 'results', f'{filename}_VALVES.html'))
+    p.write_html(os.path.join('results', f'{filename}_VALVES.html'))

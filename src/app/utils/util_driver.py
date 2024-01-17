@@ -18,8 +18,8 @@ import os
 import numpy as np
 import pandas as pd
 
-from utils.logger import CustomLogger
-from utils.util import fahrenheit_to_celsius
+from .logger import CustomLogger
+from .util import fahrenheit_to_celsius
 
 logger = CustomLogger().get_logger()
 

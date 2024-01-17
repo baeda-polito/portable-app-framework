@@ -17,8 +17,8 @@ import numpy as np
 import pandas as pd
 from statsmodels.tsa.seasonal import seasonal_decompose
 
-from utils.logger import CustomLogger
-from utils.util_plot import plot_timeseries_transient
+from .logger import CustomLogger
+from .util_plot import plot_timeseries_transient
 
 logger = CustomLogger().get_logger()
 

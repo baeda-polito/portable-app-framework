@@ -20,7 +20,7 @@ from pathlib import Path
 
 import yaml
 
-from utils.logger import CustomLogger
+from .logger import CustomLogger
 
 logger = CustomLogger().get_logger()
 

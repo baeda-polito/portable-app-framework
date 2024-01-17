@@ -87,7 +87,7 @@ class CustomLogger:
 
         # gets the path depending on the env stage
         # config_path = f"../config/logger_config_{stage}.ini"
-        config_path = os.path.join("..", "config", 'logger', f'{filename}.ini')
+        config_path = os.path.join("config", 'logger', f'{filename}.ini')
 
         if filename == "dev":
             # if dev does not create file output
