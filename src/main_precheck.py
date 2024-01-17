@@ -67,7 +67,7 @@ if __name__ == '__main__':
             'diff_damper_oaf_threshold': 0.3
         }
 
-        n_list = []  # list of check passed
+        n_list = {}  # list of check passed
 
         ##################
         df = driver_data_fetch(folder, filename)
@@ -76,25 +76,33 @@ if __name__ == '__main__':
             os.path.join("..", "data", "LBNL_FDD_Dataset_SDAHU", "LBNL_FDD_Data_Sets_SDAHU_ttl.ttl"))
 
         # APP: VARIABLES CHECK
-        app_folder = 'app_check_variables'
+        app_folder = os.path.join('..', 'app', 'app_check_variables')
         app_check_variables = Application(data=df, metadata=graph, config_folder=app_folder)
         app_check_variables.qualify()
         app_check_variables.fetch()
         app_check_variables.res.result, app_check_variables.res.message = True, ''
-        n_list.append(app_check_variables.res.result)
-        check_log_result(app_check_variables.res.result, app_folder, app_check_variables.res.message)
+        n_list[app_check_variables.details['name']] = app_check_variables.res.result
+        check_log_result(
+            result=app_check_variables.res.result,
+            check_name=app_check_variables.details['name'],
+            message=app_check_variables.res.message
+        )
 
         # APP: STUCK TEMPERATURE SENSOR VARIABLE
-        app_folder = 'app_check_sensor'
+        app_folder = os.path.join('..', 'app', 'app_check_sensor')
         app_check_sensor = Application(data=df, metadata=graph, config_folder=app_folder)
         app_check_sensor.qualify()
         app_check_sensor.fetch()
         app_check_sensor.res.result, app_check_sensor.res.message = check_sensor(app_check_sensor.res.data, config)
-        n_list.append(app_check_sensor.res.result)
-        check_log_result(app_check_sensor.res.result, app_folder, app_check_sensor.res.message)
+        n_list[app_check_sensor.details['name']] = app_check_sensor.res.result
+        check_log_result(
+            result=app_check_sensor.res.result,
+            check_name=app_check_sensor.details['name'],
+            message=app_check_sensor.res.message
+        )
 
         # APP: PREPROCESSING
-        app_folder = 'app_preprocessing'
+        app_folder = os.path.join('..', 'app', 'app_preprocessing')
         app_preprocessing = Application(data=df, metadata=graph, config_folder=app_folder)
         app_preprocessing.qualify()
         app_preprocessing.fetch()
@@ -104,17 +112,21 @@ if __name__ == '__main__':
         df_clean = app_preprocessing.res.data
 
         # APP: MINIMUM OUTDOOR AIR REQUIREMENTS
-        app_folder = 'app_check_min_oa'
+        app_folder = os.path.join('..', 'app', 'app_check_min_oa')
         app_check_min_oa = Application(data=df, metadata=graph, config_folder=app_folder)
         app_check_min_oa.qualify()
         app_check_min_oa.res.data = df_clean  # speed up the process instead of fetching again
         app_check_min_oa.res.result, app_check_min_oa.res.message, damper_min = check_min_oa(app_check_min_oa.res.data,
                                                                                              config, plot_flag)
-        n_list.append(app_check_min_oa.res.result)
-        check_log_result(app_check_min_oa.res.result, app_folder, app_check_min_oa.res.message)
+        n_list[app_check_min_oa.details['name']] = app_check_min_oa.res.result
+        check_log_result(
+            result=app_check_min_oa.res.result,
+            check_name=app_check_min_oa.details['name'],
+            message=app_check_min_oa.res.message
+        )
 
         # APP: FREEZE PROTECTION
-        app_folder = 'app_check_freeze'
+        app_folder = os.path.join('..', 'app', 'app_check_freeze')
         app_check_freeze = Application(data=df, metadata=graph, config_folder=app_folder)
         app_check_freeze.qualify()
         app_check_freeze.res.data = df_clean[
@@ -123,8 +135,12 @@ if __name__ == '__main__':
             ]  # speed up the process instead of fetching again
         app_check_freeze.res.result, app_check_freeze.res.message = check_freeze_protection(app_check_freeze.res.data,
                                                                                             damper_min)
-        n_list.append(app_check_freeze.res.result)
-        check_log_result(app_check_freeze.res.result, app_folder, app_check_freeze.res.message)
+        n_list[app_check_freeze.details['name']] = app_check_freeze.res.result
+        check_log_result(
+            result=app_check_freeze.res.result,
+            check_name=app_check_freeze.details['name'],
+            message=app_check_freeze.res.message
+        )
 
         # # APP: DAMPER CHECK
         # df_damper = df_clean[
@@ -176,4 +192,4 @@ if __name__ == '__main__':
 
     df_result = pd.DataFrame.from_dict(dict_result, orient='index')
     print(df_result)
-    df_result.to_csv(os.path.join("..", "data", "result.csv"))
+    df_result.to_csv(os.path.join("..", "results", "result.csv"))

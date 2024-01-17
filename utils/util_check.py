@@ -24,7 +24,7 @@ logger = CustomLogger().get_logger()
 plot_flag = False
 
 
-def check_log_overall_result(result: list):
+def check_log_overall_result(result: dict):
     """
     Log the result of a check
     :param result: a list of boolean representing the result
@@ -34,7 +34,7 @@ def check_log_overall_result(result: list):
     # false = ❌
     # none = ⚠️
 
-    result_emoji = ['✅' if r is True else '❌' if r is False else '⚠️' for r in result]
+    result_emoji = ['✅' if r is True else '❌' if r is False else '⚠️' for r in result.values()]
     logger.info(f'Result: {"".join(result_emoji)}')
 
 
