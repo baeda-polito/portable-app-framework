@@ -55,6 +55,14 @@ class Application:
         └── query.rq
         '''
 
+        # Class variable to store available app names
+        available_app = os.listdir('app')  # Add your app names here
+        # get only directories that start with app
+        available_app_names = [app for app in available_app if app.startswith('app')]
+
+        if app_name not in available_app_names:
+            raise ValueError(f"Invalid app name. Available app names: {available_app_names}")
+
         if os.path.join('app', app_name, 'config.yaml') is None:
             raise FileNotFoundError('config.yaml not found')
         elif os.path.join('app', app_name, 'manifest.yaml') is None:
