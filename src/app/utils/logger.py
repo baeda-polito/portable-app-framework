@@ -27,7 +27,6 @@ https://coderzcolumn.com/tutorials/python/logging-config-simple-guide-to-configu
 """
 
 import logging.config
-import os
 
 
 class ColoredFormatter(logging.Formatter):
@@ -85,26 +84,30 @@ class CustomLogger:
         :return: logger
         """
 
-        # gets the path depending on the env stage
-        # config_path = f"../config/logger_config_{stage}.ini"
-        config_path = os.path.join("config", 'logger', f'{filename}.ini')
+        logging_config = {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'formatters': {
+                'console': {
+                    'format': '%(asctime)s [%(levelname)s] (%(filename)s > %(funcName)s) %(message)s',
+                    'datefmt': '%Y-%m-%d %H:%M:%S'
+                },
+            },
+            'handlers': {
+                'console': {
+                    'class': 'logging.StreamHandler',
+                    'level': 'INFO',
+                    'formatter': 'console',
+                    'stream': 'ext://sys.stdout'
+                },
+            },
+            'root': {
+                'level': 'INFO',
+                'handlers': ['console'],
+            },
+        }
 
-        if filename == "dev":
-            # if dev does not create file output
-            logging.config.fileConfig(
-                config_path,
-                disable_existing_loggers=False
-            )
-        elif filename == "prod":
-            # if prod logs output to file
-            logging.config.fileConfig(
-                config_path,
-                disable_existing_loggers=False,
-                # defaults={"logfilename": os.path.join("..", "logs", f"{module_name}{timestamp}.log")}
-                defaults={"logfilename": os.path.join("..", "logs", "log.log")}
-            )
-        else:
-            pass
+        logging.config.dictConfig(logging_config)
 
         # Set the formatter for the console handler
         console_handler = self.logger.handlers[0]

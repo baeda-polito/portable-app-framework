@@ -12,6 +12,7 @@ Script Description:
 
 Notes:
 """
+import argparse
 import os
 
 from rdflib import URIRef, Literal
@@ -161,3 +162,35 @@ class Application:
         fetch_data.columns = fetch_metadata.keys()
 
         self.res = ApplicationData(data=fetch_data, metadata=fetch_metadata)
+
+
+def cli_new_app(app_name):
+    print(f'Creating new app {app_name}')
+
+
+def cli_list_app():
+    print(os.listdir('src/app'))
+
+
+def cli_entry_point():
+    """
+    Create a new application folder.
+    :param app_name:
+    """
+    parser = argparse.ArgumentParser(description='Utils CLI for the afdd framework.')
+    subparser = parser.add_subparsers(dest='command')
+
+    # Command to create a new app from template
+    parser_new = subparser.add_parser('new', help='Create a new application folder from template.')
+    parser_new.add_argument('app_name', help='The name of the application.')
+
+    parser_ls = subparser.add_parser('ls', help='List available applications.')
+
+    # Depending on argument does something
+    args = parser.parse_args()
+    if args.command == 'new':
+        cli_new_app(args.app_name)
+    if args.command == 'ls':
+        cli_list_app()
+    else:
+        parser.print_help()
