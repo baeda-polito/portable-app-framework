@@ -101,7 +101,7 @@ jobs:
 
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/afdd-package
+      url: https://test.pypi.org/p/afdd-framework
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -116,6 +116,8 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+          user: __token__
+          password: ${{ secrets.TESTPYPI_API_TOKEN }}
 
 #name: Publish to TestPyPI.org
 #on:
