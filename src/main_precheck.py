@@ -16,12 +16,11 @@ import os
 
 import brickschema
 import pandas as pd
-
 from app import Application
 from app.utils.logger import CustomLogger
 from app.utils.util import ensure_dir, list_files
 from app.utils.util_check import check_log_result, check_min_oa, check_sensor, check_log_overall_result, \
-    check_freeze_protection
+    check_freeze_protection, check_damper
 from app.utils.util_driver import driver_data_fetch
 from app.utils.util_preprocessing import get_steady, preprocess
 
@@ -137,20 +136,26 @@ if __name__ == '__main__':
             message=app_check_freeze.res.message
         )
 
-        # # APP: DAMPER CHECK
-        # df_damper = df_clean[
-        #     (df_clean['cooling_sig_col'] < config["valves_cutoff"]) &
-        #     (df_clean['heating_sig_col'] < config["valves_cutoff"]) &
-        #     (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"]) &
-        #     (df_clean['oat_col'] < df_clean['rat_col'])
-        #     # when the outdoor-air temperature is less than the return-airq
-        #     # temperature and the AHU is in cooling mode, it is favorable to economize.
-        #     ]
-        #
-        # result, message = check_damper(df_damper, config)
-        # n_list.append(result)
-        # check_log_result(result, 'check_damper', message)
-        #
+        # APP: DAMPER CHECK
+        app_check_damper = Application(data=df, metadata=graph, app_name='app_check_damper')
+        app_check_damper.qualify()
+        app_check_damper.res.data = df_clean[
+            (df_clean['cooling_sig_col'] < config["valves_cutoff"]) &
+            # (df_clean['heating_sig_col'] < config["valves_cutoff"]) &
+            (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"]) &
+            (df_clean['oat_col'] < df_clean['rat_col'])
+            # when the outdoor-air temperature is less than the return-airq
+            # temperature and the AHU is in cooling mode, it is favorable to economize.
+            ]
+        app_check_damper.res.result, app_check_damper.res.message = check_damper(app_check_damper.res.data,
+                                                                                 damper_min)
+        n_list[app_check_damper.details['name']] = app_check_damper.res.result
+        check_log_result(
+            result=app_check_damper.res.result,
+            check_name=app_check_damper.details['name'],
+            message=app_check_damper.res.message
+        )
+
         # # H/C CHECK
         # df_hc = df_clean[
         #     (df_clean['cooling_sig_col'] > config["valves_cutoff"]) &
