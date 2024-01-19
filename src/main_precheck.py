@@ -15,12 +15,14 @@ Notes:
 import os
 
 import brickschema
+import numpy as np
 import pandas as pd
+
 from app import Application
 from app.utils.logger import CustomLogger
 from app.utils.util import ensure_dir, list_files
-from app.utils.util_check import check_log_result, check_min_oa, check_sensor, check_log_overall_result, \
-    check_freeze_protection, check_damper
+from app.utils.util_check import check_log_result, check_min_oa, check_sensor, check_freeze_protection, check_damper, \
+    check_hc, check_valves
 from app.utils.util_driver import driver_data_fetch
 from app.utils.util_preprocessing import get_steady, preprocess
 
@@ -98,14 +100,10 @@ if __name__ == '__main__':
             message=app_check_sensor.res.message
         )
 
-        # APP: PREPROCESSING
-        app_preprocessing = Application(data=df, metadata=graph, app_name='app_preprocessing')
-        app_preprocessing.qualify()
-        app_preprocessing.fetch()
-        app_preprocessing.res.data = preprocess(app_preprocessing.res.data, config)
-        app_preprocessing.res.data = get_steady(app_preprocessing.res.data, config, plot_flag=plot_flag,
-                                                filename=datasource)
-        df_clean = app_preprocessing.res.data
+        # PREPROCESSING
+        df_clean = preprocess(app_check_variables.res.data, config)
+        df_clean = get_steady(df_clean, config, plot_flag=plot_flag, filename=datasource)
+        df_clean['heating_sig_col'] = np.zeros(len(df_clean))  # add htg just to avoid error
 
         # APP: MINIMUM OUTDOOR AIR REQUIREMENTS
         app_check_min_oa = Application(data=df, metadata=graph, app_name='app_check_min_oa')
@@ -141,7 +139,7 @@ if __name__ == '__main__':
         app_check_damper.qualify()
         app_check_damper.res.data = df_clean[
             (df_clean['cooling_sig_col'] < config["valves_cutoff"]) &
-            # (df_clean['heating_sig_col'] < config["valves_cutoff"]) &
+            (df_clean['heating_sig_col'] < config["valves_cutoff"]) &
             (df_clean['oa_dmpr_sig_col'] > config["damper_cutoff"]) &
             (df_clean['oat_col'] < df_clean['rat_col'])
             # when the outdoor-air temperature is less than the return-airq
@@ -156,37 +154,47 @@ if __name__ == '__main__':
             message=app_check_damper.res.message
         )
 
-        # # H/C CHECK
-        # df_hc = df_clean[
-        #     (df_clean['cooling_sig_col'] > config["valves_cutoff"]) &
-        #     (df_clean['heating_sig_col'] > config["valves_cutoff"])
-        #     ]
-        #
-        # result, message = check_hc(df_hc)
-        # n_list.append(result)
-        # check_log_result(result, 'check_hc', message)
-        #
-        # # VALVES CHECK
-        # df_valves = df_clean.melt(
-        #     id_vars=['dt', 'time', 'oat_col', 'slope'],
-        #     value_vars=['cooling_sig_col', 'heating_sig_col']
-        # )
-        #
-        # df_valves = df_valves[df_valves['value'] > config["valves_cutoff"]]
-        #
-        # df_valves_eco = df_clean[
-        #     (df_clean['oat_col'] < df_clean['satsp_col'])
-        #     # when the outdoor-air temperature is less than the return-air temperature
-        #     # and the AHU is in cooling mode, it is favorable to economize.
-        # ]
-        #
-        # result, message = check_valves(df_valves, df_valves_eco, config)
-        # n_list.append(result)
-        # check_log_result(result, 'check_valves', message)
-        # if plot_flag:
-        #     plot_valves(df_valves, config, filename=datasource)
+        # APP: H/C CHECK
+        app_check_contemporary_hc = Application(data=df, metadata=graph, app_name='app_check_contemporary_hc')
+        app_check_contemporary_hc.qualify()
+        app_check_contemporary_hc.res.data = df_clean[
+            (df_clean['cooling_sig_col'] > config["valves_cutoff"]) &
+            (df_clean['heating_sig_col'] > config["valves_cutoff"])
+            ]
+        app_check_contemporary_hc.res.result, app_check_contemporary_hc.res.message = check_hc(
+            app_check_contemporary_hc.res.data)
+        n_list[app_check_contemporary_hc.details['name']] = app_check_contemporary_hc.res.result
+        check_log_result(
+            result=app_check_contemporary_hc.res.result,
+            check_name=app_check_contemporary_hc.details['name'],
+            message=app_check_contemporary_hc.res.message
+        )
 
-        check_log_overall_result(n_list)
+        # APP: VALVES CHECK
+        app_check_valves = Application(data=df, metadata=graph, app_name='app_check_valves')
+        app_check_valves.qualify()
+
+        df_valves = df_clean.melt(
+            id_vars=['dt', 'time', 'oat_col', 'slope'],
+            value_vars=['cooling_sig_col', 'heating_sig_col']
+        )
+
+        df_valves = df_valves[df_valves['value'] > config["valves_cutoff"]]
+
+        df_valves_eco = df_clean[
+            (df_clean['oat_col'] < df_clean['satsp_col'])
+            # when the outdoor-air temperature is less than the return-air temperature
+            # and the AHU is in cooling mode, it is favorable to economize.
+        ]
+
+        app_check_valves.res.result, app_check_valves.res.message = check_valves(df_valves, df_valves_eco, config)
+        n_list[app_check_valves.details['name']] = app_check_valves.res.result
+        check_log_result(
+            result=app_check_valves.res.result,
+            check_name=app_check_valves.details['name'],
+            message=app_check_valves.res.message
+        )
+
         # add row to result dataframe
         dict_result[datasource] = n_list
 

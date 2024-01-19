@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 from .logger import CustomLogger
-from .util_plot import plot_damper
+from .util_plot import plot_damper, plot_valves
 from .util_preprocessing import check_low_variance
 
 logger = CustomLogger().get_logger()
@@ -220,6 +220,9 @@ def check_valves(df, df_eco, configuration):
     :param configuration: dictionary of thresholds
     """
     if not df.empty and not df_eco.empty:
+        if plot_flag:
+            plot_valves(df, configuration)
+
         # todo review check
         # 2) Does the cooling coil operate when the outdoor-air temperature is lower
         # than the discharge air temperature set point?
