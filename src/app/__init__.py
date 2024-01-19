@@ -165,17 +165,30 @@ class Application:
 
 
 def cli_new_app(app_name):
+    """
+    Create new application from template
+    :param app_name:
+    """
+    print(os.getcwd())
     print(f'Creating new app {app_name}')
+    # copy folder app_example to app_name
+    os.system(f'cp -r src/app/template src/app/{app_name}')
 
 
 def cli_list_app():
-    print(os.listdir('src/app'))
+    """
+    List available applications excluding example
+    """
+    # list folders in app folder
+    folders = os.listdir('src/app')
+    # list only folders that start with ap
+    folders = [folder for folder in folders if folder.startswith('app')]
+    print(folders)
 
 
 def cli_entry_point():
     """
-    Create a new application folder.
-    :param app_name:
+    Entrypoint for the command line CLI
     """
     parser = argparse.ArgumentParser(description='Utils CLI for the afdd framework.')
     subparser = parser.add_subparsers(dest='command')

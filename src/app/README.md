@@ -8,16 +8,16 @@ Available apps are:
 - [app_check_min_oa](app_check_min_oa)
 - [app_check_sensor](app_check_sensor)
 - [app_check_variables](app_check_variables)
-- [app_example](app_example)
+- [app_example](template)
 - [app_preprocessing](app_preprocessing)
 
 ## Usage
 
 The application folder must contains the following files
 
-- [config.yaml](app_example/config.yaml) configuration file
-- [manifest.yaml](app_example/manifest.yaml) manifest file
-- [query.rq](app_example/query.rq) query file
+- [config.yaml](template/config.yaml) configuration file
+- [manifest.yaml](template/manifest.yaml) manifest file
+- [query.rq](template/query.rq) query file
 
 Code usage in python
 

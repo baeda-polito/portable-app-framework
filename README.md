@@ -11,12 +11,20 @@ The official documentation is hosted on [PyData.org](https://afdd-framework.pyda
 ## Table of Contents
 
 - [Main Features](#main-features)
+- [Installation](#installation)
+- [Dependencies](#dependencies)
+- [License](#license)
+- [Background](#background)
+- [Getting Help](#getting-help)
+- [Discussion and Development](#discussion-and-development)
+- [Contributing to `afdd-framework`](#contributing-to-afdd-framework)
 
 ## Main Features
 
 Here are just a few of the things that afdd-framework does well:
 
-- feature 1
+- cli to create new apps
+- application based on brick schema
 
 ## Installation
 
@@ -44,7 +52,7 @@ minimum supported versions of required, recommended and optional dependencies.
 
 ## License
 
-[MIT](LICENSE)
+The present repository has been released under [MIT LICENSE](LICENSE)
 
 ## Background
 
@@ -59,28 +67,29 @@ For usage questions, the best place to go
 Most development discussions take place on GitHub in this repo, via
 the [GitHub issue tracker](https://github.com/RobertoChiosa/afdd-framework/issues).
 
-## Contributing to afdd
+## Contributing to `afdd-framework`
 
 [//]: # ([![Open Source Helpers]&#40;https://www.codetriage.com/RobertoChiosa/afdd/badges/users.svg&#41;]&#40;https://www.codetriage.com/RobertoChiosa/afdd&#41;)
 
 All contributions, bug reports, bug fixes, documentation improvements, enhancements, and ideas are welcome.
 
-A detailed overview on how to contribute can be found in the *
-*[contributing guide](https://github.com/RobertoChiosa/afdd-framework/CONTRIBUTING.md)**.
+A detailed overview on how to contribute can be found in
+the [contributing guide](https://github.com/RobertoChiosa/afdd-framework/blob/main/CONTRIBUTING.md).
 
 If you are simply looking to start working with the afdd codebase, navigate to
 the [GitHub "issues" tab](https://github.com/RobertoChiosa/afdd-framework/issues) and start looking through interesting
 issues.
 There are a number of issues listed
 under [Docs](https://github.com/RobertoChiosa/afdd-framework/issues?labels=Docs&sort=updated&state=open)
-and [good first issue](https://github.com/RobertoChiosa/afdd/issues?labels=good+first+issue&sort=updated&state=open)
+and [good first issue](https://github.com/RobertoChiosa/afdd-framework/issues?labels=good+first+issue&sort=updated&state=open)
 where you could start out.
 
 Or maybe through using afdd you have an idea of your own or are looking for something in the documentation and
 thinking ‘this can be improved’...you can do something about it!
 
 As contributors and maintainers to this project, you are expected to abide by afdd code of conduct. More information
-can be found at: [Contributor Code of Conduct](https://github.com/RobertoChiosa/.github/blob/master/CODE_OF_CONDUCT.md)
+can be found
+at: [Contributor Code of Conduct](https://github.com/RobertoChiosa/afdd-framework/blob/main/CODE_OF_CONDUCT.md)
 
 <hr>
 
