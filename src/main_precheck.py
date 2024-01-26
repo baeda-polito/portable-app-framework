@@ -25,6 +25,7 @@ from app.utils.util_check import check_log_result, check_min_oa, check_sensor, c
     check_hc, check_valves
 from app.utils.util_driver import driver_data_fetch
 from app.utils.util_preprocessing import get_steady, preprocess
+from src.app.utils.util_plot import plot_histogram, plot_lineplot
 
 if __name__ == '__main__':
 
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     ensure_dir(folder)
 
     # set plot flag
-    plot_flag = False
+    plot_flag = True
 
     # list files in the folder
     files = list_files(folder, file_formats=[".csv", ".parquet"])
@@ -50,6 +51,7 @@ if __name__ == '__main__':
     dict_result = {}
 
     for filename in files:
+        filename = 'AHU_annual.parquet'
         print(f'\n########### {filename} ###########')
         # extract information from filename
         datasource = filename.split('.')[0]
@@ -70,17 +72,19 @@ if __name__ == '__main__':
 
         n_list = {}  # list of check passed
 
-        ##################
+        # Get data from driver
         df = driver_data_fetch(folder, filename)
-        # df = pd.read_parquet(os.path.join(folder, filename))
         graph = brickschema.Graph().parse(
             os.path.join("data", "LBNL_FDD_Dataset_SDAHU", "LBNL_FDD_Data_Sets_SDAHU_ttl.ttl"))
 
-        # APP: VARIABLES CHECK
+        # APP: AHU Variables Check
         app_check_variables = Application(data=df, metadata=graph, app_name='app_check_variables')
         app_check_variables.qualify()
         app_check_variables.fetch()
         app_check_variables.res.result, app_check_variables.res.message = True, ''
+        if plot_flag:
+            plot_lineplot(app_check_variables.res.data, config['datasource'])
+            plot_histogram(app_check_variables.res.data, config['datasource'])
         n_list[app_check_variables.details['name']] = app_check_variables.res.result
         check_log_result(
             result=app_check_variables.res.result,
@@ -104,6 +108,21 @@ if __name__ == '__main__':
         df_clean = preprocess(app_check_variables.res.data, config)
         df_clean = get_steady(df_clean, config, plot_flag=plot_flag, filename=datasource)
         df_clean['heating_sig_col'] = np.zeros(len(df_clean))  # add htg just to avoid error
+
+        # APP: Temperature reset
+        app_check_tsat_reset = Application(data=df, metadata=graph, app_name='app_check_tsat_reset')
+        app_check_tsat_reset.qualify()
+        app_check_tsat_reset.fetch()
+        # TODO: @Rocco inserisci qua l'analisi
+        app_check_tsat_reset.res.result, app_check_tsat_reset.res.message, damper_min = check_min_oa(
+            app_check_tsat_reset.res.data,
+            config, plot_flag)
+        n_list[app_check_tsat_reset.details['name']] = app_check_tsat_reset.res.result
+        check_log_result(
+            result=app_check_tsat_reset.res.result,
+            check_name=app_check_tsat_reset.details['name'],
+            message=app_check_tsat_reset.res.message
+        )
 
         # APP: MINIMUM OUTDOOR AIR REQUIREMENTS
         app_check_min_oa = Application(data=df, metadata=graph, app_name='app_check_min_oa')

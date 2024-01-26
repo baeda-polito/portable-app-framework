@@ -1,0 +1,12 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX brick: <https://brickschema.org/schema/Brick#>
+PREFIX bldg: <http://bldg-59#>
+SELECT  ?oat_col ?sat_col ?satsp_col
+WHERE {
+    ?equip a brick:AHU .
+    ?equip brick:hasPoint ?oat_col, ?sat_col, ?satsp_col .
+
+    ?oat_col rdf:type brick:Outside_Air_Temperature_Sensor .
+    ?sat_col rdf:type brick:Supply_Air_Temperature_Sensor .
+    ?satsp_col rdf:type brick:Supply_Air_Temperature_Setpoint .
+}

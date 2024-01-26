@@ -12,10 +12,12 @@ Script Description:
 
 Notes:
 """
-
 import os
 
+import numpy as np
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
 def plot_histogram(df, filename=None):
@@ -25,7 +27,11 @@ def plot_histogram(df, filename=None):
     :param df: the dataframe containing the variables
     :return: 
     """
-    p = px.histogram(df, x='value', y='value',
+    # pivot longer
+    df1 = df.reset_index().melt(id_vars=['time'],
+                                value_vars=['cooling_sig_col', 'oat_col', 'sat_col', 'satsp_col', 'rat_col',
+                                            'oa_dmpr_sig_col', 'mat_col'])
+    p = px.histogram(df1, x='value', y='value',
                      color='variable',
                      facet_col='variable',
                      histnorm='probability density',
@@ -33,10 +39,78 @@ def plot_histogram(df, filename=None):
                      facet_col_wrap=3,
                      )
     p.update_yaxes(matches=None, showticklabels=True)
-    # wandb.log({'VARIABLES DISTRIBUTIONS': p})
     p.update_layout(xaxis_title='', yaxis_title='')
 
     p.write_html(os.path.join('results', f'{filename}_HISTOGRAM.html'))
+
+
+def plot_lineplot(df, filename=None):
+    """
+    Plot the histogram of the variables
+    :param filename: name of the dataset
+    :param df: the dataframe containing the variables
+    :return:
+    """
+    df_plot = df.copy()
+    # get only partially
+    df_plot = df_plot.iloc[0:10000, :]
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True)
+    # df_plot.columns exclude labels from column list
+
+    for column in df_plot.columns:
+        if np.issubdtype(df_plot[column].dtype, np.number):
+            # calculate column range in values, if 01 true
+            if (df_plot[column].max() - df_plot[column].min()) < 1.1 and df_plot[column].max() < 1.1:
+                fig.add_trace(
+                    go.Scatter(
+                        x=df_plot.index,
+                        y=df_plot[column],
+                        name=column,
+                        hoverlabel=dict(namelength=-1),
+                        line=dict(shape='spline')
+                    ),
+                    row=1, col=1)
+
+            else:
+                fig.add_trace(
+                    go.Scatter(
+                        x=df_plot.index,
+                        y=df_plot[column],
+                        name=column,
+                        hoverlabel=dict(namelength=-1),
+                        line=dict(shape='spline')
+                    ), row=2, col=1)
+        else:
+            pass
+
+    fig.update_layout(xaxis=dict(
+        showline=True,
+        showgrid=True,
+        showticklabels=True,
+        linecolor='rgb(204, 204, 204)',
+        linewidth=2,
+        ticks='outside',
+        tickfont=dict(
+            family='Arial',
+            size=12,
+            color='rgb(82, 82, 82)',
+        ),
+    ),
+        yaxis=dict(
+            showgrid=True,
+            zeroline=True,
+            showline=True,
+            showticklabels=True,
+
+        ),
+
+        hovermode="x",
+        plot_bgcolor='whitesmoke'
+    )
+
+    fig.show()
+    fig.write_html(os.path.join('results', f'{filename}_LINEPLOT.html'))
+    return fig
 
 
 def plot_timeseries_transient(df, configuration: dict, filename=None):

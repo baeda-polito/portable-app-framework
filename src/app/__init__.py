@@ -160,6 +160,8 @@ class Application:
         fetch_data = self.data.loc[:, self.data.columns.isin(fetch_metadata.values())]
         # todo remove when in production, remap to convention
         fetch_data.columns = fetch_metadata.keys()
+        fetch_metadata_rev = {v: k for k, v in fetch_metadata.items()}
+        fetch_data.rename(columns=fetch_metadata_rev)
 
         self.res = ApplicationData(data=fetch_data, metadata=fetch_metadata)
 

@@ -1,6 +1,6 @@
 details:
   name: Check Variables
-  description: Checks if a certain AHU has the required variables
+  description: Checks if are there any stuck sensor. The analysis is performed depending on the type of sensor/point.
   version: 1.0
   author: Roberto Chiosa
   email: roberto.chiosa@polito.it
