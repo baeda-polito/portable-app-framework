@@ -42,7 +42,7 @@ if __name__ == '__main__':
     ensure_dir(folder)
 
     # set plot flag
-    plot_flag = True
+    plot_flag = False
 
     # list files in the folder
     files = list_files(folder, file_formats=[".csv", ".parquet"])
@@ -51,7 +51,6 @@ if __name__ == '__main__':
     dict_result = {}
 
     for filename in files:
-        filename = 'AHU_annual.parquet'
         print(f'\n########### {filename} ###########')
         # extract information from filename
         datasource = filename.split('.')[0]
@@ -114,15 +113,15 @@ if __name__ == '__main__':
         app_check_tsat_reset.qualify()
         app_check_tsat_reset.fetch()
         # TODO: @Rocco inserisci qua l'analisi
-        app_check_tsat_reset.res.result, app_check_tsat_reset.res.message, damper_min = check_min_oa(
-            app_check_tsat_reset.res.data,
-            config, plot_flag)
-        n_list[app_check_tsat_reset.details['name']] = app_check_tsat_reset.res.result
-        check_log_result(
-            result=app_check_tsat_reset.res.result,
-            check_name=app_check_tsat_reset.details['name'],
-            message=app_check_tsat_reset.res.message
-        )
+        # app_check_tsat_reset.res.result, app_check_tsat_reset.res.message, damper_min = check_min_oa(
+        #     app_check_tsat_reset.res.data,
+        #     config, plot_flag)
+        # n_list[app_check_tsat_reset.details['name']] = app_check_tsat_reset.res.result
+        # check_log_result(
+        #     result=app_check_tsat_reset.res.result,
+        #     check_name=app_check_tsat_reset.details['name'],
+        #     message=app_check_tsat_reset.res.message
+        # )
 
         # APP: MINIMUM OUTDOOR AIR REQUIREMENTS
         app_check_min_oa = Application(data=df, metadata=graph, app_name='app_check_min_oa')
@@ -165,7 +164,8 @@ if __name__ == '__main__':
             # temperature and the AHU is in cooling mode, it is favorable to economize.
             ]
         app_check_damper.res.result, app_check_damper.res.message = check_damper(app_check_damper.res.data,
-                                                                                 damper_min)
+                                                                                 damper_min,
+                                                                                 config)
         n_list[app_check_damper.details['name']] = app_check_damper.res.result
         check_log_result(
             result=app_check_damper.res.result,

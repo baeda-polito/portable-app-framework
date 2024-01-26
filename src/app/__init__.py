@@ -126,6 +126,7 @@ class Application:
         self.logger.debug(f'Fetching metadata based on sparql query')
         # Perform query on rdf graph
         query_results = self.metadata.query(self.query)
+        # todo errore nel renaming variblili
 
         # todo considerare di spostare tutto in brick utility
         # Convert the query results to the desired JSON format
@@ -159,9 +160,12 @@ class Application:
 
         fetch_data = self.data.loc[:, self.data.columns.isin(fetch_metadata.values())]
         # todo remove when in production, remap to convention
-        fetch_data.columns = fetch_metadata.keys()
+
+        # from dict converts from original naming convention to internal naming convention
+        # fetch_data.rename(columns=fetch_metadata)
+        # from dict converts from internal naming convention to original naming convention
         fetch_metadata_rev = {v: k for k, v in fetch_metadata.items()}
-        fetch_data.rename(columns=fetch_metadata_rev)
+        fetch_data = fetch_data.rename(columns=fetch_metadata_rev)
 
         self.res = ApplicationData(data=fetch_data, metadata=fetch_metadata)
 

@@ -175,7 +175,7 @@ def check_freeze_protection(df, damper_min):
         return None, f'Freeze protection not activated ({damper_frozen} > {round(damper_min, 3)})'
 
 
-def check_damper(df, configuration, plot_flg=False):
+def check_damper(df, damper_min, configuration, plot_flg=False):
     """
     Check if the damper is stuck
     :param plot_flg: whether to plot or not
