@@ -91,7 +91,7 @@ if __name__ == '__main__':
             message=app_check_variables.res.message
         )
 
-        # APP: STUCK TEMPERATURE SENSOR VARIABLE
+        # APP: Stuck sensor check
         app_check_sensor = Application(data=df, metadata=graph, app_name='app_check_sensor')
         app_check_sensor.qualify()
         app_check_sensor.fetch()
@@ -123,7 +123,7 @@ if __name__ == '__main__':
         #     message=app_check_tsat_reset.res.message
         # )
 
-        # APP: MINIMUM OUTDOOR AIR REQUIREMENTS
+        # APP: Minimum OA requirement
         app_check_min_oa = Application(data=df, metadata=graph, app_name='app_check_min_oa')
         app_check_min_oa.qualify()
         app_check_min_oa.res.data = df_clean  # speed up the process instead of fetching again
@@ -136,7 +136,7 @@ if __name__ == '__main__':
             message=app_check_min_oa.res.message
         )
 
-        # APP: FREEZE PROTECTION
+        # APP: Freeze protection check
         app_check_freeze = Application(data=df, metadata=graph, app_name='app_check_freeze')
         app_check_freeze.qualify()
         app_check_freeze.res.data = df_clean[
@@ -173,7 +173,7 @@ if __name__ == '__main__':
             message=app_check_damper.res.message
         )
 
-        # APP: H/C CHECK
+        # APP: Simultaneous heating and cooling
         app_check_contemporary_hc = Application(data=df, metadata=graph, app_name='app_check_contemporary_hc')
         app_check_contemporary_hc.qualify()
         app_check_contemporary_hc.res.data = df_clean[
@@ -189,7 +189,7 @@ if __name__ == '__main__':
             message=app_check_contemporary_hc.res.message
         )
 
-        # APP: VALVES CHECK
+        # APP: Delta T check across valves
         app_check_valves = Application(data=df, metadata=graph, app_name='app_check_valves')
         app_check_valves.qualify()
 
