@@ -1,0 +1,9 @@
+numpy
+brickschema
+pandas
+rdflib
+setuptools
+statsmodels
+plotly
+buildingmotif
+pyarrow
