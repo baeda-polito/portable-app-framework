@@ -18,7 +18,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from utils.util import list_files, ensure_dir
+from src.app.utils.util import list_files, ensure_dir
 
 if __name__ == '__main__':
     directory = "AHU_SX"

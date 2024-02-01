@@ -244,3 +244,52 @@ def plot_valves(df, configuration: dict, filename=None):
                       '<br>Outdoor air temperature: %{customdata[1]:.2f}°C')
 
     p.write_html(os.path.join('results', f'{filename}_VALVES.html'))
+
+
+def plot_sat_reset(df, filename=None):
+    """
+    Plot the Supply Air Temperature vs Outdoor Air Temperature to see if it follows a reasonable reset schedule
+    :param filename: the name of the file
+    :param df: the dataframe containing the variables
+    :return: the plot
+    """
+
+    df.dropna(inplace=True)
+    df.reset_index(inplace=True)
+    df["schedule"] = df["time"].apply(lambda x: "ON" if 6 <= x.hour <= 17 and x.weekday() != 0 else "OFF")
+    df = df[df['schedule'] == 'ON']
+    p = px.scatter(df,
+                   x='oat_col',
+                   y='sat_col',
+                   opacity=0.6,
+                   hover_data=['time', 'oat_col', 'sat_col']
+                   )
+    p.add_scatter(x=df['oat_col'], y=df["lower_bound"], name='Lower bound',
+                    mode='lines',
+                    line=dict(color='firebrick', width=2, dash='dash'))
+    p.add_scatter(x=df['oat_col'], y=df["upper_bound"], name='Upper bound',
+                  mode='lines',
+                  line=dict(color='firebrick', width=2, dash='dash'))
+    p.update_layout(xaxis_title='Outdoor Air Temperature [°C]', yaxis_title='Supply Air Temperature [°C]',
+                    legend=dict(
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.02,
+                        xanchor="right",
+                        x=1
+                    )
+                    )
+    p.update_xaxes(showspikes=True, spikesnap="cursor", spikemode="across",
+                   spikethickness=1,
+                   spikecolor="black", title_font=dict(size=14),
+                   tickfont=dict(size=12, color='black'))
+    p.update_yaxes(showspikes=True, spikesnap="cursor", spikemode="across",
+                   spikethickness=1,
+                   spikecolor="black", tickformat='°C', title_font=dict(size=14),
+                   tickfont=dict(size=12, color='black'))
+
+    p.write_html(os.path.join('results', f'{filename}_SAT_RESET.html'))
+
+
+
+

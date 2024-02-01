@@ -17,15 +17,18 @@ import os
 import brickschema
 import numpy as np
 import pandas as pd
+import warnings
 
 from app import Application
 from app.utils.logger import CustomLogger
 from app.utils.util import ensure_dir, list_files
 from app.utils.util_check import check_log_result, check_min_oa, check_sensor, check_freeze_protection, check_damper, \
-    check_hc, check_valves
+    check_hc, check_valves, check_sat_reset
 from app.utils.util_driver import driver_data_fetch
 from app.utils.util_preprocessing import get_steady, preprocess
 from src.app.utils.util_plot import plot_histogram, plot_lineplot
+
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 if __name__ == '__main__':
 
@@ -66,7 +69,8 @@ if __name__ == '__main__':
             'temperature_sensor_variance_threshold': 0.01,
             'control_sensor_variance_threshold': 0.01,
             'damper_min_oa_threshold': 0.3,
-            'diff_damper_oaf_threshold': 0.3
+            'diff_damper_oaf_threshold': 0.3,
+            'sat_reset_threshold': 0.1
         }
 
         n_list = {}  # list of check passed
@@ -112,16 +116,15 @@ if __name__ == '__main__':
         app_check_tsat_reset = Application(data=df, metadata=graph, app_name='app_check_tsat_reset')
         app_check_tsat_reset.qualify()
         app_check_tsat_reset.fetch()
-        # TODO: @Rocco inserisci qua l'analisi
-        # app_check_tsat_reset.res.result, app_check_tsat_reset.res.message, damper_min = check_min_oa(
-        #     app_check_tsat_reset.res.data,
-        #     config, plot_flag)
-        # n_list[app_check_tsat_reset.details['name']] = app_check_tsat_reset.res.result
-        # check_log_result(
-        #     result=app_check_tsat_reset.res.result,
-        #     check_name=app_check_tsat_reset.details['name'],
-        #     message=app_check_tsat_reset.res.message
-        # )
+        app_check_tsat_reset.res.result, app_check_tsat_reset.res.message = check_sat_reset(
+            app_check_tsat_reset.res.data,
+            config, plot_flag=True, filename=datasource)
+        n_list[app_check_tsat_reset.details['name']] = app_check_tsat_reset.res.result
+        check_log_result(
+            result=app_check_tsat_reset.res.result,
+            check_name=app_check_tsat_reset.details['name'],
+            message=app_check_tsat_reset.res.message
+        )
 
         # APP: Minimum OA requirement
         app_check_min_oa = Application(data=df, metadata=graph, app_name='app_check_min_oa')
