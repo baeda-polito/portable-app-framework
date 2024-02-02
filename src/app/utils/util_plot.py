@@ -255,8 +255,7 @@ def plot_sat_reset(df, filename=None):
     """
 
     df.dropna(inplace=True)
-    df.reset_index(inplace=True)
-    df["schedule"] = df["time"].apply(lambda x: "ON" if 6 <= x.hour <= 17 and x.weekday() != 0 else "OFF")
+    df["schedule"] = df["time"].apply(lambda x: "ON" if 6 <= x.hour <= 22 and x.weekday() != 0 else "OFF")
     df = df[df['schedule'] == 'ON']
     p = px.scatter(df,
                    x='oat_col',

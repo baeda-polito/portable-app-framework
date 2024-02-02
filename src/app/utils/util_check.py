@@ -250,10 +250,12 @@ def check_sat_reset(df, configuration, plot_flag=False, filename=None):
     df['lower_bound'] = df['oat_col'].apply(lambda x: 17 if x <= -10 else 12 if x >= 10 else -0.25 * x + 14.5)
     df['upper_bound'] = df['oat_col'].apply(lambda x: 22 if x <= -15 else 14 if x >= 20 else -0.24 * x + 18.8)
 
-    if plot_flag:
-        plot_sat_reset(df, filename)
+    df_steady = df[df['slope'] == 'steady']
 
-    percentage_violation = df[(df['sat_col'] < df['lower_bound']) | (df['sat_col'] > df['upper_bound'])].shape[0] / len(df)
+    if plot_flag:
+        plot_sat_reset(df_steady, filename)
+
+    percentage_violation = df_steady[(df_steady['sat_col'] < df_steady['lower_bound']) | (df_steady['sat_col'] > df_steady['upper_bound'])].shape[0] / len(df_steady)
 
     if percentage_violation < configuration['sat_reset_threshold']:
         return True, f"Less than 10% of Supply Air Temperature setpoint reset"

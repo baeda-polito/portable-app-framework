@@ -112,10 +112,12 @@ if __name__ == '__main__':
         df_clean = get_steady(df_clean, config, plot_flag=plot_flag, filename=datasource)
         df_clean['heating_sig_col'] = np.zeros(len(df_clean))  # add htg just to avoid error
 
+        # TODO: Aggiungere requirement ON/OFF nel manifest
         # APP: Temperature reset
         app_check_tsat_reset = Application(data=df, metadata=graph, app_name='app_check_tsat_reset')
         app_check_tsat_reset.qualify()
         app_check_tsat_reset.fetch()
+        app_check_tsat_reset.res.data = df_clean  # speed up the process instead of fetching again
         app_check_tsat_reset.res.result, app_check_tsat_reset.res.message = check_sat_reset(
             app_check_tsat_reset.res.data,
             config, plot_flag=True, filename=datasource)
