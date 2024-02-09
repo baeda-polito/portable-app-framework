@@ -17,4 +17,12 @@
                      sh:path                brick:hasPoint ;
                      sh:message             "need at least 1 Outside Air Temperature Sensor" ;
                      sh:qualifiedValueShape [ sh:class brick:Outside_Air_Temperature_Sensor ; ] ;
+                     sh:qualifiedMinCount   1 ; ] ;
+    sh:property    [ sh:path                brick:hasPart ;
+                     sh:message             "need at least 1 Cooling_Coil" ;
+                     sh:qualifiedValueShape [ sh:class brick:Cooling_Coil ; ] ;
+                     sh:qualifiedMinCount   1 ;
+                     sh:path                brick:hasPart ;
+                     sh:message             "need at least 1 Outside_Damper" ;
+                     sh:qualifiedValueShape [ sh:class brick:Outside_Damper ; ] ;
                      sh:qualifiedMinCount   1 ; ] .

@@ -175,7 +175,7 @@ class Application:
                                    metadata=fetch_metadata)
         self.mapping = fetch_metadata
 
-    def clean(self):  # fn, *args, **kwargs):
+    def clean(self, fn, *args, **kwargs):
         """
          The purpose of this component is to normalize the timeseries data for the "analyze" component.
 
@@ -186,16 +186,7 @@ class Application:
        :param fn: function to clean the data
        :return: The cleaned data
         """
-        df = self.remap(self.data, mode='to_internal')
-
-        # TODO @ rocco trasforma tutto nella stess funzione per tutti
-        # df_clean = preprocess(df, config)
-        # df_clean = get_steady(df_clean, config, plot_flag=plot_flag, filename=datasource)
-        # df_clean['heating_sig_col'] = np.zeros(len(df_clean))  # add htg just to avoid error
-        # todo fare to internal
-        # Call the external function with its arbitrary arguments
-        # self.res.data_clean = fn(*args, **kwargs)
-        # todo fare to exetrnal
+        self.res.data_clean = fn(*args, **kwargs)
 
     def analyze(self, fn, *args, **kwargs):
         """
