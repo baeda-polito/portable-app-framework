@@ -19,7 +19,7 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 
 from .logger import CustomLogger
 from .util_plot import plot_timeseries_transient
-from src.app import ApplicationData
+
 logger = CustomLogger().get_logger()
 
 
@@ -245,7 +245,8 @@ def get_steady(df, configuration: dict, plot_flag: bool = False, filename=None):
 
     return df_steady
 
-def pre_process_tsat_reset(app_data: ApplicationData, configuration: dict):
+
+def pre_process_tsat_reset(app_data, configuration: dict):
     """
     This function preprocesses the dataframe according to the configuration file.
     :param df: the raw dataset
@@ -295,6 +296,7 @@ def pre_process_tsat_reset(app_data: ApplicationData, configuration: dict):
             pass
 
     df = linear_interpolation(df)
-    df['time'] = df.index
-
+    # todo fare steady state
+    app_data.data_clean = get_steady(df, configuration)
+    
     return app_data

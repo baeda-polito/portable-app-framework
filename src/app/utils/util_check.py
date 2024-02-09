@@ -18,7 +18,6 @@ import pandas as pd
 from .logger import CustomLogger
 from .util_plot import plot_damper, plot_valves, plot_sat_reset
 from .util_preprocessing import check_low_variance
-from .. import ApplicationData
 
 logger = CustomLogger().get_logger()
 
@@ -56,7 +55,7 @@ def check_log_result(result: bool, check_name: str, message: ''):
         raise Exception('The result of the check is not a boolean')
 
 
-def check_variables1(app_data: ApplicationData):
+def check_variables1(app_data):
     app_data.result = True
     app_data.message = ''
     return app_data
@@ -95,7 +94,7 @@ def check_variables(df: pd.DataFrame):
         return True, ''
 
 
-def check_sensor(app_data: ApplicationData, configuration):
+def check_sensor(app_data, configuration):
     """
     Check if the sensors are stuck
     :param df: the dataset containing the measured variables

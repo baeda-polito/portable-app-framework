@@ -109,7 +109,7 @@ if __name__ == '__main__':
         )
 
         # PREPROCESSING
-        df_clean = preprocess(df, config)
+        df_clean = preprocess(app_check_variables.res.data_internal, config)
         df_clean = get_steady(df_clean, config, plot_flag=plot_flag, filename=datasource)
         df_clean['heating_sig_col'] = np.zeros(len(df_clean))  # add htg just to avoid error
 

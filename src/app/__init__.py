@@ -15,6 +15,7 @@ Notes:
 import argparse
 import os
 
+import pandas as pd
 from rdflib import URIRef, Literal
 
 from .utils.logger import CustomLogger
@@ -28,14 +29,21 @@ class ApplicationData:
     Application data class
     """
 
-    def __init__(self, data=None, data_internal=None, metadata=None):
+    def __init__(self,
+                 data: pd.DataFrame = None,
+                 data_internal: pd.DataFrame = None,
+                 data_clean: pd.DataFrame = None,
+                 metadata: dict = None,
+                 result: bool = None,
+                 message: str = 'No message'
+                 ):
         # The graph_path and datasource are external to the configuration file.
         self.data = data
         self.data_internal = data_internal
+        self.data_clean = data_clean
         self.metadata = metadata
-        self.data_clean = None
-        self.result = None
-        self.message = 'No message'
+        self.result = result
+        self.message = message
 
 
 class Application:
@@ -186,7 +194,7 @@ class Application:
        :param fn: function to clean the data
        :return: The cleaned data
         """
-        self.res.data_clean = fn(*args, **kwargs)
+        self.res = fn(*args, **kwargs)
 
     def analyze(self, fn, *args, **kwargs):
         """
