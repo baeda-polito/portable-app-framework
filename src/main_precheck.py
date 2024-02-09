@@ -25,7 +25,7 @@ from app.utils.util import ensure_dir, list_files
 from app.utils.util_check import check_log_result, check_min_oa, check_sensor, check_freeze_protection, check_damper, \
     check_hc, check_valves, check_sat_reset
 from app.utils.util_driver import driver_data_fetch
-from app.utils.util_preprocessing import get_steady, preprocess
+from app.utils.util_preprocessing import get_steady, preprocess, pre_process_tsat_reset
 from src.app.utils.util_plot import plot_histogram, plot_lineplot
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -99,7 +99,6 @@ if __name__ == '__main__':
         app_check_sensor = Application(data=df, metadata=graph, app_name='app_check_sensor')
         app_check_sensor.qualify()
         app_check_sensor.fetch()
-        print(app_check_sensor.remap('to_internal').head())
 
         app_check_sensor.res.result, app_check_sensor.res.message = check_sensor(app_check_sensor.res.data, config)
         n_list[app_check_sensor.details['name']] = app_check_sensor.res.result
@@ -110,7 +109,7 @@ if __name__ == '__main__':
         )
 
         # PREPROCESSING
-        df_clean = preprocess(app_check_variables.res.data, config)
+        df_clean = preprocess(app_check_variables.res.remap(app_check_variables.res.data, mode="to_internal"), config)
         df_clean = get_steady(df_clean, config, plot_flag=plot_flag, filename=datasource)
         df_clean['heating_sig_col'] = np.zeros(len(df_clean))  # add htg just to avoid error
 
@@ -119,10 +118,11 @@ if __name__ == '__main__':
         app_check_tsat_reset = Application(data=df, metadata=graph, app_name='app_check_tsat_reset')
         app_check_tsat_reset.qualify()
         app_check_tsat_reset.fetch()
-        app_check_tsat_reset.res.data = df_clean  # speed up the process instead of fetching again
+        app_check_tsat_reset.clean(pre_process_tsat_reset, app_check_tsat_reset.res, config)
+        # app_check_tsat_reset.res.data = df_clean  # speed up the process instead of fetching again
         app_check_tsat_reset.res.result, app_check_tsat_reset.res.message = check_sat_reset(
             app_check_tsat_reset.res.data,
-            config, plot_flag=True, filename=datasource)
+            config, plot_flag=False, filename=datasource)
         n_list[app_check_tsat_reset.details['name']] = app_check_tsat_reset.res.result
         check_log_result(
             result=app_check_tsat_reset.res.result,

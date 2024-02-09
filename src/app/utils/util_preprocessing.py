@@ -19,7 +19,7 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 
 from .logger import CustomLogger
 from .util_plot import plot_timeseries_transient
-
+from src.app import ApplicationData
 logger = CustomLogger().get_logger()
 
 
@@ -244,3 +244,57 @@ def get_steady(df, configuration: dict, plot_flag: bool = False, filename=None):
     # perc_transient = df_steady[df_steady['slope'] == 'transient'].shape[0] / df_steady.shape[0]
 
     return df_steady
+
+def pre_process_tsat_reset(app_data: ApplicationData, configuration: dict):
+    """
+    This function preprocesses the dataframe according to the configuration file.
+    :param df: the raw dataset
+    :param configuration: dictionary of configuration files
+    """
+    df = app_data.data_internal.copy()
+    df = resample(df=df, window=f'{configuration["aggregation"]}T')
+    # resample and eventually fill with linear interpolation
+    df = linear_interpolation(df)
+    for col in df.columns:
+        try:
+            if col in ['sat_col', 'oat_col']:
+                series = drop_na(df[col])
+                # seasonal period assumed to be 1 day nd so adapt to aggregation parameter
+                period = int(24 * 60 / configuration['aggregation'])
+                stl_result = seasonal_decompose(series, period=period)
+                # stl_result.plot().show()
+                # get outlier from the residuals
+                arr1 = stl_result.resid.dropna()
+
+                # finding the 1st quartile
+                q1 = np.quantile(arr1, 0.25)
+                # finding the 3rd quartile
+                q3 = np.quantile(arr1, 0.75)
+                # finding the iqr region
+                iqr = q3 - q1
+                # finding upper and lower whiskers
+                upper_bound = q3 + (20 * iqr)
+                lower_bound = q1 - (20 * iqr)
+                outliers = arr1[(arr1 <= lower_bound) | (arr1 >= upper_bound)]
+
+                if 0 < len(outliers) < 20:
+                    # limit the number of outliers to first 10 sort
+                    outliers = outliers.sort_values(ascending=False).head(10)
+                    logger.debug(f'Dropping {len(outliers)} outliers in {col}\n{outliers}')
+                    # stl_result.plot().show()
+                    df.loc[outliers.index, col] = None
+
+            elif col in ['oa_dmpr_sig_col', 'cooling_sig_col']:
+                # fill na with zeros if necessary
+                df[col] = df[col].fillna(0)
+                # find outliers
+                normalize_01(df, col)
+            else:
+                pass
+        except KeyError:
+            pass
+
+    df = linear_interpolation(df)
+    df['time'] = df.index
+
+    return app_data
