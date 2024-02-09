@@ -101,7 +101,7 @@ def check_sensor(app_data: ApplicationData, configuration):
     :param df: the dataset containing the measured variables
     :param configuration: a dictionary of thresholds
     """
-    df = app_data.data
+    df = app_data.data_internal
     # drop columns if all na in the column or zero
     df = df.loc[:, (df != 0).any(axis=0)]
     stuck_var = []

@@ -101,7 +101,6 @@ if __name__ == '__main__':
         app_check_sensor.qualify()
         app_check_sensor.fetch()
         app_check_sensor.analyze(check_sensor, app_check_sensor.res, config)
-        # app_check_sensor.res.result, app_check_sensor.res.message = check_sensor(app_check_sensor.res.data, config)
         n_list[app_check_sensor.details['name']] = app_check_sensor.res.result
         check_log_result(
             result=app_check_sensor.res.result,
