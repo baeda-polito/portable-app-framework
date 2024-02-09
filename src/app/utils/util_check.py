@@ -18,6 +18,7 @@ import pandas as pd
 from .logger import CustomLogger
 from .util_plot import plot_damper, plot_valves, plot_sat_reset
 from .util_preprocessing import check_low_variance
+from .. import ApplicationData
 
 logger = CustomLogger().get_logger()
 
@@ -53,6 +54,12 @@ def check_log_result(result: bool, check_name: str, message: ''):
         logger.error(f'{check_name} = FAILED ❌ ' + message)
     else:
         raise Exception('The result of the check is not a boolean')
+
+
+def check_variables1(app_data: ApplicationData):
+    app_data.result = True
+    app_data.message = ''
+    return app_data
 
 
 # noinspection PyUnresolvedReferences
@@ -255,7 +262,8 @@ def check_sat_reset(df, configuration, plot_flag=False, filename=None):
     if plot_flag:
         plot_sat_reset(df_steady, filename)
 
-    percentage_violation = df_steady[(df_steady['sat_col'] < df_steady['lower_bound']) | (df_steady['sat_col'] > df_steady['upper_bound'])].shape[0] / len(df_steady)
+    percentage_violation = df_steady[(df_steady['sat_col'] < df_steady['lower_bound']) | (
+                df_steady['sat_col'] > df_steady['upper_bound'])].shape[0] / len(df_steady)
 
     if percentage_violation < configuration['sat_reset_threshold']:
         return True, f"Less than 10% of Supply Air Temperature setpoint reset"

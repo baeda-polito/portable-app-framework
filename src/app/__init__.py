@@ -19,6 +19,7 @@ from rdflib import URIRef, Literal
 
 from .utils.logger import CustomLogger
 from .utils.util import load_file
+from .utils.util_preprocessing import preprocess, get_steady
 from .utils.util_qualify import BasicValidationInterface
 
 
@@ -190,7 +191,7 @@ class Application:
         else:
             raise ValueError('Invalid mode')
 
-    def clean(self, fn, *args, **kwargs):
+    def clean(self):  # fn, *args, **kwargs):
         """
          The purpose of this component is to normalize the timeseries data for the "analyze" component.
 
@@ -201,9 +202,16 @@ class Application:
        :param fn: function to clean the data
        :return: The cleaned data
         """
+        df = self.remap(self.data, mode='to_internal')
 
+        # TODO @ rocco trasforma tutto nella stess funzione per tutti
+        # df_clean = preprocess(df, config)
+        # df_clean = get_steady(df_clean, config, plot_flag=plot_flag, filename=datasource)
+        # df_clean['heating_sig_col'] = np.zeros(len(df_clean))  # add htg just to avoid error
+        # todo fare to internal
         # Call the external function with its arbitrary arguments
-        self.res.data_clean = fn(*args, **kwargs)
+        # self.res.data_clean = fn(*args, **kwargs)
+        # todo fare to exetrnal
 
     def analyze(self, fn, *args, **kwargs):
         """
@@ -217,7 +225,7 @@ class Application:
 
         """
         # Call the external function with its arbitrary arguments
-        # self.res.data_clean = fn(*args, **kwargs)
+        self.res = fn(*args, **kwargs)
         pass
 
 
