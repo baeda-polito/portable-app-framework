@@ -95,13 +95,13 @@ def check_variables(df: pd.DataFrame):
         return True, ''
 
 
-def check_sensor(df, configuration):
+def check_sensor(app_data: ApplicationData, configuration):
     """
     Check if the sensors are stuck
     :param df: the dataset containing the measured variables
     :param configuration: a dictionary of thresholds
     """
-
+    df = app_data.data
     # drop columns if all na in the column or zero
     df = df.loc[:, (df != 0).any(axis=0)]
     stuck_var = []
@@ -127,9 +127,14 @@ def check_sensor(df, configuration):
             pass
 
     if stuck_var.__len__() > 0:
-        return None, f'(Possible sensor freeze/stuck {list(stuck_var)})'
+        app_data.result = None
+        app_data.message = f'(Possible sensor freeze/stuck {list(stuck_var)})'
     else:
-        return True, ''
+
+        app_data.result = True
+        app_data.message = ''
+
+    return app_data
 
 
 def check_min_oa(df, configuration, plot_flag=True):
@@ -263,7 +268,7 @@ def check_sat_reset(df, configuration, plot_flag=False, filename=None):
         plot_sat_reset(df_steady, filename)
 
     percentage_violation = df_steady[(df_steady['sat_col'] < df_steady['lower_bound']) | (
-                df_steady['sat_col'] > df_steady['upper_bound'])].shape[0] / len(df_steady)
+            df_steady['sat_col'] > df_steady['upper_bound'])].shape[0] / len(df_steady)
 
     if percentage_violation < configuration['sat_reset_threshold']:
         return True, f"Less than 10% of Supply Air Temperature setpoint reset"
