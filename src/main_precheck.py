@@ -13,11 +13,11 @@ Script Description:
 Notes:
 """
 import os
+import warnings
 
 import brickschema
 import numpy as np
 import pandas as pd
-import warnings
 
 from app import Application
 from app.utils.logger import CustomLogger

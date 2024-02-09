@@ -31,6 +31,7 @@ class ApplicationData:
         # The graph_path and datasource are external to the configuration file.
         self.data = data
         self.metadata = metadata
+        self.data_clean = None
         self.result = None
         self.message = 'No message'
 
@@ -105,6 +106,7 @@ class Application:
             #     manifest_path=manifest_path,
             # )
             # BMI.validate()
+            # TODO inserire qualify su aggregazione e time span
         except Exception as e:
             self.logger.error(f'Error during the validation of the manifest: {e}')
 
@@ -168,6 +170,36 @@ class Application:
         fetch_data = fetch_data.rename(columns=fetch_metadata_rev)
 
         self.res = ApplicationData(data=fetch_data, metadata=fetch_metadata)
+
+    def clean(self, fn, *args, **kwargs):
+        """
+         The purpose of this component is to normalize the timeseries data for the "analyze" component.
+
+       Common operations in the clean component are hole filling,specialized aggregation, and data filtering.
+       It is kept modular to facilitate the re-use of standard
+       cleaning steps. Application developers can build their own cleaning components or leverage existing methods
+
+       :param fn: function to clean the data
+       :return: The cleaned data
+        """
+
+        # Call the external function with its arbitrary arguments
+        self.res.data_clean = fn(*args, **kwargs)
+
+    def analyze(self, fn, *args, **kwargs):
+        """
+        The purpose of this component is to perform the actual analysis of the data.
+
+        The output of the "analyze" component is a set of timeseries dataframes
+        containing the results of the analysis. The application developer can choose to save these results to the
+        timeseries database, or to perform additional analysis on the results in the aggregate component.
+
+        Updates the res_dict["timeseries"] with the tagged data frame in the column FAULT
+
+        """
+        # Call the external function with its arbitrary arguments
+        # self.res.data_clean = fn(*args, **kwargs)
+        pass
 
 
 def cli_new_app(app_name):
