@@ -48,6 +48,7 @@ class Application:
         self.data = data
         self.metadata = metadata
         self.res = ApplicationData()
+        self.mapping = None
 
         '''
         The config folder should be structured as follows
@@ -166,10 +167,28 @@ class Application:
         # from dict converts from original naming convention to internal naming convention
         # fetch_data.rename(columns=fetch_metadata)
         # from dict converts from internal naming convention to original naming convention
-        fetch_metadata_rev = {v: k for k, v in fetch_metadata.items()}
-        fetch_data = fetch_data.rename(columns=fetch_metadata_rev)
+        # fetch_metadata_rev = {v: k for k, v in fetch_metadata.items()}
+        # fetch_data = fetch_data.rename(columns=fetch_metadata_rev)
 
-        self.res = ApplicationData(data=fetch_data, metadata=fetch_metadata)
+        self.res = ApplicationData(data=fetch_data, metadata=fetch_metadata)  # todo togliere metadata
+        self.mapping = fetch_metadata
+
+    def remap(self, mode):
+        """
+        Remap the columns of the dataframe to the internal naming convention
+        :return: The remapped dataframe
+        """
+        if mode == 'to_external':
+            # map to internal convention
+            df = self.res.data.rename(columns=self.mapping)
+            return df
+        elif mode == 'to_internal':
+            # map to external convention
+            fetch_metadata_rev = {v: k for k, v in self.mapping.items()}
+            df = self.res.data.rename(columns=fetch_metadata_rev)
+            return df
+        else:
+            raise ValueError('Invalid mode')
 
     def clean(self, fn, *args, **kwargs):
         """

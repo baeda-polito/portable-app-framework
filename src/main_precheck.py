@@ -99,6 +99,8 @@ if __name__ == '__main__':
         app_check_sensor = Application(data=df, metadata=graph, app_name='app_check_sensor')
         app_check_sensor.qualify()
         app_check_sensor.fetch()
+        print(app_check_sensor.remap('to_internal').head())
+
         app_check_sensor.res.result, app_check_sensor.res.message = check_sensor(app_check_sensor.res.data, config)
         n_list[app_check_sensor.details['name']] = app_check_sensor.res.result
         check_log_result(
