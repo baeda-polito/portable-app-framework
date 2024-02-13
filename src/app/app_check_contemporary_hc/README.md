@@ -1,4 +1,4 @@
-# Check valves
+# Contemporary heating and cooling
 #### Version v.1.0 (YYYY-MM-DD)
 Short description
 

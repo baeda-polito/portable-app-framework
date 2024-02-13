@@ -15,8 +15,9 @@ Notes:
 import argparse
 import os
 
-import yaml
+import inquirer  # noqa
 import pandas as pd
+import yaml
 from rdflib import URIRef, Literal
 
 from .utils.logger import CustomLogger
@@ -212,15 +213,23 @@ class Application:
         self.res = fn(*args, **kwargs)
 
 
-def cli_new_app(app_name):
+def app_name_validation(answers, current):
+    if not current.startswith('app_'):
+        raise inquirer.errors.ValidationError("", reason="Must start with 'app_'")
+
+    return True
+
+
+def cli_new_app():
     """
     Create new application from template
-    :param app_name:
     """
-    print(os.getcwd())
-    print(f'Creating new app {app_name}')
+    questions = [
+        inquirer.Text("name", message="App name?", validate=app_name_validation),
+    ]
+    answers = inquirer.prompt(questions)
     # copy folder app_example to app_name
-    os.system(f'cp -r src/app/template src/app/{app_name}')
+    os.system(f'cp -r src/app/template src/app/{answers["name"]}')
 
 
 def cli_list_app():
@@ -228,57 +237,78 @@ def cli_list_app():
     List available applications excluding example
     """
     # list folders in app folder
-    folders = os.listdir('src/app')
+    app_folder = os.listdir('src/app')
     # list only folders that start with ap
-    folders = [folder for folder in folders if folder.startswith('app')]
-    print(folders)
+    app_names = [app for app in app_folder if app.startswith('app')]
+    print(app_names)
 
 
-def cli_update_app(app_name):
-    """
-    Create new application from template
-    :param app_name:
-    """
-    print(os.getcwd())
+def update_readme(app_name):
     print(f'Updating app {app_name}')
     # read config.yaml and transform in markdown.md
     with open(f'src/app/{app_name}/config.yaml', 'r') as file:
         data = yaml.load(file, Loader=yaml.FullLoader)
 
     with open(f'src/app/{app_name}/README.md', 'w') as file:
-        md = f'# {data["details"]["name"]} (v{data["details"]["version"]})\n'
+        md = f'# {data["details"]["name"]}\n'
         md += f'#### Version v.{data["details"]["version"]} ({data["details"]["created_at"]})\n'
         md += f'{data["details"]["description"]}\n\n'
-        md += f'The app[1](#author) is structured as follows:\n'
+        md += f'The app[^1] is structured as follows:\n'
         md += f'- Configuration file ([config.yaml](config.yaml))\n'
-        md += f'- SPARQL query ([query.yaml](query.yaml))\n'
-        md += f'- SHACL Shape or manifest ([manifest.yaml](manifest.yaml))\n\n'
-        md += f'[1](#author) by {data["details"]["author"]} - {data["details"]["email"]} \n'
+        md += f'- SPARQL query ([query.rq](query.rq))\n'
+        md += f'- SHACL Shape or manifest ([manifest.ttl](manifest.ttl))\n\n'
+        md += f'[^1]: by {data["details"]["author"]} - {data["details"]["email"]} \n'
         file.write(md)
+
+
+def cli_update_app():
+    """
+    Create new application from template
+    """
+
+    app_names = [app for app in os.listdir('src/app') if app.startswith('app')]
+
+    questions = [
+        inquirer.Checkbox(
+            "size",
+            message="Which app do you want to update?",
+            choices=["all"] + app_names,
+        ),
+    ]
+
+    answer = inquirer.prompt(questions)
+
+    if len(answer['size']) > 1:
+        for app in answer['size']:
+            update_readme(app)
+    elif answer['size'][0] == 'all':
+        for app in app_names:
+            update_readme(app)
+    else:
+        update_readme(answer)
 
 
 def cli_entry_point():
     """
     Entrypoint for the command line CLI
     """
+
     parser = argparse.ArgumentParser(description='Utils CLI for the afdd framework.')
     subparser = parser.add_subparsers(dest='command')
 
     # Command to create a new app from template
-    parser_new = subparser.add_parser('new', help='Create a new application folder from template.')
-    parser_new.add_argument('app_name', help='The name of the application.')
+    subparser.add_parser('new', help='Create a new application folder from template.')
+    # parser_new.add_argument('app_name', help='The name of the application.')
 
-    parser_new = subparser.add_parser('update', help='Update a new application folder from template.')
-    parser_new.add_argument('app_name', help='The name of the application.')
-
-    parser_ls = subparser.add_parser('ls', help='List available applications.')
+    subparser.add_parser('update', help='Update README of an application.')
+    subparser.add_parser('ls', help='List available applications.')
 
     # Depending on argument does something
     args = parser.parse_args()
     if args.command == 'new':
-        cli_new_app(args.app_name)
+        cli_new_app()
     if args.command == 'update':
-        cli_update_app(args.app_name)
+        cli_update_app()
     if args.command == 'ls':
         cli_list_app()
     else:
