@@ -250,7 +250,8 @@ def update_readme(app_name):
         data = yaml.load(file, Loader=yaml.FullLoader)
 
     with open(f'src/app/{app_name}/README.md', 'w') as file:
-        md = f'# {data["details"]["name"]}\n'
+        md = '[//]: # (AUTOMATICALLY GENERATED DO NOT MODIFY)\n\n'
+        md += f'# {data["details"]["name"]}\n'
         md += f'#### Version v.{data["details"]["version"]} ({data["details"]["created_at"]})\n'
         md += f'{data["details"]["description"]}\n\n'
         md += f'The app[^1] is structured as follows:\n'

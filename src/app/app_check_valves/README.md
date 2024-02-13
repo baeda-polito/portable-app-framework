@@ -1,3 +1,5 @@
+[//]: # (AUTOMATICALLY GENERATED DO NOT MODIFY)
+
 # Check valves
 #### Version v.1.0 (YYYY-MM-DD)
 Short description

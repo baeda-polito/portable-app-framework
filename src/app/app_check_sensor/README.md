@@ -1,3 +1,5 @@
+[//]: # (AUTOMATICALLY GENERATED DO NOT MODIFY)
+
 # Check Variables
 #### Version v.1.0 (2024-01-01)
 Checks if are there any stuck sensor. The analysis is performed depending on the type of sensor/point.

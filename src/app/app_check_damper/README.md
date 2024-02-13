@@ -1,3 +1,5 @@
+[//]: # (AUTOMATICALLY GENERATED DO NOT MODIFY)
+
 # Check damper
 #### Version v.1.0 (2024-01-01)
 Check damper

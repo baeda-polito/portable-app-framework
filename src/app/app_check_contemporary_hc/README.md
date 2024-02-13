@@ -1,3 +1,5 @@
+[//]: # (AUTOMATICALLY GENERATED DO NOT MODIFY)
+
 # Contemporary heating and cooling
 #### Version v.1.0 (YYYY-MM-DD)
 Short description
