@@ -264,10 +264,26 @@ def update_readme(app_name):
         md += f'# {data["details"]["name"]}\n\n'
         md += f'#### Version v.{data["details"]["version"]} ({data["details"]["created_at"]})\n\n'
         md += f'{data["details"]["description"]}\n\n'
-        md += f'The app[^1] is structured as follows:\n'
+        md += f'## Structure\n\n'
+        md += f'The app[^1] is structured as follows:\n\n'
         md += f'- Configuration file ([config.yaml](config.yaml))\n'
         md += f'- SPARQL query ([query.rq](query.rq))\n'
-        md += f'- SHACL Shape or manifest ([manifest.ttl](manifest.ttl))\n\n'
+        md += f'- SHACL Shape or manifest ([manifest.ttl](manifest.ttl))\n\n\n'
+        md += f'## Usage\n\n'
+        md += f'```python\n'
+        md += f'import pandas as pd\n'
+        md += f'import brickschema\n'
+        md += f'from afdd_framework import Application\n\n'
+        md += f'app = Application(\n'
+        md += f'    data=pd.DataFrame(),\n'
+        md += f'    metadata=brickschema.Graph(),\n'
+        md += f'    app_name=\'{app_name}\'\n'
+        md += f')\n'
+        md += f'app.qualify()\n'
+        md += f'app.fetch()\n'
+        md += f'app.clean()\n'
+        md += f'app.analyze()\n'
+        md += f'```\n\n'
         md += f'[^1]: by {data["details"]["author"]} - {data["details"]["email"]} \n'
         file.write(md)
 
@@ -296,7 +312,7 @@ def cli_update_app():
         for app in app_names:
             update_readme(app)
     else:
-        update_readme(answer)
+        update_readme(answer['size'][0])
 
 
 def cli_entry_point():
