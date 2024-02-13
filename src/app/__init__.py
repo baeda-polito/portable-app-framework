@@ -213,7 +213,13 @@ class Application:
         self.res = fn(*args, **kwargs)
 
 
-def app_name_validation(answers, current):
+def app_name_validation(answer, current):
+    """
+    Validate the app name in the inquirer prompt
+    :param answer: The answer
+    :param current: The current answer
+    :return:
+    """
     if not current.startswith('app_'):
         raise inquirer.errors.ValidationError("", reason="Must start with 'app_'")
 
@@ -244,6 +250,10 @@ def cli_list_app():
 
 
 def update_readme(app_name):
+    """
+    Update the README.md of the app
+    :param app_name: The name of the app
+    """
     print(f'Updating app {app_name}')
     # read config.yaml and transform in markdown.md
     with open(f'src/app/{app_name}/config.yaml', 'r') as file:
@@ -251,8 +261,8 @@ def update_readme(app_name):
 
     with open(f'src/app/{app_name}/README.md', 'w') as file:
         md = '[//]: # (AUTOMATICALLY GENERATED DO NOT MODIFY)\n\n'
-        md += f'# {data["details"]["name"]}\n'
-        md += f'#### Version v.{data["details"]["version"]} ({data["details"]["created_at"]})\n'
+        md += f'# {data["details"]["name"]}\n\n'
+        md += f'#### Version v.{data["details"]["version"]} ({data["details"]["created_at"]})\n\n'
         md += f'{data["details"]["description"]}\n\n'
         md += f'The app[^1] is structured as follows:\n'
         md += f'- Configuration file ([config.yaml](config.yaml))\n'

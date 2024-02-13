@@ -1,6 +1,6 @@
 [//]: # (AUTOMATICALLY GENERATED DO NOT MODIFY)
 
-# Check valves
+# Template
 
 #### Version v.1.0 (YYYY-MM-DD)
 
