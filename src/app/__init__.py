@@ -15,6 +15,7 @@ Notes:
 import argparse
 import os
 
+import yaml
 import pandas as pd
 from rdflib import URIRef, Literal
 
@@ -233,6 +234,29 @@ def cli_list_app():
     print(folders)
 
 
+def cli_update_app(app_name):
+    """
+    Create new application from template
+    :param app_name:
+    """
+    print(os.getcwd())
+    print(f'Updating app {app_name}')
+    # read config.yaml and transform in markdown.md
+    with open(f'src/app/{app_name}/config.yaml', 'r') as file:
+        data = yaml.load(file, Loader=yaml.FullLoader)
+
+    with open(f'src/app/{app_name}/README.md', 'w') as file:
+        md = f'# {data["details"]["name"]} (v{data["details"]["version"]})\n'
+        md += f'#### Version v.{data["details"]["version"]} ({data["details"]["created_at"]})\n'
+        md += f'{data["details"]["description"]}\n\n'
+        md += f'The app[1](#author) is structured as follows:\n'
+        md += f'- Configuration file ([config.yaml](config.yaml))\n'
+        md += f'- SPARQL query ([query.yaml](query.yaml))\n'
+        md += f'- SHACL Shape or manifest ([manifest.yaml](manifest.yaml))\n\n'
+        md += f'[1](#author) by {data["details"]["author"]} - {data["details"]["email"]} \n'
+        file.write(md)
+
+
 def cli_entry_point():
     """
     Entrypoint for the command line CLI
@@ -244,12 +268,17 @@ def cli_entry_point():
     parser_new = subparser.add_parser('new', help='Create a new application folder from template.')
     parser_new.add_argument('app_name', help='The name of the application.')
 
+    parser_new = subparser.add_parser('update', help='Update a new application folder from template.')
+    parser_new.add_argument('app_name', help='The name of the application.')
+
     parser_ls = subparser.add_parser('ls', help='List available applications.')
 
     # Depending on argument does something
     args = parser.parse_args()
     if args.command == 'new':
         cli_new_app(args.app_name)
+    if args.command == 'update':
+        cli_update_app(args.app_name)
     if args.command == 'ls':
         cli_list_app()
     else:
