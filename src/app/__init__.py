@@ -15,7 +15,7 @@ Notes:
 import argparse
 import os
 
-import inquirer  # noqa
+import inquirer
 import pandas as pd
 import yaml
 from rdflib import URIRef, Literal
@@ -24,6 +24,14 @@ from .utils.logger import CustomLogger
 from .utils.util import load_file
 from .utils.util_preprocessing import preprocess, get_steady
 from .utils.util_qualify import BasicValidationInterface
+
+# create app folder if not exists
+APP_FOLDER = os.path.join(os.getcwd(), 'app')
+os.makedirs(APP_FOLDER, exist_ok=True)
+print('App folder created' + APP_FOLDER)
+
+MODULE_BASEPATH = os.path.dirname(__file__)
+USER_BASEPATH = os.getcwd()
 
 
 class ApplicationData:
@@ -226,6 +234,20 @@ def app_name_validation(answer, current):
     return True
 
 
+def app_folder_validation(answer, current):
+    """
+    Validate the app name in the inquirer prompt
+    :param answer: The answer
+    :param current: The current answer
+    :return:
+    """
+    # must be a path in this form /path/to/folder
+    if not os.path.exists(current):
+        raise inquirer.errors.ValidationError("", reason="Path does not exist")
+
+    return True
+
+
 def cli_new_app():
     """
     Create new application from template
@@ -233,16 +255,17 @@ def cli_new_app():
     questions = [
         inquirer.Text("name", message="App name?", validate=app_name_validation),
     ]
-    answers = inquirer.prompt(questions)
-    # copy folder app_example to app_name
-    os.system(f'cp -r src/app/template src/app/{answers["name"]}')
+    answer = inquirer.prompt(questions)
+    # copy folder 'template' to user local folder
+    os.system(
+        f'cp -r {os.path.join(MODULE_BASEPATH, "template")} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["name"])}')
 
 
 def cli_clone_app():
     """
     Create new application from template
     """
-    app_names = [app for app in os.listdir('src/app') if app.startswith('app')]
+    app_names = [app for app in os.listdir(os.path.dirname(__file__)) if app.startswith('app')]
 
     questions = [
         inquirer.List(
@@ -255,15 +278,16 @@ def cli_clone_app():
     answer = inquirer.prompt(questions)
     print(answer)
     # copy folder app_example to app_name
-    # os.system(f'cp -r src/app/template src/app/{answer["app"]}')
+    os.system(
+        f'cp -r {os.path.join(MODULE_BASEPATH, answer["app"])} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["app"])}')
 
 
 def cli_list_app():
     """
     List available applications excluding example
     """
-    # list folders in app folder
-    app_folder = os.listdir('src/app')
+    # list folders in app folder inside the module
+    app_folder = os.listdir(MODULE_BASEPATH)
     # list only folders that start with ap
     app_names = [app for app in app_folder if app.startswith('app')]
     print(app_names)
@@ -276,10 +300,10 @@ def update_readme(app_name):
     """
     print(f'Updating app {app_name}')
     # read config.yaml and transform in markdown.md
-    with open(f'src/app/{app_name}/config.yaml', 'r') as file:
+    with open(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, "config.yaml")) as file:
         data = yaml.load(file, Loader=yaml.FullLoader)
 
-    with open(f'src/app/{app_name}/README.md', 'w') as file:
+    with open(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, "README.md"), 'w') as file:
         md = '[//]: # (AUTOMATICALLY GENERATED DO NOT MODIFY)\n\n'
         md += f'# {data["details"]["name"]}\n\n'
         md += f'#### Version v.{data["details"]["version"]} ({data["details"]["created_at"]})\n\n'
@@ -313,18 +337,20 @@ def cli_update_app():
     Create new application from template
     """
 
-    app_names = [app for app in os.listdir('src/app') if app.startswith('app')]
+    app_names = [app for app in os.listdir(os.path.join(USER_BASEPATH, APP_FOLDER)) if app.startswith('app')]
 
     questions = [
         inquirer.Checkbox(
-            "app",
+            name="app",
             message="Which app do you want to update?",
             choices=["all"] + app_names,
-        ),
+        )
     ]
+    # todo add validation on empty
 
     answer = inquirer.prompt(questions)
 
+    print(answer)
     if len(answer['app']) > 1:
         for app in answer['app']:
             update_readme(app)
@@ -346,8 +372,6 @@ def cli_entry_point():
     # Command to create a new app from template
     subparser.add_parser('new', help='Create a new application folder from template.')
     subparser.add_parser('clone', help='Clone an existing application.')
-    # parser_new.add_argument('app_name', help='The name of the application.')
-
     subparser.add_parser('update', help='Update README of an application.')
     subparser.add_parser('ls', help='List available applications.')
 
