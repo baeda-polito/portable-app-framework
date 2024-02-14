@@ -249,14 +249,16 @@ def check_valves(df, df_eco, configuration):
         return None, f'(Not enough info)'
 
 
-def check_sat_reset(df, configuration, plot_flag=False, filename=None):
+def check_sat_reset(app_data, configuration, plot_flag=False, filename=None):
     """
     Check if the Supply Air Temperature is in a reasonable reset schedule
-    :param df: dataset with variables
+    :param app_data:
     :param configuration: dictionary of thresholds
     :param plot_flag: whether to plot or not
     :param filename: the name of the file to save the plot
     """
+
+    df = app_data.data_clean.copy()
 
     df['lower_bound'] = df['oat_col'].apply(lambda x: 17 if x <= -10 else 12 if x >= 10 else -0.25 * x + 14.5)
     df['upper_bound'] = df['oat_col'].apply(lambda x: 22 if x <= -15 else 14 if x >= 20 else -0.24 * x + 18.8)
@@ -270,6 +272,10 @@ def check_sat_reset(df, configuration, plot_flag=False, filename=None):
             df_steady['sat_col'] > df_steady['upper_bound'])].shape[0] / len(df_steady)
 
     if percentage_violation < configuration['sat_reset_threshold']:
-        return True, f"Less than 10% of Supply Air Temperature setpoint reset"
+        app_data.result = True
+        app_data.message = f"Less than 10% of Supply Air Temperature setpoint reset"
     else:
-        return False, f'(sat_reset violations = {round(percentage_violation, 3)} > {configuration["sat_reset_threshold"]})'
+        app_data.result = False
+        app_data.message = f'(sat_reset violations = {round(percentage_violation, 3)} > {configuration["sat_reset_threshold"]})'
+
+    return app_data

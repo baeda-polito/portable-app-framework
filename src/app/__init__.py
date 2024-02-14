@@ -61,6 +61,8 @@ class Application:
         self.metadata = metadata
         self.res = ApplicationData()
         self.mapping = None
+        # TODO: Path to application in the init input
+        self.path_to_app = os.path.abspath(os.path.join('app', app_name))
 
         '''
         The config folder should be structured as follows
