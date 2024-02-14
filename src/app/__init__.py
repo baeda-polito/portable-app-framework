@@ -79,24 +79,24 @@ class Application:
         '''
 
         # Class variable to store available app names
-        available_app = os.listdir('app')  # Add your app names here
+        available_app = os.listdir(os.path.join(USER_BASEPATH, APP_FOLDER))  # Add your app names here
         # get only directories that start with app
         available_app_names = [app for app in available_app if app.startswith('app')]
 
         if app_name not in available_app_names:
             raise ValueError(f"Invalid app name. Available app names: {available_app_names}")
 
-        if os.path.join('app', app_name, 'config.yaml') is None:
+        if os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'config.yaml') is None:
             raise FileNotFoundError('config.yaml not found')
-        elif os.path.join('app', app_name, 'manifest.yaml') is None:
+        elif os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'manifest.yaml') is None:
             raise FileNotFoundError('manifest.yaml not found')
-        elif os.path.join('app', app_name, 'query.ttl') is None:
+        elif os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'query.ttl') is None:
             raise FileNotFoundError('query.ttl not found')
         else:
-            config_file = load_file(os.path.join('app', app_name, 'config.yaml'), yaml_type=True)
+            config_file = load_file(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'config.yaml'), yaml_type=True)
             self.details = config_file['details']
-            self.manifest = os.path.join('app', app_name, 'manifest.ttl')
-            self.query = load_file(os.path.join('app', app_name, 'query.rq'))
+            self.manifest = os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'manifest.ttl')
+            self.query = load_file(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'query.rq'))
 
     def qualify(self) -> None:
         """
@@ -317,7 +317,7 @@ def update_readme(app_name):
         md += f'```python\n'
         md += f'import pandas as pd\n'
         md += f'import brickschema\n'
-        md += f'from afdd_framework import Application\n\n'
+        md += f'from app import Application\n\n'  # todo dare nome migliore a pacchetto
         md += f'app = Application(\n'
         md += f'    data=pd.DataFrame(),\n'
         md += f'    metadata=brickschema.Graph(),\n'
