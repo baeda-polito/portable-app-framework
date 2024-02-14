@@ -238,6 +238,26 @@ def cli_new_app():
     os.system(f'cp -r src/app/template src/app/{answers["name"]}')
 
 
+def cli_clone_app():
+    """
+    Create new application from template
+    """
+    app_names = [app for app in os.listdir('src/app') if app.startswith('app')]
+
+    questions = [
+        inquirer.List(
+            "app",
+            message="Which app do you want to clone?",
+            choices=app_names,
+        ),
+    ]
+
+    answer = inquirer.prompt(questions)
+    print(answer)
+    # copy folder app_example to app_name
+    # os.system(f'cp -r src/app/template src/app/{answer["app"]}')
+
+
 def cli_list_app():
     """
     List available applications excluding example
@@ -297,7 +317,7 @@ def cli_update_app():
 
     questions = [
         inquirer.Checkbox(
-            "size",
+            "app",
             message="Which app do you want to update?",
             choices=["all"] + app_names,
         ),
@@ -305,14 +325,14 @@ def cli_update_app():
 
     answer = inquirer.prompt(questions)
 
-    if len(answer['size']) > 1:
-        for app in answer['size']:
+    if len(answer['app']) > 1:
+        for app in answer['app']:
             update_readme(app)
-    elif answer['size'][0] == 'all':
+    elif answer['app'][0] == 'all':
         for app in app_names:
             update_readme(app)
     else:
-        update_readme(answer['size'][0])
+        update_readme(answer['app'][0])
 
 
 def cli_entry_point():
@@ -325,6 +345,7 @@ def cli_entry_point():
 
     # Command to create a new app from template
     subparser.add_parser('new', help='Create a new application folder from template.')
+    subparser.add_parser('clone', help='Clone an existing application.')
     # parser_new.add_argument('app_name', help='The name of the application.')
 
     subparser.add_parser('update', help='Update README of an application.')
@@ -334,6 +355,8 @@ def cli_entry_point():
     args = parser.parse_args()
     if args.command == 'new':
         cli_new_app()
+    if args.command == 'clone':
+        cli_clone_app()
     if args.command == 'update':
         cli_update_app()
     if args.command == 'ls':
