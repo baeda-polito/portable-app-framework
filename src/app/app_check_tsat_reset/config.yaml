@@ -1,8 +1,0 @@
-details:
-  name: Check supply air temperature
-  description: Check supply air temperature setpoint reset
-  version: 1.0
-  author: Rocco Giudice
-  email: rocco.giudice@polito.it
-  created_at: 2024-01-30
-

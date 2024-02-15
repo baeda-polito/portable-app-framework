@@ -12,7 +12,7 @@ Script Description:
 
 Notes:
 """
-import rdflib
+import brickschema
 from buildingmotif import BuildingMOTIF
 from buildingmotif.dataclasses import Model, Library
 from rdflib import Namespace
@@ -28,7 +28,7 @@ class BasicValidationInterface:
     https://github.com/gtfierro/shapes/blob/main/verify.py
     """
 
-    def __init__(self, graph: rdflib.Graph, manifest: str):
+    def __init__(self, graph: brickschema.Graph, manifest: str):
         # use the wrapper BrickGraph to initialize the graph
         self.graph = graph
         self.graph.parse(manifest, format='ttl')

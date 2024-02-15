@@ -1,8 +1,0 @@
-details:
-  name: AHU Variables Check
-  description: Look for the following points in the metadata schema Cooling_Command, Damper_Position_Command, Heating_Command, Supply_Air_Temperature_Setpoint, Outside_Air_Temperature_Sensor, Return_Air_Temperature_Sensor, Mixed_Air_Temperature_Sensor, Supply_Air_Temperature_Sensor
-  version: 1.0
-  author: Roberto Chiosa
-  email: roberto.chiosa@polito.it
-  created_at: 2024-01-01
-

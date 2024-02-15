@@ -22,7 +22,6 @@ from rdflib import URIRef, Literal
 
 from .utils.logger import CustomLogger
 from .utils.util import load_file
-from .utils.util_preprocessing import preprocess, get_steady
 from .utils.util_qualify import BasicValidationInterface
 
 # create app folder if not exists
@@ -373,19 +372,19 @@ def cli_entry_point():
 
     # Command to create a new app from template
     subparser.add_parser('new', help='Create a new application folder from template.')
-    subparser.add_parser('clone', help='Clone an existing application.')
+    # subparser.add_parser('clone', help='Clone an existing application.') # todo clone da app online
     subparser.add_parser('update', help='Update README of an application.')
-    subparser.add_parser('ls', help='List available applications.')
+    # subparser.add_parser('ls', help='List available applications.')
 
     # Depending on argument does something
     args = parser.parse_args()
     if args.command == 'new':
         cli_new_app()
-    if args.command == 'clone':
-        cli_clone_app()
+    # if args.command == 'clone':
+    #     cli_clone_app()
     if args.command == 'update':
         cli_update_app()
-    if args.command == 'ls':
-        cli_list_app()
+    # if args.command == 'ls':
+    #     cli_list_app()
     else:
         parser.print_help()

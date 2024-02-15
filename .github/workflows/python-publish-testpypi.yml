@@ -106,7 +106,7 @@ jobs:
 
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/afdd-framework
+      url: https://test.pypi.org/p/portable-app-framework
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
