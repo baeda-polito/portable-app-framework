@@ -18,7 +18,7 @@ setup(
     description="Portable Framework for Building Applications - PFB-Toolkit",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/portable-app-framework",
+    url="https://github.com/RobertoChiosa/portable-app-framework",
     author="Roberto Chiosa",
     author_email="roberto.chiosa@polito.it",
     classifiers=[
@@ -26,10 +26,7 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
+        "Operating System :: OS Independent",
         "Programming Language :: Python :: 3 :: Only",
     ],
     keywords="",
@@ -38,11 +35,11 @@ setup(
     python_requires=">=3.8",
     include_package_data=True,
     package_data={
-        "app": ["*.md", "**/*.md", "**/*.rq", "**/*.ttl", "**/*.yaml"],
+        "portable_app_framework": ["**/*.md", "**/*.rq", "**/*.ttl", "**/*.yaml"],
     },
     entry_points={
         "console_scripts": [
-            "portable-app-framework=app:cli_entry_point",
+            "portable-app-framework=portable_app_framework:cli_entry_point",
         ],
     },
     extras_require={

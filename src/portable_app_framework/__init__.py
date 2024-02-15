@@ -261,6 +261,8 @@ def cli_new_app():
     os.system(
         f'cp -r {os.path.join(MODULE_BASEPATH, "template")} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["name"])}')
 
+    update_readme(answer["name"])
+
 
 def cli_clone_app():
     """

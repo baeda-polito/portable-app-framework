@@ -2,15 +2,6 @@
 
 A portable application is
 
-Available apps are:
-
-- [app_check_freeze](app_check_freeze)
-- [app_check_min_oa](app_check_min_oa)
-- [app_check_sensor](app_check_sensor)
-- [app_check_variables](app_check_variables)
-- [app_example](template)
-- [app_preprocessing](app_preprocessing)
-
 ## Usage
 
 The application folder must contains the following files
