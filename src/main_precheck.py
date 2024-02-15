@@ -119,10 +119,11 @@ if __name__ == '__main__':
         app_check_tsat_reset.qualify()
         app_check_tsat_reset.fetch()
         app_check_tsat_reset.clean(pre_process_tsat_reset, app_check_tsat_reset.res, config)
+        app_check_tsat_reset.analyze(check_sat_reset, app_check_tsat_reset.res, config, plot_flag, filename=datasource)
         # app_check_tsat_reset.res.data = df_clean  # speed up the process instead of fetching again
-        app_check_tsat_reset.res.result, app_check_tsat_reset.res.message = check_sat_reset(
-            app_check_tsat_reset.res.data,
-            config, plot_flag=False, filename=datasource)
+        # app_check_tsat_reset.res.result, app_check_tsat_reset.res.message = check_sat_reset(
+        #     app_check_tsat_reset.res.data,
+        #     config, plot_flag=False, filename=datasource)
         n_list[app_check_tsat_reset.details['name']] = app_check_tsat_reset.res.result
         check_log_result(
             result=app_check_tsat_reset.res.result,
