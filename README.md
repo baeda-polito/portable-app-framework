@@ -9,9 +9,12 @@
 ## Table of Contents
 
 - [Main Features](#main-features)
-  - [Command Line Interface (CLI)](#command-line-interface-cli)
-  - [Application class](#application-class)
+    - [Command Line Interface (CLI)](#command-line-interface-cli)
+    - [Application class](#application-class)
 - [Installation](#installation)
+    - [From source](#from-source)
+    - [From test PyPI](#from-test-pypi)
+    - [From PyPI](#from-pypi)
 - [Dependencies](#dependencies)
 - [Background](#background)
 - [Contributing](#contributing)
@@ -78,7 +81,9 @@ You can install the package in different ways depending on the level of usage yo
 - [ ] From PyPI (not yet released)
 
 ### From source
+
 You can install the package from source by cloning the repository and running the following command:
+
 ```sh
 git clone https://github.com/RobertoChiosa/portable-app-framework.git
 cd portable-app-framework
@@ -86,13 +91,17 @@ pip install .
 ```
 
 ### From test PyPI
+
 You can install the latest test version from test PyPI with the following command:
+
 ```sh
 pip install -i https://test.pypi.org/simple/ portable-app-framework
 ```
 
 ### From PyPI
+
 You can install the stable version from PyPI with the following command:
+
 ```sh
 pip install portable-app-framework
 ```
