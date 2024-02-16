@@ -60,7 +60,7 @@ A detailed overview on how to contribute can be found in the [contributing guide
 
 Most development discussions take place on GitHub in this repo, via the [GitHub issue tracker](https://github.com/RobertoChiosa/portable-app-framework/issues).
 
-If you are simply looking to start working with the `portable_app_framework` codebase, navigate to the [GitHub "issues" tab](https://github.com/RobertoChiosa/portable-app-framework/issues) and start looking through interesting issues. There are a number of issues listed under [Docs](https://github.com/RobertoChiosa/portable-app-framework/issues?labels=Docs&sort=updated&state=open) and [good first issue](https://github.com/RobertoChiosa/portable-app-framework/issues?labels=good+first+issue&sort=updated&state=open) where you could start out.
+If you are simply looking to start working with the `portable_app_framework` codebase, navigate to the [GitHub "issues" tab](https://github.com/RobertoChiosa/portable-app-framework/issues) and start looking through interesting issues.
 
 Or maybe through using `portable_app_framework` you have an idea of your own or are looking for something in the documentation and
 thinking ‘this can be improved’...you can do something about it!
