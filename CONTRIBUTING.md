@@ -32,7 +32,6 @@ python3 -m twine upload --repository pypi dist/*
 
 ```
 jupyter-book build docs/
-
 ```
 
 Copy main readme to docs folder as intro.md. In this way we will always have the intro updated.
