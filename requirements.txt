@@ -1,6 +1,6 @@
-brickschema==0.7.2
-buildingmotif==0.2.0b0
-inquirer==3.2.3
-pandas==2.2.0
-PyYAML==6.0.1
-rdflib==6.1.1
+brickschema
+buildingmotif
+inquirer
+pandas
+PyYAML
+rdflib
