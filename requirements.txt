@@ -1,8 +1,0 @@
-brickschema
-buildingmotif
-inquirer
-pandas
-PyYAML
-jupyter-book
-jupyter
-rdflib
