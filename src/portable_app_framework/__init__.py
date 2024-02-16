@@ -259,7 +259,7 @@ def cli_new_app():
     answer = inquirer.prompt(questions)
     # copy folder 'template' to user local folder
     os.system(
-        f'cp -r {os.path.join(MODULE_BASEPATH, "template")} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["name"])}')
+        f'cp -r {os.path.join(MODULE_BASEPATH, "app_template")} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["name"])}')
 
     update_readme(answer["name"])
 
@@ -337,7 +337,7 @@ def update_readme(app_name):
 
 def cli_update_app():
     """
-    Create new application from template
+    Update the README.md of the app
     """
 
     app_names = [app for app in os.listdir(os.path.join(USER_BASEPATH, APP_FOLDER)) if app.startswith('app')]

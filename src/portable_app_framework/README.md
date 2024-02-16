@@ -1,36 +1,26 @@
-# Portable applications repository
+# Portable applications framework package
 
-A portable application is
+This folder contains the source code for the portable applications framework package. The package is designed to
+facilitate the development of portable applications that can be easily shared and reused. 
 
-## Usage
-
-The application folder must contains the following files
-
-- [config.yaml](template/config.yaml) configuration file
-- [manifest.yaml](template/manifest.yaml) manifest file
-- [query.rq](template/query.rq) query file
-
-Code usage in python
-
-```python
-import pandas as pd
-import brickschema
-from utils.util_app import Application
-
-app = Application(
-    data=pd.DataFrame(),
-    metadata=brickschema.Graph(),
-    app_name='path/to/app/folder'
-)
-app.qualify()
-app.fetch()
+## Structure
+```txt
+├── README.md
+├── __init__.py                   # Package initialization with Application class and CLI
+├── app_template                  # Template example application
+│   ├── README.md           
+│   ├── __init__.py         # Application initialization
+│   ├── config.yaml         # Application configuration
+│   ├── manifest.ttl        # SHACL Shape or manifest
+│   └── query.rq            # SPARQL query
+├── libraries                     # External libraries
+│   ├── Brick-nightly.ttl     
+│   ├── Brick-subset.ttl      
+│   └── Brick.ttl             
+└── utils                         # Utility functions
+    ├── __init__.p
+    ├── logger.py                 # Logging utility
+    ├── util.py                   # General utility functions
+    ├── util_brick.py             # Brick-specific utility functions
+    └── util_qualify.py           # Qualification utility functions
 ```
-
-## Contribute
-
-- Create app
-- Push
-
-
-
-
