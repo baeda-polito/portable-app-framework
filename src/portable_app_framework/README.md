@@ -9,10 +9,10 @@ facilitate the development of portable applications that can be easily shared an
 ├── __init__.py                   # Package initialization with Application class and CLI
 ├── app_template                  # Template example application
 │   ├── README.md           
-│   ├── __init__.py         # Application initialization
-│   ├── config.yaml         # Application configuration
-│   ├── manifest.ttl        # SHACL Shape or manifest
-│   └── query.rq            # SPARQL query
+│   ├── __init__.py               # Application initialization
+│   ├── config.yaml               # Application configuration
+│   ├── manifest.ttl              # SHACL Shape or manifest
+│   └── query.rq                  # SPARQL query
 ├── libraries                     # External libraries
 │   ├── Brick-nightly.ttl     
 │   ├── Brick-subset.ttl      
