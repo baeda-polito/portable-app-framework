@@ -3,4 +3,6 @@ buildingmotif
 inquirer
 pandas
 PyYAML
+jupiter-book
+jupiter
 rdflib
