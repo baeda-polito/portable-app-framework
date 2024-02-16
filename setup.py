@@ -32,7 +32,7 @@ setup(
     keywords="",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     include_package_data=True,
     package_data={
         "portable_app_framework": ["**/*.md", "**/*.rq", "**/*.ttl", "**/*.yaml"],
