@@ -14,6 +14,7 @@ Notes:
 """
 import argparse
 import os
+import importlib
 
 import inquirer
 import pandas as pd
@@ -196,30 +197,47 @@ class Application:
 
     def clean(self, fn, *args, **kwargs):
         """
-         The purpose of this component is to normalize the timeseries data for the "analyze" component.
+        The purpose of this component is to normalize the data for the "analyze" component.
 
-       Common operations in the clean component are hole filling,specialized aggregation, and data filtering.
-       It is kept modular to facilitate the re-use of standard
-       cleaning steps. Application developers can build their own cleaning components or leverage existing methods
+        Common operations in the clean component are hole filling,specialized aggregation, and data filtering.
+        It is kept modular to facilitate the re-use of standard  cleaning steps.
+        Application developers can build their own cleaning components or leverage existing methods.
 
-       :param fn: function to clean the data
-       :return: The cleaned data
+        :param fn: function to clean the data
+        :return: The cleaned data
         """
-        self.res = fn(*args, **kwargs)
+        # Dynamically import the clan module
+        clean_module = importlib.import_module('.clean', package=__name__)
+
+        # Get the function object from the module
+        clean_fn = getattr(clean_module, fn, None)
+
+        if clean_fn is not None and callable(clean_fn):
+            # Call the function with the provided arguments
+            self.res = clean_fn(*args, **kwargs)
+        else:
+            print(f"Function {fn} not found in analyze module.")
+            return None
 
     def analyze(self, fn, *args, **kwargs):
         """
         The purpose of this component is to perform the actual analysis of the data.
 
         The output of the "analyze" component is a set of timeseries dataframes
-        containing the results of the analysis. The application developer can choose to save these results to the
-        timeseries database, or to perform additional analysis on the results in the aggregate component.
-
-        Updates the res_dict["timeseries"] with the tagged data frame in the column FAULT
-
+        containing the results of the analysis. The application saves the data in the form of ApplicationData class.
         """
-        # Call the external function with its arbitrary arguments
-        self.res = fn(*args, **kwargs)
+        # Dynamically import the analyze module
+        analyze_module = importlib.import_module('.analyze', package=__name__)
+
+        # Get the function object from the module
+        analyze_fn = getattr(analyze_module, fn, None)
+
+        if analyze_fn is not None and callable(analyze_fn):
+            # Call the function with the provided arguments
+            self.res = analyze_fn(*args, **kwargs)
+        else:
+            print(f"Function {fn} not found in analyze module.")
+            return None
 
 
 def app_name_validation(answer, current):
