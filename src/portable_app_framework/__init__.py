@@ -287,36 +287,36 @@ def cli_new_app():
     update_readme(answer["name"])
 
 
-def cli_clone_app():
-    """
-    Create new application from template
-    """
-    app_names = [app for app in os.listdir(os.path.dirname(__file__)) if app.startswith('app')]
+# def cli_clone_app():
+#     """
+#     Create new application from template
+#     """
+#     app_names = [app for app in os.listdir(os.path.dirname(__file__)) if app.startswith('app')]
+#
+#     questions = [
+#         inquirer.List(
+#             "app",
+#             message="Which app do you want to clone?",
+#             choices=app_names,
+#         ),
+#     ]
+#
+#     answer = inquirer.prompt(questions)
+#     print(answer)
+#     # copy folder app_example to app_name
+#     os.system(
+#         f'cp -r {os.path.join(MODULE_BASEPATH, answer["app"])} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["app"])}')
 
-    questions = [
-        inquirer.List(
-            "app",
-            message="Which app do you want to clone?",
-            choices=app_names,
-        ),
-    ]
 
-    answer = inquirer.prompt(questions)
-    print(answer)
-    # copy folder app_example to app_name
-    os.system(
-        f'cp -r {os.path.join(MODULE_BASEPATH, answer["app"])} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["app"])}')
-
-
-def cli_list_app():
-    """
-    List available applications excluding example
-    """
-    # list folders in app folder inside the module
-    app_folder = os.listdir(MODULE_BASEPATH)
-    # list only folders that start with ap
-    app_names = [app for app in app_folder if app.startswith('app')]
-    print(app_names)
+# def cli_list_app():
+#     """
+#     List available applications excluding example
+#     """
+#     # list folders in app folder inside the module
+#     app_folder = os.listdir(MODULE_BASEPATH)
+#     # list only folders that start with ap
+#     app_names = [app for app in app_folder if app.startswith('app')]
+#     print(app_names)
 
 
 def update_readme(app_name):
@@ -338,14 +338,14 @@ def update_readme(app_name):
         md += f'The app[^1] is structured as follows:\n\n'
         md += f'- Configuration file ([config.yaml](config.yaml))\n'
         md += f'- SPARQL query ([query.rq](query.rq))\n'
-        md += f'- SHACL Shape or manifest ([manifest.ttl](manifest.ttl))\n\n\n'
-        md += f'- Clean function ([clean.py](clean.py))\n\n\n'
+        md += f'- SHACL Shape or manifest ([manifest.ttl](manifest.ttl))\n'
+        md += f'- Clean function ([clean.py](clean.py))\n'
         md += f'- Analyze function ([analyze.py](analyze.py))\n\n\n'
         md += f'## Usage\n\n'
         md += f'```python\n'
         md += f'import pandas as pd\n'
         md += f'import brickschema\n'
-        md += f'from portable-app-framework import Application\n\n'  # todo dare nome migliore a pacchetto
+        md += f'from portable_app_framework import Application\n\n'  # todo dare nome migliore a pacchetto
         md += f'app = Application(\n'
         md += f'    data=pd.DataFrame(),\n'
         md += f'    metadata=brickschema.Graph(),\n'
@@ -372,13 +372,12 @@ def cli_update_app():
             name="app",
             message="Which app do you want to update?",
             choices=["all"] + app_names,
+            default=["all"]
         )
     ]
-    # todo add validation on empty
 
     answer = inquirer.prompt(questions)
 
-    print(answer)
     if len(answer['app']) > 1:
         for app in answer['app']:
             update_readme(app)
