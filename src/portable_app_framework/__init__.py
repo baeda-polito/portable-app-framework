@@ -51,7 +51,7 @@ class ApplicationData:
         # The graph_path and datasource are external to the configuration file.
         self.data = data
         self.data_internal = data_internal
-        self.data_clean = data_clean
+        # self.data_clean = data_clean
         self.metadata = metadata
         self.result = result
         self.message = message
@@ -62,13 +62,15 @@ class Application:
     Application class
     """
 
-    def __init__(self, data=None, metadata=None, app_name=None):
+    def __init__(self, metadata=None, app_name=None):
         # Class specific logger
         self.logger = CustomLogger().get_logger()
         # The graph_path and datasource are external to the configuration file.
-        self.data = data
+        self.data = None
         self.metadata = metadata
-        self.res = ApplicationData()
+        self.app_name = app_name
+        self.data_internal = None
+        self.res = {}
         self.mapping = None
         # TODO: Path to application in the init input
         self.path_to_app = os.path.abspath(os.path.join('app', app_name))
@@ -134,7 +136,7 @@ class Application:
         except Exception as e:
             self.logger.error(f'Error during the validation of the manifest: {e}')
 
-    def fetch(self):
+    def fetch(self, data):
         """
         The fetch component performs the actual retrieval of data from the timeseries database corresponding to the set of streams identified by the Brick queries.
 
@@ -150,6 +152,7 @@ class Application:
         :return: The data
         """
         self.logger.debug(f'Fetching metadata based on sparql query')
+        self.data = data
         # Perform query on rdf graph
         query_results = self.metadata.query(self.query)
         # todo errore nel renaming variblili
@@ -191,36 +194,34 @@ class Application:
         fetch_metadata_rev = {v: k for k, v in fetch_metadata.items()}
         fetch_data_internal = fetch_data.rename(columns=fetch_metadata_rev)
 
-        self.res = ApplicationData(data=fetch_data,
-                                   data_internal=fetch_data_internal,
-                                   metadata=fetch_metadata)
         self.mapping = fetch_metadata
+        self.data_internal = fetch_data_internal
 
-    def clean(self, fn, *args, **kwargs):
-        """
-        The purpose of this component is to normalize the data for the "analyze" component.
+    # def clean(self, fn, *args, **kwargs):
+    #     """
+    #     The purpose of this component is to normalize the data for the "analyze" component.
+    #
+    #     Common operations in the clean component are hole filling,specialized aggregation, and data filtering.
+    #     It is kept modular to facilitate the re-use of standard  cleaning steps.
+    #     Application developers can build their own cleaning components or leverage existing methods.
+    #
+    #     :param fn: function to clean the data
+    #     :return: The cleaned data
+    #     """
+    #     # Dynamically import the clan module
+    #     clean_module = importlib.import_module('.clean', package=__name__)
+    #
+    #     # Get the function object from the module
+    #     clean_fn = getattr(clean_module, fn, None)
+    #
+    #     if clean_fn is not None and callable(clean_fn):
+    #         # Call the function with the provided arguments
+    #         self.res = clean_fn(*args, **kwargs)
+    #     else:
+    #         print(f"Function {fn} not found in analyze module.")
+    #         return None
 
-        Common operations in the clean component are hole filling,specialized aggregation, and data filtering.
-        It is kept modular to facilitate the re-use of standard  cleaning steps.
-        Application developers can build their own cleaning components or leverage existing methods.
-
-        :param fn: function to clean the data
-        :return: The cleaned data
-        """
-        # Dynamically import the clan module
-        clean_module = importlib.import_module('.clean', package=__name__)
-
-        # Get the function object from the module
-        clean_fn = getattr(clean_module, fn, None)
-
-        if clean_fn is not None and callable(clean_fn):
-            # Call the function with the provided arguments
-            self.res = clean_fn(*args, **kwargs)
-        else:
-            print(f"Function {fn} not found in analyze module.")
-            return None
-
-    def analyze(self, fn, *args, **kwargs):
+    def analyze(self, *args, **kwargs):
         """
         The purpose of this component is to perform the actual analysis of the data.
 
@@ -228,16 +229,16 @@ class Application:
         containing the results of the analysis. The application saves the data in the form of ApplicationData class.
         """
         # Dynamically import the analyze module
-        analyze_module = importlib.import_module('.analyze', package=__name__)
+        analyze_module = importlib.import_module(f"app.{self.app_name}.analyze", package=__name__)
 
         # Get the function object from the module
-        analyze_fn = getattr(analyze_module, fn, None)
+        analyze_fn = getattr(analyze_module, "analyze_fn", None)
 
         if analyze_fn is not None and callable(analyze_fn):
             # Call the function with the provided arguments
             self.res = analyze_fn(*args, **kwargs)
         else:
-            print(f"Function {fn} not found in analyze module.")
+            print(f"Function {analyze_fn} not found in analyze module.")
             return None
 
 
