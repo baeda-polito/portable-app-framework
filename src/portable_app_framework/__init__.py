@@ -15,6 +15,7 @@ Notes:
 import argparse
 import os
 import importlib
+import shutil
 
 import inquirer
 import pandas as pd
@@ -275,10 +276,17 @@ def cli_new_app():
         inquirer.Text("name", message="App name?", validate=app_name_validation),
     ]
     answer = inquirer.prompt(questions)
-    # copy folder 'template' to user local folder
-    os.system(
-        f'cp -r {os.path.join(MODULE_BASEPATH, "app_template")} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["name"])}')
 
+    template_folder = os.path.join(MODULE_BASEPATH, "app_template")
+    user_folder = os.path.join(USER_BASEPATH, APP_FOLDER, answer["name"])
+
+    # Create the destination folder if it doesn't exist
+    os.makedirs(user_folder, exist_ok=True)
+
+    # Recursively copy the template folder to the user's folder
+    shutil.copytree(template_folder, user_folder)
+
+    # Update the README or perform other necessary actions
     update_readme(answer["name"])
 
 
