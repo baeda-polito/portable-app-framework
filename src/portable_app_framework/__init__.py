@@ -13,8 +13,8 @@ Script Description:
 Notes:
 """
 import argparse
-import os
 import importlib
+import os
 import shutil
 
 import inquirer
@@ -280,11 +280,8 @@ def cli_new_app():
     template_folder = os.path.join(MODULE_BASEPATH, "app_template")
     user_folder = os.path.join(USER_BASEPATH, APP_FOLDER, answer["name"])
 
-    # Create the destination folder if it doesn't exist
-    os.makedirs(user_folder, exist_ok=True)
-
-    # Recursively copy the template folder to the user's folder
-    shutil.copytree(template_folder, user_folder)
+    # Recursively copy the template folder content to the user folder
+    shutil.copytree(template_folder, user_folder, dirs_exist_ok=True)
 
     # Update the README or perform other necessary actions
     update_readme(answer["name"])
@@ -342,11 +339,13 @@ def update_readme(app_name):
         md += f'- Configuration file ([config.yaml](config.yaml))\n'
         md += f'- SPARQL query ([query.rq](query.rq))\n'
         md += f'- SHACL Shape or manifest ([manifest.ttl](manifest.ttl))\n\n\n'
+        md += f'- Clean function ([clean.py](clean.py))\n\n\n'
+        md += f'- Analyze function ([analyze.py](analyze.py))\n\n\n'
         md += f'## Usage\n\n'
         md += f'```python\n'
         md += f'import pandas as pd\n'
         md += f'import brickschema\n'
-        md += f'from app import Application\n\n'  # todo dare nome migliore a pacchetto
+        md += f'from portable-app-framework import Application\n\n'  # todo dare nome migliore a pacchetto
         md += f'app = Application(\n'
         md += f'    data=pd.DataFrame(),\n'
         md += f'    metadata=brickschema.Graph(),\n'
