@@ -62,7 +62,7 @@ class Application:
     Application class
     """
 
-    def __init__(self, data=None, metadata=None, app_name=None):
+    def __init__(self, data, metadata, app_name):
         # Class specific logger
         self.logger = CustomLogger().get_logger()
         # The graph_path and datasource are external to the configuration file.
@@ -70,8 +70,7 @@ class Application:
         self.metadata = metadata
         self.res = ApplicationData()
         self.mapping = None
-        # TODO: Path to application in the init input
-        self.path_to_app = os.path.abspath(os.path.join('app', app_name))
+        self.path_to_app = os.path.join(USER_BASEPATH, APP_FOLDER, app_name)
 
         '''
         The config folder should be structured as follows
@@ -88,7 +87,6 @@ class Application:
 
         if app_name not in available_app_names:
             raise ValueError(f"Invalid app name. Available app names: {available_app_names}")
-
         if os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'config.yaml') is None:
             raise FileNotFoundError('config.yaml not found')
         elif os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'manifest.yaml') is None:
@@ -98,6 +96,7 @@ class Application:
         else:
             config_file = load_file(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'config.yaml'), yaml_type=True)
             self.details = config_file['details']
+            self.parameters = config_file['parameters']
             self.manifest = os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'manifest.ttl')
             self.query = load_file(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'query.rq'))
 
