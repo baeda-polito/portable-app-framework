@@ -185,7 +185,10 @@ class Application:
         # From the result i need to fetch the corresponding column in data
         fetch_metadata = {}
         for item in json_results['results']['bindings'][0].items():
-            fetch_metadata[item[0]] = item[1]['value'].split('#')[1]
+            if '#' in item[1]['value']:
+                fetch_metadata[item[0]] = item[1]['value'].split('#')[1]
+            else:
+                fetch_metadata[item[0]] = item[1]['value']
 
         fetch_data = self.data.loc[:, self.data.columns.isin(fetch_metadata.values())]
         # todo remove when in production, remap to convention
