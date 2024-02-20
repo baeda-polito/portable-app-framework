@@ -272,6 +272,20 @@ def app_folder_validation(answer, current):
     return True
 
 
+def app_selection_validation(answer, current):
+    """
+    Validate an app is selected
+    :param answer: The answer
+    :param current: The current answer
+    :return:
+    """
+    # must be a path in this form /path/to/folder
+    if len(current) == 0:
+        raise inquirer.errors.ValidationError("", reason="Please choose one app from the list")
+
+    return True
+
+
 def cli_new_app():
     """
     Create new application from template
@@ -345,6 +359,10 @@ def update_readme(app_name):
         md += f'- SHACL Shape or manifest ([manifest.ttl](manifest.ttl))\n'
         md += f'- Clean function ([clean.py](clean.py))\n'
         md += f'- Analyze function ([analyze.py](analyze.py))\n\n\n'
+        md += f'The app accepts the following parameters\n\n'
+        for name, value in data["parameters"].items():
+            md += f'- `{name}` {value}\n'
+        md += f'\n'
         md += f'## Usage\n\n'
         md += f'```python\n'
         md += f'import pandas as pd\n'
@@ -376,7 +394,7 @@ def cli_update_app():
             name="app",
             message="Which app do you want to update?",
             choices=["all"] + app_names,
-            default=["all"]
+            validate=app_selection_validation
         )
     ]
 

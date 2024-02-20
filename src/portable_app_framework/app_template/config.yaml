@@ -7,18 +7,9 @@ details:
   created_at: YYYY-MM-DD
 
 parameters:
-  time_from:
-    value: 2021-01-01T00:00:00Z
-    description: The starting time for the analysis
-    type: string
-  time_to:
-    value: 2021-01-01T00:00:00Z
-    description: The ending time for the analysis
-    type: string
-  aggregation:
-    value: 1h
-    description: The aggregation level for the analysis
-    type: string
+  time_from: 2021-01-01T00:00:00Z
+  time_to: 2021-01-01T00:00:00Z
+  aggregation: 1h
 
 
 
