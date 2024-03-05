@@ -24,7 +24,7 @@ from rdflib import URIRef, Literal
 
 from .utils.logger import CustomLogger
 from .utils.util import load_file
-from .utils.util_qualify import BasicValidationInterface
+from .utils.util_qualify import BasicValidationInterface, BuildingMotifValidationInterface
 
 # create app folder if not exists
 APP_FOLDER = os.path.join(os.getcwd(), 'app')
@@ -62,7 +62,7 @@ class Application:
     Application class
     """
 
-    def __init__(self, data=None, metadata=None, app_name=None):
+    def __init__(self, metadata=None, app_name=None):
         # Class specific logger
         self.logger = CustomLogger().get_logger()
         # The graph_path and datasource are external to the configuration file.
@@ -121,18 +121,17 @@ class Application:
 
         try:
             self.logger.debug(f'Validating the ttl file on manifest.ttl')
-            basic_validation = BasicValidationInterface(
-                graph=self.metadata,
-                manifest=self.manifest,
-            )
-            basic_validation.validate()
-
-            # BMI = BuildingMotifValidationInterface(
-            #     graph_path=self.graph_path,
-            #     manifest_path=manifest_path,
+            # basic_validation = BasicValidationInterface(
+            #     graph=self.metadata,
+            #     manifest=self.manifest,
             # )
-            # BMI.validate()
-            # TODO inserire qualify su aggregazione e time span
+            # basic_validation.validate()
+
+            BMI = BuildingMotifValidationInterface(
+                graph_path=self.metadata,
+                manifest_path=self.manifest,
+            )
+            BMI.validate()
         except Exception as e:
             self.logger.error(f'Error during the validation of the manifest: {e}')
 

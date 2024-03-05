@@ -48,6 +48,7 @@ class BasicValidationInterface:
             raise Exception("Model is invalid")
 
 
+# TODO: Procedura per quando il .ttl non è disponibile + sistemare logger in autocorrection
 class BuildingMotifValidationInterface:
     """
     This class is used to validate a graph using the Buildingmotif validation as described here:
@@ -72,22 +73,11 @@ class BuildingMotifValidationInterface:
         bldg = Namespace('urn:bldg/')
 
         # create the building model
-        model = Model.create(bldg, description="This is a test model for a simple building")
-        # print(model.graph.serialize())
-
-        # load test case model
+        model = Model.create(bldg)
         model.graph.parse(self.graph_path, format="ttl")
-        # print(model.graph.serialize())
-        # print(f"Model length {len(model.graph.serialize())}")
 
-        # load brick ontology
-        brick = Library.load(ontology_graph="../config/libraries/Brick-subset.ttl")
-        # print(f"Model + brick length {len(model.graph.serialize())}")
-
-        # load libraries included with the python package
-        constraints = Library.load(ontology_graph="../../buildingmotif/libraries/constraints/constraints.ttl")
-        # load libraries excluded from the python package (available from the repository)
-        # load manifest into BuildingMOTIF as its own library!
+        brick = Library.load(ontology_graph="../libraries/Brick-subset.ttl")
+        constraints = Library.load(ontology_graph="../libraries/constraints.ttl")
         manifest = Library.load(ontology_graph=self.manifest_path)
 
         # gather shape collections into a list for ease of use
@@ -111,4 +101,13 @@ class BuildingMotifValidationInterface:
             for diff in validation_result.diffset:
                 print(f" - {diff.reason()}")
 
-            raise Exception("Model is invalid")
+            generated_templates = validation_result.as_templates()
+            print(generated_templates)
+            for t in generated_templates:
+                print('-'*80)
+                print(t.body.serialize())
+                for p in t.parameters:
+                    ident = input(f"Give value for 'name' of {p} in the above template: ")
+                    model.add_graph(t.evaluate({"name": bldg[ident]}))
+
+            print(model.graph.serialize())
