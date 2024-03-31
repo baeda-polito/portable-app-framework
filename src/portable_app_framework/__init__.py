@@ -62,7 +62,7 @@ class Application:
     Application class
     """
 
-    def __init__(self, data=None, metadata=None, app_name=None):
+    def __init__(self, metadata=None, app_name=None):
         # Class specific logger
         self.logger = CustomLogger().get_logger()
         # The graph_path and datasource are external to the configuration file.
@@ -136,7 +136,8 @@ class Application:
         except Exception as e:
             self.logger.error(f'Error during the validation of the manifest: {e}')
 
-    def fetch(self, data):
+    def fetch(self,
+              data):  # todo pèotremmo passare un parametro che forza il fetch e mettere data nella app definition perche usato nel qualify
         """
         The fetch component performs the actual retrieval of data from the timeseries database corresponding to the set of streams identified by the Brick queries.
 
@@ -200,29 +201,25 @@ class Application:
         self.mapping = fetch_metadata
         self.data_internal = fetch_data_internal
 
-    # def clean(self, fn, *args, **kwargs):
-    #     """
-    #     The purpose of this component is to normalize the data for the "analyze" component.
-    #
-    #     Common operations in the clean component are hole filling,specialized aggregation, and data filtering.
-    #     It is kept modular to facilitate the re-use of standard  cleaning steps.
-    #     Application developers can build their own cleaning components or leverage existing methods.
-    #
-    #     :param fn: function to clean the data
-    #     :return: The cleaned data
-    #     """
-    #     # Dynamically import the clan module
-    #     clean_module = importlib.import_module('.clean', package=__name__)
-    #
-    #     # Get the function object from the module
-    #     clean_fn = getattr(clean_module, fn, None)
-    #
-    #     if clean_fn is not None and callable(clean_fn):
-    #         # Call the function with the provided arguments
-    #         self.res = clean_fn(*args, **kwargs)
-    #     else:
-    #         print(f"Function {fn} not found in analyze module.")
-    #         return None
+    def clean(self, *args, **kwargs):
+        """
+        The purpose of this component is to perform the actual analysis of the data.
+
+        The output of the "analyze" component is a set of timeseries dataframes
+        containing the results of the analysis. The application saves the data in the form of ApplicationData class.
+        """
+        # Dynamically import the analyze module
+        clean_module = importlib.import_module(f"app.{self.app_name}.clean", package=__name__)
+
+        # Get the function object from the module
+        clean_fn = getattr(clean_module, "clean_fn", None)
+
+        if clean_fn is not None and callable(clean_fn):
+            # Call the function with the provided arguments
+            self.res = clean_fn(*args, **kwargs)  # todo we should save in a clean:{}
+        else:
+            print(f"Function {clean_fn} not found in analyze module.")
+            return None
 
     def analyze(self, *args, **kwargs):
         """
@@ -239,7 +236,7 @@ class Application:
 
         if analyze_fn is not None and callable(analyze_fn):
             # Call the function with the provided arguments
-            self.res = analyze_fn(*args, **kwargs)
+            self.res = analyze_fn(*args, **kwargs)  # todo we should save in a analyze:{}
         else:
             print(f"Function {analyze_fn} not found in analyze module.")
             return None
@@ -305,7 +302,7 @@ def cli_new_app():
     update_readme(answer["name"])
 
 
-# def cli_clone_app():
+# todo def cli_clone_app():
 #     """
 #     Create new application from template
 #     """
