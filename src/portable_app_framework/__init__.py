@@ -68,9 +68,10 @@ class Application:
         # The graph_path and datasource are external to the configuration file.
         self.metadata = metadata
         self.app_name = app_name
-        self.res = {}
-        self.mapping_int_ext = None
-        self.mapping_ext_int = None
+        self.res_qualify = None
+        self.res_fetch = None
+        self.res_clean = None
+        self.res_analyze = None
         self.path_to_app = os.path.join(USER_BASEPATH, APP_FOLDER, app_name)
 
         '''
@@ -132,10 +133,12 @@ class Application:
             # )
             # BMI.validate()
             # TODO inserire qualify su aggregazione e time span
+            res = True
         except Exception as e:
             self.logger.error(f'Error during the validation of the manifest: {e}')
 
-        return True
+        self.res_qualify = res
+        return res
 
     def fetch(self):
         """
@@ -158,7 +161,7 @@ class Application:
         # Convert the query results to the desired JSON format
         fetch_metadata = parse_raw_query(query_results)
         # save internal external naming convention to class
-        self.mapping_int_ext = fetch_metadata
+        self.res_fetch = fetch_metadata
         # return mapping
         return fetch_metadata
 
@@ -186,7 +189,7 @@ class Application:
 
         if clean_fn is not None and callable(clean_fn):
             # Call the function with the provided arguments
-            self.res = clean_fn(*args, **kwargs)  # todo we should save in a clean:{}
+            self.res_clean = clean_fn(*args, **kwargs)
         else:
             print(f"Function {clean_fn} not found in analyze module.")
             return None
@@ -206,7 +209,7 @@ class Application:
 
         if analyze_fn is not None and callable(analyze_fn):
             # Call the function with the provided arguments
-            self.res = analyze_fn(*args, **kwargs)  # todo we should save in a analyze:{}
+            self.res_analyze = analyze_fn(*args, **kwargs)
         else:
             print(f"Function {analyze_fn} not found in analyze module.")
             return None
