@@ -155,24 +155,21 @@ class Application:
         self.logger.debug(f'Fetching metadata based on sparql query')
         # Perform query on rdf graph
         query_results = self.metadata.query(self.query)
-
         # Convert the query results to the desired JSON format
-        json_results = parse_raw_query(query_results)
-
-        # todo non prendere il primo
-        # From the result i need to fetch the corresponding column in data
-        fetch_metadata = {}
-        for item in json_results['results']['bindings'][0].items():
-            if '#' in item[1]['value']:
-                fetch_metadata[item[0]] = item[1]['value'].split('#')[1]
-            else:
-                fetch_metadata[item[0]] = item[1]['value']
-
-        # from dict converts from internal naming convention to original naming convention
-        fetch_metadata_rev = {v: k for k, v in fetch_metadata.items()}
-
+        fetch_metadata = parse_raw_query(query_results)
+        # save internal external naming convention to class
         self.mapping_int_ext = fetch_metadata
-        self.mapping_ext_int = fetch_metadata_rev
+        # return mapping
+        return fetch_metadata
+
+    def internal_external_mapping(self, data):
+        """
+        The internal_external_mapping component performs the actual mapping of the internal data to the external data
+        """
+        self.logger.debug(f'Mapping internal data to external data convention')
+        # Perform mapping of internal data to external data
+        # convert to internal naming convention
+        return data
 
     def clean(self, *args, **kwargs):
         """

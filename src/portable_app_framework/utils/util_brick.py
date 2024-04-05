@@ -48,7 +48,19 @@ def parse_raw_query(query_results):
         'head': {'vars': head_vars},
         'results': {'bindings': bindings_list}
     }
-    return json_results
+    fetch_metadata = {}
+    i = 0
+    for binding in json_results['results']['bindings']:
+        fetch_metadata_binding = {}
+        for item in binding.items():
+            if '#' in item[1]['value']:
+                fetch_metadata_binding[item[0]] = item[1]['value'].split('#')[1]
+            else:
+                fetch_metadata_binding[item[0]] = item[1]['value']
+        fetch_metadata[i] = fetch_metadata_binding
+        i += 1
+
+    return fetch_metadata
 
 
 def parse_results(results, full_uri=False, df=True, no_prefix=False):
