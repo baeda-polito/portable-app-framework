@@ -15,7 +15,40 @@ Notes:
 
 import brickschema
 import pandas as pd
+from rdflib import Literal
 from rdflib import URIRef, Variable
+
+
+def parse_raw_query(query_results):
+    """
+    Parse the results of a SPARQL query into a standard json format
+    :param query_results:
+    :return:
+    """
+    # Convert the query results to the desired JSON format
+    head_vars = [str(var) for var in query_results.vars]
+    # Convert FrozenBindings to JSON format
+    bindings_list = []
+    for binding in query_results.bindings:
+        binding_dict = {}
+        for var in head_vars:
+            try:
+                value = binding[var]
+                value_dict = {
+                    'type': 'uri' if isinstance(value, URIRef) else 'literal' if isinstance(value,
+                                                                                            Literal) else None,
+                    'value': str(value),
+                }
+                binding_dict[var] = value_dict
+            except KeyError:
+                pass
+        bindings_list.append(binding_dict)
+
+    json_results = {
+        'head': {'vars': head_vars},
+        'results': {'bindings': bindings_list}
+    }
+    return json_results
 
 
 def parse_results(results, full_uri=False, df=True, no_prefix=False):

@@ -20,10 +20,10 @@ import shutil
 import inquirer
 import pandas as pd
 import yaml
-from rdflib import URIRef, Literal
 
 from .utils.logger import CustomLogger
 from .utils.util import load_file
+from .utils.util_brick import parse_raw_query
 from .utils.util_qualify import BasicValidationInterface
 
 # create app folder if not exists
@@ -66,12 +66,11 @@ class Application:
         # Class specific logger
         self.logger = CustomLogger().get_logger()
         # The graph_path and datasource are external to the configuration file.
-        self.data = None
         self.metadata = metadata
         self.app_name = app_name
-        self.data_internal = None
         self.res = {}
-        self.mapping = None
+        self.mapping_int_ext = None
+        self.mapping_ext_int = None
         self.path_to_app = os.path.join(USER_BASEPATH, APP_FOLDER, app_name)
 
         '''
@@ -103,7 +102,7 @@ class Application:
             self.manifest = os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'manifest.ttl')
             self.query = load_file(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'query.rq'))
 
-    def qualify(self) -> None:
+    def qualify(self) -> bool:
         """
         The "qualify" component defines the metadata and data requirements of an application.
 
@@ -136,8 +135,9 @@ class Application:
         except Exception as e:
             self.logger.error(f'Error during the validation of the manifest: {e}')
 
-    def fetch(self,
-              data):  # todo pèotremmo passare un parametro che forza il fetch e mettere data nella app definition perche usato nel qualify
+        return True
+
+    def fetch(self):
         """
         The fetch component performs the actual retrieval of data from the timeseries database corresponding to the set of streams identified by the Brick queries.
 
@@ -150,39 +150,16 @@ class Application:
         timeseries dataframes, and convenience methods for relating specific dataframes based on the Brick context
         (for example, the setpoint timeseries related to a given sensor timeseries).
 
-        :return: The data
+        :return:
         """
         self.logger.debug(f'Fetching metadata based on sparql query')
-        self.data = data
         # Perform query on rdf graph
         query_results = self.metadata.query(self.query)
-        # todo errore nel renaming variblili
 
-        # todo considerare di spostare tutto in brick utility
         # Convert the query results to the desired JSON format
-        head_vars = [str(var) for var in query_results.vars]
-        # Convert FrozenBindings to JSON format
-        bindings_list = []
-        for binding in query_results.bindings:
-            binding_dict = {}
-            for var in head_vars:
-                try:
-                    value = binding[var]
-                    value_dict = {
-                        'type': 'uri' if isinstance(value, URIRef) else 'literal' if isinstance(value,
-                                                                                                Literal) else None,
-                        'value': str(value),
-                    }
-                    binding_dict[var] = value_dict
-                except KeyError:
-                    pass
-            bindings_list.append(binding_dict)
+        json_results = parse_raw_query(query_results)
 
-        json_results = {
-            'head': {'vars': head_vars},
-            'results': {'bindings': bindings_list}
-        }
-
+        # todo non prendere il primo
         # From the result i need to fetch the corresponding column in data
         fetch_metadata = {}
         for item in json_results['results']['bindings'][0].items():
@@ -191,15 +168,11 @@ class Application:
             else:
                 fetch_metadata[item[0]] = item[1]['value']
 
-        fetch_data = self.data.loc[:, self.data.columns.isin(fetch_metadata.values())]
-        # todo remove when in production, remap to convention
-
         # from dict converts from internal naming convention to original naming convention
         fetch_metadata_rev = {v: k for k, v in fetch_metadata.items()}
-        fetch_data_internal = fetch_data.rename(columns=fetch_metadata_rev)
 
-        self.mapping = fetch_metadata
-        self.data_internal = fetch_data_internal
+        self.mapping_int_ext = fetch_metadata
+        self.mapping_ext_int = fetch_metadata_rev
 
     def clean(self, *args, **kwargs):
         """
