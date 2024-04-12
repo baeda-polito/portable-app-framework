@@ -3,8 +3,8 @@
 
 bldg:AHU
     a              brick:AHU ;
-    brick:hasPoint bldg:MA_TEMP .
+    brick:hasPoint bldg:MAT .
 
-bldg:MA_TEMP1
+bldg:MAT
     a brick:Mixed_Air_Temperature_Sensor .
 
