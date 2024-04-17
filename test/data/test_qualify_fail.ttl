@@ -6,5 +6,5 @@ bldg:AHU
     brick:hasPoint bldg:MA_TEMP .
 
 bldg:MA_TEMP1
-    a brick:Temperature_Sensor .
+    a brick:AHU .
 

@@ -67,6 +67,7 @@ class BuildingMotifValidationInterface:
         Validate the graph
         :return: print the validation report
         """
+        # todo dismiss logger buildingmotif
         # in-memory instance
         BuildingMOTIF("sqlite://")
         # remind to deactivate logger from BuildingMOTIF class in python package
@@ -107,7 +108,7 @@ class BuildingMotifValidationInterface:
         valid = validation_result.valid
 
         # print validation result
-        logger.info(f"[BuildingMOTIF] Model is valid? {valid}")
+        logger_new.info(f"[BuildingMOTIF] Model is valid? {valid}")
 
         # if not valid print the validation results
         if not validation_result.valid:

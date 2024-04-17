@@ -108,7 +108,7 @@ class Application:
                 manifest=self.manifest,
             )
             res_building_motif_validation = building_motif_validation.validate()
-            
+
             res = any([res_basic_validation, res_building_motif_validation])
         except Exception as e:
             self.logger.error(f'Error during the validation of the manifest: {e}')
@@ -166,6 +166,7 @@ class Application:
         if clean_fn is not None and callable(clean_fn):
             # Call the function with the provided arguments
             self.res_clean = clean_fn(*args, **kwargs)
+            return self.res_clean
         else:
             print(f"Function {clean_fn} not found in analyze module.")
             return None
@@ -186,6 +187,7 @@ class Application:
         if analyze_fn is not None and callable(analyze_fn):
             # Call the function with the provided arguments
             self.res_analyze = analyze_fn(*args, **kwargs)
+            return self.res_analyze
         else:
             print(f"Function {analyze_fn} not found in analyze module.")
             return None
