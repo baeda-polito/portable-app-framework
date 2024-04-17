@@ -18,14 +18,14 @@ import os
 import shutil
 
 import inquirer
-import pandas as pd
 import yaml
 
 from .utils.logger import CustomLogger
 from .utils.util import load_file
 from .utils.util_brick import parse_raw_query
-from .utils.util_qualify import BasicValidationInterface
+from .utils.util_qualify import BasicValidationInterface, BuildingMotifValidationInterface
 
+# todo spostare all'interno della cli setup
 # create app folder if not exists
 APP_FOLDER = os.path.join(os.getcwd(), 'app')
 os.makedirs(APP_FOLDER, exist_ok=True)
@@ -33,28 +33,6 @@ print('App folder created' + APP_FOLDER)
 
 MODULE_BASEPATH = os.path.dirname(__file__)
 USER_BASEPATH = os.getcwd()
-
-
-class ApplicationData:
-    """
-    Application data class
-    """
-
-    def __init__(self,
-                 data: pd.DataFrame = None,
-                 data_internal: pd.DataFrame = None,
-                 data_clean: pd.DataFrame = None,
-                 metadata: dict = None,
-                 result: bool = None,
-                 message: str = 'No message'
-                 ):
-        # The graph_path and datasource are external to the configuration file.
-        self.data = data
-        self.data_internal = data_internal
-        # self.data_clean = data_clean
-        self.metadata = metadata
-        self.result = result
-        self.message = message
 
 
 class Application:
@@ -107,11 +85,9 @@ class Application:
         """
         The "qualify" component defines the metadata and data requirements of an application.
 
-        Mortar evaluates these requirements against all available buildings in order to determine the subset of
-        buildings against which the application can run (the execution set).
-
         Specifically, the qualify component checks
-        (1) constraints on building typology and other properties, such as the number of floors in a building, floor area, climate, and occupancy class
+        (1) constraints on building typology and other properties, such as the number of floors in a building, floor
+        area, climate, and occupancy class
         (2) data context constraints, such as the kinds of equipment in the building and available relationships
         (3) data availability constraints, including the amount of historical data and available data resolution
 
@@ -125,15 +101,15 @@ class Application:
                 graph=self.metadata,
                 manifest=self.manifest,
             )
-            basic_validation.validate()
+            res_basic_validation = basic_validation.validate()
 
-            # BMI = BuildingMotifValidationInterface(
-            #     graph_path=self.graph_path,
-            #     manifest_path=manifest_path,
-            # )
-            # BMI.validate()
-            # TODO inserire qualify su aggregazione e time span
-            res = True
+            building_motif_validation = BuildingMotifValidationInterface(
+                graph=self.metadata,
+                manifest=self.manifest,
+            )
+            res_building_motif_validation = building_motif_validation.validate()
+            
+            res = any([res_basic_validation, res_building_motif_validation])
         except Exception as e:
             self.logger.error(f'Error during the validation of the manifest: {e}')
 
@@ -337,16 +313,16 @@ def update_readme(app_name):
         md += f'```python\n'
         md += f'import pandas as pd\n'
         md += f'import brickschema\n'
-        md += f'from portable_app_framework import Application\n\n'  # todo dare nome migliore a pacchetto
+        md += f'from portable_app_framework import Application\n\n'
         md += f'app = Application(\n'
-        md += f'    data=pd.DataFrame(),\n'
         md += f'    metadata=brickschema.Graph(),\n'
         md += f'    app_name=\'{app_name}\'\n'
         md += f')\n'
-        md += f'app.qualify()\n'
-        md += f'app.fetch()\n'
-        md += f'app.clean()\n'
-        md += f'app.analyze()\n'
+        md += f'qualify_result = app.qualify() # True/False\n'
+        md += f'fetch_result = app.fetch() # Dict of mapped variables\n'
+        md += f'# get df according to your logic \n'
+        md += f'df_clean = app.clean(df)\n'
+        md += f'final_result = app.analyze(df_clean)\n'
         md += f'```\n\n'
         md += f'[^1]: by {data["details"]["author"]} - {data["details"]["email"]} \n'
         file.write(md)
@@ -392,7 +368,7 @@ def cli_entry_point():
     subparser.add_parser('new', help='Create a new application folder from template.')
     # subparser.add_parser('clone', help='Clone an existing application.') # todo clone da app online
     subparser.add_parser('update', help='Update README of an application.')
-    # subparser.add_parser('ls', help='List available applications.')
+    subparser.add_parser('ls', help='List available applications.')
 
     # Depending on argument does something
     args = parser.parse_args()

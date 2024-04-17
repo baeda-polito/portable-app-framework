@@ -42,18 +42,18 @@ def test_qualify_pass():
     assert res is True
 
 
-# def test_qualify_fail():
-#     """
-#     Test that the qualify returns False
-#     :return:
-#     """
-#     app = Application(
-#         metadata=load_ttl("test_qualify_fail.ttl"),
-#         app_name='app_test'
-#     )
-#     res = app.qualify()
-#
-#     assert res is False
+def test_qualify_fail():
+    """
+    Test that the qualify returns False
+    :return:
+    """
+    app = Application(
+        metadata=load_ttl("test_qualify_fail.ttl"),
+        app_name='app_test'
+    )
+    res = app.qualify()
+
+    assert res is False
 
 
 def test_fetch_dict():

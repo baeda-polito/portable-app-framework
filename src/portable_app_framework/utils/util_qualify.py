@@ -12,6 +12,8 @@ Script Description:
 
 Notes:
 """
+import os
+
 import brickschema
 from buildingmotif import BuildingMOTIF
 from buildingmotif.dataclasses import Model, Library
@@ -33,7 +35,7 @@ class BasicValidationInterface:
         self.graph = graph
         self.graph.parse(manifest, format='ttl')
 
-    def validate(self) -> None:
+    def validate(self) -> bool:
         """
         Validate the graph
         :return: print the validation report
@@ -45,7 +47,8 @@ class BasicValidationInterface:
             print("-" * 79)
             print(report)
             print("-" * 79)
-            raise Exception("Model is invalid")
+
+        return valid
 
 
 class BuildingMotifValidationInterface:
@@ -54,12 +57,12 @@ class BuildingMotifValidationInterface:
     https://github.com/NREL/BuildingMOTIF
     """
 
-    def __init__(self, graph_path: str, manifest_path: str):
+    def __init__(self, graph: brickschema.Graph, manifest: str):
         # Define graph path
-        self.manifest_path = manifest_path
-        self.graph_path = graph_path
+        self.manifest = manifest
+        self.graph = graph
 
-    def validate(self) -> None:
+    def validate(self) -> bool:
         """
         Validate the graph
         :return: print the validation report
@@ -76,19 +79,21 @@ class BuildingMotifValidationInterface:
         # print(model.graph.serialize())
 
         # load test case model
-        model.graph.parse(self.graph_path, format="ttl")
+        model.add_graph(self.graph)
         # print(model.graph.serialize())
         # print(f"Model length {len(model.graph.serialize())}")
 
         # load brick ontology
-        brick = Library.load(ontology_graph="../config/libraries/Brick-subset.ttl")
+        brick = Library.load(
+            ontology_graph=os.path.join(os.path.dirname(__file__), "..", "libraries", "Brick-subset.ttl"))
         # print(f"Model + brick length {len(model.graph.serialize())}")
 
         # load libraries included with the python package
-        constraints = Library.load(ontology_graph="../../buildingmotif/libraries/constraints/constraints.ttl")
+        constraints = Library.load(
+            ontology_graph=os.path.join(os.path.dirname(__file__), "..", "libraries", "constraints.ttl"))
         # load libraries excluded from the python package (available from the repository)
         # load manifest into BuildingMOTIF as its own library!
-        manifest = Library.load(ontology_graph=self.manifest_path)
+        manifest = Library.load(ontology_graph=self.manifest)
 
         # gather shape collections into a list for ease of use
         shape_collections = [
@@ -99,8 +104,10 @@ class BuildingMotifValidationInterface:
 
         # pass a list of shape collections to .validate()
         validation_result = model.validate(shape_collections)
+        valid = validation_result.valid
+
         # print validation result
-        logger.warning(f"[BuildingMOTIF] Model <{self.graph_path}> is valid? {validation_result.valid}")
+        logger.info(f"[BuildingMOTIF] Model is valid? {valid}")
 
         # if not valid print the validation results
         if not validation_result.valid:
@@ -111,4 +118,4 @@ class BuildingMotifValidationInterface:
             for diff in validation_result.diffset:
                 print(f" - {diff.reason()}")
 
-            raise Exception("Model is invalid")
+        return valid
