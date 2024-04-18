@@ -107,9 +107,6 @@ class BuildingMotifValidationInterface:
         validation_result = model.validate(shape_collections)
         valid = validation_result.valid
 
-        # print validation result
-        logger_new.info(f"[BuildingMOTIF] Model is valid? {valid}")
-
         # if not valid print the validation results
         if not validation_result.valid:
             print("-" * 79)  # just a separator for better error display
@@ -118,5 +115,16 @@ class BuildingMotifValidationInterface:
             print("Model is invalid for these reasons:")
             for diff in validation_result.diffset:
                 print(f" - {diff.reason()}")
+
+            # generated_templates = validation_result.as_templates()
+            # print(generated_templates)
+            # for t in generated_templates:
+            #     print('-' * 80)
+            #     print(t.body.serialize())
+            #     for p in t.parameters:
+            #         ident = input(f"Give value for 'name' of {p} in the above template: ")
+            #         model.add_graph(t.evaluate({"name": BLDG[ident]}))
+            #
+            # print(model.graph.serialize())
 
         return valid
