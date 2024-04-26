@@ -69,6 +69,34 @@ def test_fetch_dict():
 
     assert type(res) == type({})
 
+
+def test_remap():
+    """
+    Test that the fetch returns dictionary
+    :return:
+    """
+    app = Application(
+        metadata=load_ttl("test_fetch_dict.ttl"),
+        app_name='app_test'
+    )
+    res = app.fetch()
+    fetch_mapping_dictionary = res[0]
+
+    # create a dataframe
+    df_mock = pd.DataFrame({'t_mix': [1, 2, 3], 'ahu': [1, 1, 1]})
+    
+    # remap the dataframe to external
+    df_to_external = app.remap(data=df_mock, fetch_map_dict=fetch_mapping_dictionary, mode='to_external')
+    print(df_to_external)
+    first_check = list(df_to_external.columns).sort() == list(fetch_mapping_dictionary.values()).sort()
+
+    # remap the dataframe to internal
+    df_to_internal = app.remap(data=df_to_external, fetch_map_dict=fetch_mapping_dictionary, mode='to_internal')
+    print(df_to_internal)
+    second_check = list(df_to_internal.columns).sort() == list(fetch_mapping_dictionary.keys()).sort()
+
+    assert all([first_check, second_check]) is True
+
 # def test_change_name():
 #     """
 #     Test that if name change the fetch doesnt fail

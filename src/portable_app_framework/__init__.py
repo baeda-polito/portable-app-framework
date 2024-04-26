@@ -18,6 +18,7 @@ import os
 import shutil
 
 import inquirer
+import pandas as pd
 import yaml
 
 from .utils.logger import CustomLogger
@@ -118,18 +119,11 @@ class Application:
         self.res_qualify = is_valid
         return is_valid
 
-    def fetch(self):
+    def fetch(self) -> dict:
         """
-        The fetch component performs the actual retrieval of data from the timeseries database corresponding to the set of streams identified by the Brick queries.
-
-        The data retrieval request uses the following parameters:
-        (1) “variable” definitions: these map a name to a Brick query defining the context for a point and the desired
-            engineering units for that point (if known), and aggregation function (min,max,mean,count, or raw).
-        (2) temporal parameters: defines the bounds on the data, desired resolution, and if we want aligned timestamps.
-
-        The output of the fetch component is an object providing access to the results of the Brick queries, the resulting
-        timeseries dataframes, and convenience methods for relating specific dataframes based on the Brick context
-        (for example, the setpoint timeseries related to a given sensor timeseries).
+        The fetch component performs the retrival of the metadata based on the sparql query.
+        This method returns the mapping convention between the internal naming convention (i.e., naming convention
+        defined in the SPARQL query) an the external naming convention (i.e., naming convention used in the building)
 
         :return:
         """
@@ -137,19 +131,29 @@ class Application:
         # Perform query on rdf graph
         query_results = self.metadata.query(self.query)
         # Convert the query results to the desired JSON format
-        fetch_metadata = parse_raw_query(query_results)
+        int_to_ext = parse_raw_query(query_results)
         # save internal external naming convention to class
-        self.res_fetch = fetch_metadata
+        self.res_fetch = int_to_ext
         # return mapping
-        return fetch_metadata
+        return int_to_ext
 
-    def internal_external_mapping(self, data):
+    def remap(self, data: pd.DataFrame, fetch_map_dict: dict, mode=None):
         """
         The internal_external_mapping component performs the actual mapping of the internal data to the external data
         """
-        self.logger.debug(f'Mapping internal data to external data convention')
-        # Perform mapping of internal data to external data
-        # convert to internal naming convention
+
+        dict_to_external = fetch_map_dict
+        dict_to_internal = {v: k for k, v in fetch_map_dict.items()}
+
+        if mode == "to_external":
+            # rename dataframe to external naming convention
+            data = data.rename(columns=dict_to_external)
+        elif mode == "to_internal":
+            # rename dataframe to internal naming convention
+            data = data.rename(columns=dict_to_internal)
+        else:
+            self.logger.error(f'Invalid mode {mode}. Please choose between to_external or to_internal')
+
         return data
 
     def clean(self, *args, **kwargs):
