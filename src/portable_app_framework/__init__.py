@@ -85,18 +85,17 @@ class Application:
         """
         The "qualify" component defines the metadata and data requirements of an application.
 
-        Specifically, the qualify component checks
-        (1) constraints on building typology and other properties, such as the number of floors in a building, floor
-        area, climate, and occupancy class
-        (2) data context constraints, such as the kinds of equipment in the building and available relationships
-        (3) data availability constraints, including the amount of historical data and available data resolution
+        The metadata requirements are validated in two steps:
+        (1) basic validation of the metadata against the Brick schema
+        (2) validation of the metadata against the specific constraints through BuildingMOTIF
 
-        Notes: https://github.com/flaand/demand_response_controls_library/blob/flaand-dev/examples/boptest/BOPTest_interface_zone_temp_shift_shed_price.py
-
+        The output of the "qualify" component is a boolean value indicating whether the metadata meets the requirements.
+        :return: bool indicating whether the requirements are satisfied or not
         """
-
+        self.logger.debug(f'Validating the ttl file on manifest.ttl')
+        # by default it is not valid
+        is_valid = False
         try:
-            self.logger.debug(f'Validating the ttl file on manifest.ttl')
             basic_validation = BasicValidationInterface(
                 graph=self.metadata,
                 manifest=self.manifest,
@@ -109,12 +108,15 @@ class Application:
             )
             res_building_motif_validation = building_motif_validation.validate()
 
-            res = any([res_basic_validation, res_building_motif_validation])
+            # is at least one of the two validation valid?
+            is_valid = any([res_basic_validation, res_building_motif_validation])
+
         except Exception as e:
+            # If some exception the valid is still false
             self.logger.error(f'Error during the validation of the manifest: {e}')
 
-        self.res_qualify = res
-        return res
+        self.res_qualify = is_valid
+        return is_valid
 
     def fetch(self):
         """
