@@ -26,11 +26,13 @@ from .utils.util import load_file
 from .utils.util_brick import parse_raw_query
 from .utils.util_qualify import BasicValidationInterface, BuildingMotifValidationInterface
 
+logger = CustomLogger().get_logger()
 # todo spostare all'interno della cli setup
 # create app folder if not exists
 APP_FOLDER = os.path.join(os.getcwd(), 'app')
-os.makedirs(APP_FOLDER, exist_ok=True)
-print('App folder created' + APP_FOLDER)
+if not os.path.exists(APP_FOLDER):
+    os.makedirs(APP_FOLDER, exist_ok=True)
+    logger.info(f'Created app folder in {APP_FOLDER}')
 
 MODULE_BASEPATH = os.path.dirname(__file__)
 USER_BASEPATH = os.getcwd()
@@ -326,7 +328,7 @@ def update_readme(app_name):
         md += f')\n'
         md += f'qualify_result = app.qualify() # True/False\n'
         md += f'fetch_result = app.fetch() # Dict of mapped variables\n'
-        md += f'# get df according to your logic \n'
+        md += f'df = pd.DataFrame()# get df according to your logic \n'
         md += f'df_clean = app.clean(df)\n'
         md += f'final_result = app.analyze(df_clean)\n'
         md += f'```\n\n'

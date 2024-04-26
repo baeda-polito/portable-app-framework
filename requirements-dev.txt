@@ -4,3 +4,5 @@ inquirer==3.2.4
 pandas==2.2.2
 PyYAML==6.0.1
 rdflib==6.1.1
+jupyter-book
+jupyter
