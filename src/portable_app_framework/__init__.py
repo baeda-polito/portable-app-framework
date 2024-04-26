@@ -125,7 +125,7 @@ class Application:
         This method returns the mapping convention between the internal naming convention (i.e., naming convention
         defined in the SPARQL query) an the external naming convention (i.e., naming convention used in the building)
 
-        :return:
+        :return dict: mapping between internal and external naming convention
         """
         self.logger.debug(f'Fetching metadata based on sparql query')
         # Perform query on rdf graph
@@ -137,9 +137,13 @@ class Application:
         # return mapping
         return int_to_ext
 
-    def remap(self, data: pd.DataFrame, fetch_map_dict: dict, mode=None):
+    def remap(self, data: pd.DataFrame, fetch_map_dict: dict, mode=None) -> pd.DataFrame:
         """
         The internal_external_mapping component performs the actual mapping of the internal data to the external data
+        :param data: The dataframe to be mapped
+        :param fetch_map_dict: The mapping dictionary with key-value pairs
+        :param mode: The mode of the mapping (to_internal or to_external)
+        :return: The mapped dataframe
         """
 
         dict_to_external = fetch_map_dict
@@ -159,9 +163,6 @@ class Application:
     def clean(self, *args, **kwargs):
         """
         The purpose of this component is to perform the actual analysis of the data.
-
-        The output of the "analyze" component is a set of timeseries dataframes
-        containing the results of the analysis. The application saves the data in the form of ApplicationData class.
         """
         # Dynamically import the analyze module
         clean_module = importlib.import_module(f"app.{self.app_name}.clean", package=__name__)
@@ -174,15 +175,12 @@ class Application:
             self.res_clean = clean_fn(*args, **kwargs)
             return self.res_clean
         else:
-            print(f"Function {clean_fn} not found in analyze module.")
+            self.logger.error(f"Function {clean_fn} not found in analyze module.")
             return None
 
     def analyze(self, *args, **kwargs):
         """
         The purpose of this component is to perform the actual analysis of the data.
-
-        The output of the "analyze" component is a set of timeseries dataframes
-        containing the results of the analysis. The application saves the data in the form of ApplicationData class.
         """
         # Dynamically import the analyze module
         analyze_module = importlib.import_module(f"app.{self.app_name}.analyze", package=__name__)
@@ -195,7 +193,7 @@ class Application:
             self.res_analyze = analyze_fn(*args, **kwargs)
             return self.res_analyze
         else:
-            print(f"Function {analyze_fn} not found in analyze module.")
+            self.logger.error(f"Function {analyze_fn} not found in analyze module.")
             return None
 
 
