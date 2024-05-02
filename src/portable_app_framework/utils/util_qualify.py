@@ -12,6 +12,8 @@ Script Description:
 
 Notes:
 """
+import os
+
 import brickschema
 from buildingmotif import BuildingMOTIF
 from buildingmotif.dataclasses import Model, Library
@@ -33,7 +35,7 @@ class BasicValidationInterface:
         self.graph = graph
         self.graph.parse(manifest, format='ttl')
 
-    def validate(self) -> None:
+    def validate(self) -> bool:
         """
         Validate the graph
         :return: print the validation report
@@ -45,26 +47,27 @@ class BasicValidationInterface:
             print("-" * 79)
             print(report)
             print("-" * 79)
-            raise Exception("Model is invalid")
+
+        return valid
 
 
-# TODO: Procedura per quando il .ttl non è disponibile + sistemare logger in autocorrection
 class BuildingMotifValidationInterface:
     """
     This class is used to validate a graph using the Buildingmotif validation as described here:
     https://github.com/NREL/BuildingMOTIF
     """
 
-    def __init__(self, graph_path: str, manifest_path: str):
+    def __init__(self, graph: brickschema.Graph, manifest: str):
         # Define graph path
-        self.manifest_path = manifest_path
-        self.graph_path = graph_path
+        self.manifest = manifest
+        self.graph = graph
 
-    def validate(self) -> None:
+    def validate(self) -> bool:
         """
         Validate the graph
         :return: print the validation report
         """
+        # todo dismiss logger buildingmotif
         # in-memory instance
         BuildingMOTIF("sqlite://")
         # remind to deactivate logger from BuildingMOTIF class in python package
@@ -73,12 +76,25 @@ class BuildingMotifValidationInterface:
         bldg = Namespace('urn:bldg/')
 
         # create the building model
-        model = Model.create(bldg)
-        model.graph.parse(self.graph_path, format="ttl")
+        model = Model.create(bldg, description="This is a test model for a simple building")
+        # print(model.graph.serialize())
 
-        brick = Library.load(ontology_graph="../libraries/Brick-subset.ttl")
-        constraints = Library.load(ontology_graph="../libraries/constraints.ttl")
-        manifest = Library.load(ontology_graph=self.manifest_path)
+        # load test case model
+        model.add_graph(self.graph)
+        # print(model.graph.serialize())
+        # print(f"Model length {len(model.graph.serialize())}")
+
+        # load brick ontology
+        brick = Library.load(
+            ontology_graph=os.path.join(os.path.dirname(__file__), "..", "libraries", "Brick-subset.ttl"))
+        # print(f"Model + brick length {len(model.graph.serialize())}")
+
+        # load libraries included with the python package
+        constraints = Library.load(
+            ontology_graph=os.path.join(os.path.dirname(__file__), "..", "libraries", "constraints.ttl"))
+        # load libraries excluded from the python package (available from the repository)
+        # load manifest into BuildingMOTIF as its own library!
+        manifest = Library.load(ontology_graph=self.manifest)
 
         # gather shape collections into a list for ease of use
         shape_collections = [
@@ -89,8 +105,7 @@ class BuildingMotifValidationInterface:
 
         # pass a list of shape collections to .validate()
         validation_result = model.validate(shape_collections)
-        # print validation result
-        logger.warning(f"[BuildingMOTIF] Model <{self.graph_path}> is valid? {validation_result.valid}")
+        valid = validation_result.valid
 
         # if not valid print the validation results
         if not validation_result.valid:
@@ -101,13 +116,15 @@ class BuildingMotifValidationInterface:
             for diff in validation_result.diffset:
                 print(f" - {diff.reason()}")
 
-            generated_templates = validation_result.as_templates()
-            print(generated_templates)
-            for t in generated_templates:
-                print('-'*80)
-                print(t.body.serialize())
-                for p in t.parameters:
-                    ident = input(f"Give value for 'name' of {p} in the above template: ")
-                    model.add_graph(t.evaluate({"name": bldg[ident]}))
+            # generated_templates = validation_result.as_templates()
+            # print(generated_templates)
+            # for t in generated_templates:
+            #     print('-' * 80)
+            #     print(t.body.serialize())
+            #     for p in t.parameters:
+            #         ident = input(f"Give value for 'name' of {p} in the above template: ")
+            #         model.add_graph(t.evaluate({"name": BLDG[ident]}))
+            #
+            # print(model.graph.serialize())
 
-            print(model.graph.serialize())
+        return valid

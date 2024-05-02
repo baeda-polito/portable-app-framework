@@ -22,7 +22,6 @@ import brickschema
 from portable_app_framework import Application
 
 app = Application(
-    data=pd.DataFrame(),
     metadata=brickschema.Graph(),
     app_name='app_template'
 )

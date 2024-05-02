@@ -56,14 +56,14 @@ import brickschema
 from portable_app_framework import Application
 
 app = Application(
-    data=pd.DataFrame(),
     metadata=brickschema.Graph(),
-    app_name='app_example'
+    app_name='app_name'
 )
-app.qualify()
-app.fetch()
-app.clean()
-app.analyze()
+qualify_result = app.qualify()  # True/False
+fetch_result = app.fetch()  # Dict of mapped variables
+df = pd.DataFrame()  # get df according to your logic 
+df_clean = app.clean(df)
+final_result = app.analyze(df_clean)
 ```
 
 ## Installation
@@ -72,7 +72,7 @@ The source code is currently hosted on GitHub at
 https://github.com/RobertoChiosa/portable-app-framework and the list of changes for each release can be found in the
 [CHANGELOG](https://github.com/RobertoChiosa/portable-app-framework/blob/main/CHANGELOG.md).
 
-The `portable-app-framework` package requires Python >= 3.8.
+The `portable-app-framework` package requires Python >= 3.9.
 
 You can install the package in different ways depending on the level of usage you want to have.
 
@@ -97,6 +97,7 @@ You can install the latest test version from test PyPI with the following comman
 ```sh
 pip install -i https://test.pypi.org/simple/ PFB-Toolkit==0.1.0
 ```
+
 ### From PyPI
 
 You can install the stable version from PyPI with the following command:
@@ -107,17 +108,10 @@ pip install portable-app-framework
 
 ## Dependencies
 
-- [Pandas]()
-- [Brickschema]()
-- [Buildingmotif]()
-
+The main dependencies are reported in the requirements.txt and in the setup.py file.
 See
 the [full installation instructions](https://portable-app-framework.pydata.org/portable-app-framework-docs/stable/install.html#dependencies)
 for minimum supported versions of required, recommended and optional dependencies.
-
-## Background
-
-Work on ``portable-app-framework`` started ...
 
 ## Contributing
 
@@ -145,4 +139,23 @@ by [Contributor Code of Conduct](https://github.com/RobertoChiosa/portable-app-f
 ## License
 
 The present repository has been released under [MIT LICENSE](LICENSE)
+
+## Cite
+
+Work on ``portable-app-framework`` started in 2021 as an internal project at BAEDA Lab to deploy energy management and
+information systems application in a most reliable way instead of solving implementation issues from scratch every time.
+We found that the framework enabled faster deployment of such solutions thanks to the builtin methods that allowed the
+analyst to skip ripetitive data integration tasks. Moreover allowed non analyst expert of metadata schema to exploit the
+power of such tools. So we decided to create this package to share our experience with the scientific community and not
+only.
+
+To cite the package in publications use:
+
+```bibtex
+@software{portable-app-framework,
+  author = {Roberto Chiosa},
+  title = {Portable Framework for Building Applications - PFB-Toolkit},
+  url = {}
+}
+```
 

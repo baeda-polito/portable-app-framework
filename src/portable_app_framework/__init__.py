@@ -20,41 +20,22 @@ import shutil
 import inquirer
 import pandas as pd
 import yaml
-from rdflib import URIRef, Literal
 
 from .utils.logger import CustomLogger
 from .utils.util import load_file
+from .utils.util_brick import parse_raw_query
 from .utils.util_qualify import BasicValidationInterface, BuildingMotifValidationInterface
 
+logger = CustomLogger().get_logger()
+# todo spostare all'interno della cli setup
 # create app folder if not exists
 APP_FOLDER = os.path.join(os.getcwd(), 'app')
-os.makedirs(APP_FOLDER, exist_ok=True)
-print('App folder created' + APP_FOLDER)
+if not os.path.exists(APP_FOLDER):
+    os.makedirs(APP_FOLDER, exist_ok=True)
+    logger.info(f'Created app folder in {APP_FOLDER}')
 
 MODULE_BASEPATH = os.path.dirname(__file__)
 USER_BASEPATH = os.getcwd()
-
-
-class ApplicationData:
-    """
-    Application data class
-    """
-
-    def __init__(self,
-                 data: pd.DataFrame = None,
-                 data_internal: pd.DataFrame = None,
-                 data_clean: pd.DataFrame = None,
-                 metadata: dict = None,
-                 result: bool = None,
-                 message: str = 'No message'
-                 ):
-        # The graph_path and datasource are external to the configuration file.
-        self.data = data
-        self.data_internal = data_internal
-        # self.data_clean = data_clean
-        self.metadata = metadata
-        self.result = result
-        self.message = message
 
 
 class Application:
@@ -66,12 +47,12 @@ class Application:
         # Class specific logger
         self.logger = CustomLogger().get_logger()
         # The graph_path and datasource are external to the configuration file.
-        self.data = None
         self.metadata = metadata
         self.app_name = app_name
-        self.data_internal = None
-        self.res = {}
-        self.mapping = None
+        self.res_qualify = None
+        self.res_fetch = None
+        self.res_clean = None
+        self.res_analyze = None
         self.path_to_app = os.path.join(USER_BASEPATH, APP_FOLDER, app_name)
 
         '''
@@ -103,132 +84,105 @@ class Application:
             self.manifest = os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'manifest.ttl')
             self.query = load_file(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'query.rq'))
 
-    def qualify(self) -> None:
+    def qualify(self) -> bool:
         """
         The "qualify" component defines the metadata and data requirements of an application.
 
-        Mortar evaluates these requirements against all available buildings in order to determine the subset of
-        buildings against which the application can run (the execution set).
+        The metadata requirements are validated in two steps:
+        (1) basic validation of the metadata against the Brick schema
+        (2) validation of the metadata against the specific constraints through BuildingMOTIF
 
-        Specifically, the qualify component checks
-        (1) constraints on building typology and other properties, such as the number of floors in a building, floor area, climate, and occupancy class
-        (2) data context constraints, such as the kinds of equipment in the building and available relationships
-        (3) data availability constraints, including the amount of historical data and available data resolution
-
-        Notes: https://github.com/flaand/demand_response_controls_library/blob/flaand-dev/examples/boptest/BOPTest_interface_zone_temp_shift_shed_price.py
-
+        The output of the "qualify" component is a boolean value indicating whether the metadata meets the requirements.
+        :return: bool indicating whether the requirements are satisfied or not
         """
-
+        self.logger.debug(f'Validating the ttl file on manifest.ttl')
+        # by default it is not valid
+        is_valid = False
         try:
-            self.logger.debug(f'Validating the ttl file on manifest.ttl')
-            # basic_validation = BasicValidationInterface(
-            #     graph=self.metadata,
-            #     manifest=self.manifest,
-            # )
-            # basic_validation.validate()
-
-            BMI = BuildingMotifValidationInterface(
-                graph_path=self.metadata,
-                manifest_path=self.manifest,
+            basic_validation = BasicValidationInterface(
+                graph=self.metadata,
+                manifest=self.manifest,
             )
-            BMI.validate()
+            res_basic_validation = basic_validation.validate()
+
+            building_motif_validation = BuildingMotifValidationInterface(
+                graph=self.metadata,
+                manifest=self.manifest,
+            )
+            res_building_motif_validation = building_motif_validation.validate()
+
+            # is at least one of the two validation valid?
+            is_valid = any([res_basic_validation, res_building_motif_validation])
+
         except Exception as e:
+            # If some exception the valid is still false
             self.logger.error(f'Error during the validation of the manifest: {e}')
 
-    def fetch(self, data):
+        self.res_qualify = is_valid
+        return is_valid
+
+    def fetch(self) -> dict:
         """
-        The fetch component performs the actual retrieval of data from the timeseries database corresponding to the set of streams identified by the Brick queries.
+        The fetch component performs the retrival of the metadata based on the sparql query.
+        This method returns the mapping convention between the internal naming convention (i.e., naming convention
+        defined in the SPARQL query) an the external naming convention (i.e., naming convention used in the building)
 
-        The data retrieval request uses the following parameters:
-        (1) “variable” definitions: these map a name to a Brick query defining the context for a point and the desired
-            engineering units for that point (if known), and aggregation function (min,max,mean,count, or raw).
-        (2) temporal parameters: defines the bounds on the data, desired resolution, and if we want aligned timestamps.
-
-        The output of the fetch component is an object providing access to the results of the Brick queries, the resulting
-        timeseries dataframes, and convenience methods for relating specific dataframes based on the Brick context
-        (for example, the setpoint timeseries related to a given sensor timeseries).
-
-        :return: The data
+        :return dict: mapping between internal and external naming convention
         """
         self.logger.debug(f'Fetching metadata based on sparql query')
-        self.data = data
         # Perform query on rdf graph
         query_results = self.metadata.query(self.query)
-        # todo errore nel renaming variblili
-
-        # todo considerare di spostare tutto in brick utility
         # Convert the query results to the desired JSON format
-        head_vars = [str(var) for var in query_results.vars]
-        # Convert FrozenBindings to JSON format
-        bindings_list = []
-        for binding in query_results.bindings:
-            binding_dict = {}
-            for var in head_vars:
-                try:
-                    value = binding[var]
-                    value_dict = {
-                        'type': 'uri' if isinstance(value, URIRef) else 'literal' if isinstance(value,
-                                                                                                Literal) else None,
-                        'value': str(value),
-                    }
-                    binding_dict[var] = value_dict
-                except KeyError:
-                    pass
-            bindings_list.append(binding_dict)
+        int_to_ext = parse_raw_query(query_results)
+        # save internal external naming convention to class
+        self.res_fetch = int_to_ext
+        # return mapping
+        return int_to_ext
 
-        json_results = {
-            'head': {'vars': head_vars},
-            'results': {'bindings': bindings_list}
-        }
+    def remap(self, data: pd.DataFrame, fetch_map_dict: dict, mode=None) -> pd.DataFrame:
+        """
+        The internal_external_mapping component performs the actual mapping of the internal data to the external data
+        :param data: The dataframe to be mapped
+        :param fetch_map_dict: The mapping dictionary with key-value pairs
+        :param mode: The mode of the mapping (to_internal or to_external)
+        :return: The mapped dataframe
+        """
 
-        # From the result i need to fetch the corresponding column in data
-        fetch_metadata = {}
-        for item in json_results['results']['bindings'][0].items():
-            if '#' in item[1]['value']:
-                fetch_metadata[item[0]] = item[1]['value'].split('#')[1]
-            else:
-                fetch_metadata[item[0]] = item[1]['value']
+        dict_to_external = fetch_map_dict
+        dict_to_internal = {v: k for k, v in fetch_map_dict.items()}
 
-        fetch_data = self.data.loc[:, self.data.columns.isin(fetch_metadata.values())]
-        # todo remove when in production, remap to convention
+        if mode == "to_external":
+            # rename dataframe to external naming convention
+            data = data.rename(columns=dict_to_external)
+        elif mode == "to_internal":
+            # rename dataframe to internal naming convention
+            data = data.rename(columns=dict_to_internal)
+        else:
+            self.logger.error(f'Invalid mode {mode}. Please choose between to_external or to_internal')
 
-        # from dict converts from internal naming convention to original naming convention
-        fetch_metadata_rev = {v: k for k, v in fetch_metadata.items()}
-        fetch_data_internal = fetch_data.rename(columns=fetch_metadata_rev)
+        return data
 
-        self.mapping = fetch_metadata
-        self.data_internal = fetch_data_internal
+    def clean(self, *args, **kwargs):
+        """
+        The purpose of this component is to perform the actual analysis of the data.
+        """
+        # Dynamically import the analyze module
+        clean_module = importlib.import_module(f"app.{self.app_name}.clean", package=__name__)
 
-    # def clean(self, fn, *args, **kwargs):
-    #     """
-    #     The purpose of this component is to normalize the data for the "analyze" component.
-    #
-    #     Common operations in the clean component are hole filling,specialized aggregation, and data filtering.
-    #     It is kept modular to facilitate the re-use of standard  cleaning steps.
-    #     Application developers can build their own cleaning components or leverage existing methods.
-    #
-    #     :param fn: function to clean the data
-    #     :return: The cleaned data
-    #     """
-    #     # Dynamically import the clan module
-    #     clean_module = importlib.import_module('.clean', package=__name__)
-    #
-    #     # Get the function object from the module
-    #     clean_fn = getattr(clean_module, fn, None)
-    #
-    #     if clean_fn is not None and callable(clean_fn):
-    #         # Call the function with the provided arguments
-    #         self.res = clean_fn(*args, **kwargs)
-    #     else:
-    #         print(f"Function {fn} not found in analyze module.")
-    #         return None
+        # Get the function object from the module
+        clean_fn = getattr(clean_module, "clean_fn", None)
+
+        if clean_fn is not None and callable(clean_fn):
+            # Call the function with the provided arguments
+            self.res_clean = clean_fn(*args, **kwargs)
+            return self.res_clean
+        else:
+            self.logger.error(f"Function {clean_fn} not found in analyze module.")
+            return None
 
     def analyze(self, *args, **kwargs):
         """
         The purpose of this component is to perform the actual analysis of the data.
-
-        The output of the "analyze" component is a set of timeseries dataframes
-        containing the results of the analysis. The application saves the data in the form of ApplicationData class.
         """
         # Dynamically import the analyze module
         analyze_module = importlib.import_module(f"app.{self.app_name}.analyze", package=__name__)
@@ -238,9 +192,10 @@ class Application:
 
         if analyze_fn is not None and callable(analyze_fn):
             # Call the function with the provided arguments
-            self.res = analyze_fn(*args, **kwargs)
+            self.res_analyze = analyze_fn(*args, **kwargs)
+            return self.res_analyze
         else:
-            print(f"Function {analyze_fn} not found in analyze module.")
+            self.logger.error(f"Function {analyze_fn} not found in analyze module.")
             return None
 
 
@@ -304,7 +259,7 @@ def cli_new_app():
     update_readme(answer["name"])
 
 
-# def cli_clone_app():
+# todo def cli_clone_app():
 #     """
 #     Create new application from template
 #     """
@@ -366,16 +321,16 @@ def update_readme(app_name):
         md += f'```python\n'
         md += f'import pandas as pd\n'
         md += f'import brickschema\n'
-        md += f'from portable_app_framework import Application\n\n'  # todo dare nome migliore a pacchetto
+        md += f'from portable_app_framework import Application\n\n'
         md += f'app = Application(\n'
-        md += f'    data=pd.DataFrame(),\n'
         md += f'    metadata=brickschema.Graph(),\n'
         md += f'    app_name=\'{app_name}\'\n'
         md += f')\n'
-        md += f'app.qualify()\n'
-        md += f'app.fetch()\n'
-        md += f'app.clean()\n'
-        md += f'app.analyze()\n'
+        md += f'qualify_result = app.qualify() # True/False\n'
+        md += f'fetch_result = app.fetch() # Dict of mapped variables\n'
+        md += f'df = pd.DataFrame()# get df according to your logic \n'
+        md += f'df_clean = app.clean(df)\n'
+        md += f'final_result = app.analyze(df_clean)\n'
         md += f'```\n\n'
         md += f'[^1]: by {data["details"]["author"]} - {data["details"]["email"]} \n'
         file.write(md)
@@ -421,7 +376,7 @@ def cli_entry_point():
     subparser.add_parser('new', help='Create a new application folder from template.')
     # subparser.add_parser('clone', help='Clone an existing application.') # todo clone da app online
     subparser.add_parser('update', help='Update README of an application.')
-    # subparser.add_parser('ls', help='List available applications.')
+    subparser.add_parser('ls', help='List available applications.')
 
     # Depending on argument does something
     args = parser.parse_args()
