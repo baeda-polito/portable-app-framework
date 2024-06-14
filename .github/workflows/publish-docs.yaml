@@ -1,8 +1,8 @@
-name: "📕Deploy docs to GitHub Pages"
+name: "Deploy docs"
 
 on:
   push:
-    branches: [ main,dev ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
