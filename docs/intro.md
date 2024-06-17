@@ -95,7 +95,7 @@ pip install .
 You can install the latest test version from test PyPI with the following command:
 
 ```sh
-pip install -i https://test.pypi.org/simple/ PFB-Toolkit==0.1.1
+pip install -i https://test.pypi.org/simple/ PFB-Toolkit==0.1.2
 ```
 
 ### From PyPI
@@ -153,9 +153,9 @@ To cite the package in publications use:
 
 ```bibtex
 @software{portable-app-framework,
-  author = {Roberto Chiosa},
-  title = {Portable Framework for Building Applications - PFB-Toolkit},
-  url = {}
+    author = {Roberto Chiosa},
+    title = {Portable Framework for Building Applications - PFB-Toolkit},
+    url = {}
 }
 ```
 

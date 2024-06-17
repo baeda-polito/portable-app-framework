@@ -62,12 +62,6 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
-      - name: "Sign the distribution"
-        uses: sigstore/gh-action-sigstore-python@v1.2.3
-        with:
-          inputs: >-
-            ./dist/*.tar.gz
-            ./dist/*.whl
       - name: "Create Release"
         env:
           GITHUB_TOKEN: ${{ github.token }}
