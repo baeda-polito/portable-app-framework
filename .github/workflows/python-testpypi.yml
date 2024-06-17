@@ -51,7 +51,7 @@ jobs:
           password: ${{ secrets.TESTPYPI_API_TOKEN }}
 
   github-release:
-    name: "Sign the distribution and release"
+    name: "Sign and release"
     needs:
       - publish-to-testpypi
     runs-on: ubuntu-latest
