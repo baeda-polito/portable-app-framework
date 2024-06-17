@@ -53,7 +53,7 @@ jobs:
   github-release:
     name: "Sign the distribution and release"
     needs:
-      - publish-to-pypi
+      - publish-to-testpypi
     runs-on: ubuntu-latest
     permissions:
       contents: write  # IMPORTANT: mandatory for making GitHub Releases
