@@ -3,7 +3,7 @@ name: "Publish to TestPyPI"
 on:
   push:
     tags:
-      - '*-dev' # Push events to matching *-dev, i.e. v1.0-dev, v20.15.10-dev
+      - '*-dev' # Push events to matching *-dev, i.e. v1.0-dev
   workflow_dispatch:
 
 jobs:
