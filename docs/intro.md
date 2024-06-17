@@ -95,7 +95,7 @@ pip install .
 You can install the latest test version from test PyPI with the following command:
 
 ```sh
-pip install -i https://test.pypi.org/simple/ PFB-Toolkit==0.1.0
+pip install -i https://test.pypi.org/simple/ PFB-Toolkit==0.1.1
 ```
 
 ### From PyPI
