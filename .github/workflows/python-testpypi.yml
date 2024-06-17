@@ -1,9 +1,9 @@
 name: "Publish to TestPyPI"
 
 on:
-  #  push:
-  #    tags:
-  #      - '*-dev' # Push events to matching *-dev, i.e. v1.0-dev, v20.15.10-dev
+  push:
+    tags:
+      - 'v*' # Push events to matching *-dev, i.e. v1.0-dev
   workflow_dispatch:
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v4
       - name: "Set up Python"
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
       - name: "Install pypa/build"
@@ -22,63 +22,60 @@ jobs:
       - name: "Build a binary wheel and a source tarball"
         run: python3 -m build
       - name: "Store the distribution packages"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
 
-  publish-to-testpypi:
-    name: "Publish distribution to PyPI"
-    needs:
-      - build
-    runs-on: ubuntu-latest
-    environment:
-      name: testpypi
-      url: https://test.pypi.org/project/PFB-Toolkit/
-    permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
-    steps:
-      - name: "Download all the dists"
-        uses: actions/download-artifact@v3
-        with:
-          name: python-package-distributions
-          path: dist/
-      - name: "Publish to PyPI"
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          user: __token__
-          password: ${{ secrets.TESTPYPI_API_TOKEN }}
+  #  publish-to-testpypi:
+  #    name: "Publish distribution to PyPI"
+  #    needs:
+  #      - build
+  #    runs-on: ubuntu-latest
+  #    environment:
+  #      name: testpypi
+  #      url: https://test.pypi.org/project/PFB-Toolkit/
+  #    permissions:
+  #      id-token: write  # IMPORTANT: mandatory for trusted publishing
+  #    steps:
+  #      - name: "Download all the dists"
+  #        uses: actions/download-artifact@v4
+  #        with:
+  #          name: python-package-distributions
+  #          path: dist/
+  #      - name: "Publish to PyPI"
+  #        uses: pypa/gh-action-pypi-publish@release/v1
+  #        with:
+  #          repository-url: https://test.pypi.org/legacy/
+  #          user: __token__
+  #          password: ${{ secrets.TESTPYPI_API_TOKEN }}
 
   github-release:
-    name: "Sign the distribution and release"
+    name: "Release"
     needs:
-      - publish-to-pypi
+      - build
     runs-on: ubuntu-latest
     permissions:
       contents: write  # IMPORTANT: mandatory for making GitHub Releases
       id-token: write  # IMPORTANT: mandatory for sigstore
     steps:
       - name: "Download all the dists"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
-      - name: "Sign the distribution"
-        uses: sigstore/gh-action-sigstore-python@v1.2.3
-        with:
-          inputs: >-
-            ./dist/*.tar.gz
-            ./dist/*.whl
-      - name: "Create GitHub Release"
+      - name: "Create Release"
+        id: create_release
+        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create
-          '${{ github.ref_name }}'
-          --repo '${{ github.repository }}'
-          --notes ""
-      - name: "Upload Release"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body_path: RELEASE.md
+          draft: false
+          prerelease: false
+      - name: "Upload artifact"
         env:
           GITHUB_TOKEN: ${{ github.token }}
         # Upload to GitHub Release using the `gh` CLI.
