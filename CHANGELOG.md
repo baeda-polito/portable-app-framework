@@ -1,4 +1,4 @@
-# Changelog
+# Changelog init
 
 ## Unreleased (2024-02-15)
 
@@ -17,6 +17,7 @@
 * (data): added files to gitignore
 * (data): added files to gitignore
 * (data): added conversion file parquet
+
 #### Fixes
 
 * (action): fixed repo name
@@ -25,6 +26,7 @@
 * (git): remove csv and log files
 * (git): remove csv and log files
 * (git): changed gitignore
+
 #### Refactorings
 
 * (cli): cleaned repo from apps
@@ -49,6 +51,7 @@
 * (data): added real ahu and refactored folders
 * (check): corrected check and project errors
 * (ttl): refactored folders
+
 #### Docs
 
 * (readme): updated

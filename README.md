@@ -15,8 +15,6 @@
     - [From source](#from-source)
     - [From test PyPI](#from-test-pypi)
     - [From PyPI](#from-pypi)
-- [Dependencies](#dependencies)
-- [Background](#background)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -72,7 +70,8 @@ The source code is currently hosted on GitHub at
 https://github.com/RobertoChiosa/portable-app-framework and the list of changes for each release can be found in the
 [CHANGELOG](https://github.com/RobertoChiosa/portable-app-framework/blob/main/CHANGELOG.md).
 
-The `portable-app-framework` package requires Python >= 3.9.
+The `portable-app-framework` package requires Python >= 3.9. The main dependencies are reported in
+the [`requirements.txt`](requirements.txt) and in the [`setup.py`](setup.py) file.
 
 You can install the package in different ways depending on the level of usage you want to have.
 
@@ -106,21 +105,11 @@ You can install the stable version from PyPI with the following command:
 pip install portable-app-framework
 ```
 
-## Dependencies
-
-The main dependencies are reported in the requirements.txt and in the setup.py file.
-See
-the [full installation instructions](https://portable-app-framework.pydata.org/portable-app-framework-docs/stable/install.html#dependencies)
-for minimum supported versions of required, recommended and optional dependencies.
-
 ## Contributing
 
 [//]: # ([![Open Source Helpers]&#40;https://www.codetriage.com/RobertoChiosa/afdd/badges/users.svg&#41;]&#40;https://www.codetriage.com/RobertoChiosa/afdd&#41;)
 
 All contributions, bug reports, bug fixes, documentation improvements, enhancements, and ideas are welcome.
-
-A detailed overview on how to contribute can be found in
-the [contributing guide](https://github.com/RobertoChiosa/portable-app-framework/blob/main/CONTRIBUTING.md).
 
 Most development discussions take place on GitHub in this repo, via
 the [GitHub issue tracker](https://github.com/RobertoChiosa/portable-app-framework/issues).
@@ -133,12 +122,9 @@ Or maybe through using `portable_app_framework` you have an idea of your own or 
 documentation and
 thinking ‘this can be improved’...you can do something about it!
 
-As contributors and maintainers to this project, you are expected to abide
-by [Contributor Code of Conduct](https://github.com/RobertoChiosa/portable-app-framework/blob/main/CODE_OF_CONDUCT.md).
-
 ## License
 
-The present repository has been released under [MIT LICENSE](LICENSE)
+The present repository has been released under [MIT LICENSE](LICENSE.md)
 
 ## Cite
 
@@ -153,9 +139,9 @@ To cite the package in publications use:
 
 ```bibtex
 @software{portable-app-framework,
-  author = {Roberto Chiosa},
-  title = {Portable Framework for Building Applications - PFB-Toolkit},
-  url = {}
+    author = {Roberto Chiosa},
+    title = {Portable Framework for Building Applications - PFB-Toolkit},
+    url = {}
 }
 ```
 
