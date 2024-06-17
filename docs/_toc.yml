@@ -7,9 +7,10 @@ options: # The options key will be applied to all chapters, but not sub-sections
   numbered: True
 
 parts:
-- caption: Reference
-  chapters:
-    - file: reference/setup.md
-- caption: Tutorials
-  chapters:
-    - file: tutorials/example.ipynb
+  - caption: Reference
+    chapters:
+      - file: reference/setup.md
+      - file: reference/framework.md
+  - caption: Tutorials
+    chapters:
+      - file: tutorials/example.ipynb

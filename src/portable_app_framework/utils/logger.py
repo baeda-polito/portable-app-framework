@@ -96,13 +96,13 @@ class CustomLogger:
             'handlers': {
                 'console': {
                     'class': 'logging.StreamHandler',
-                    'level': 'INFO',
+                    'level': 'WARNING',
                     'formatter': 'console',
                     'stream': 'ext://sys.stdout'
                 },
             },
             'root': {
-                'level': 'INFO',
+                'level': 'WARNING',
                 'handlers': ['console'],
             },
         }
