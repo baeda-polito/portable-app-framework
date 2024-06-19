@@ -42,6 +42,12 @@ test:
 	source ${VENV}/bin/activate && \
  	python3 -m test.test
 
+.PHONY: publish
+# https://stackoverflow.com/questions/68882603/using-python-poetry-to-publish-to-test-pypi-org
+publish:
+	@echo "Publishing package"
+	source ${VENV}/bin/activate && \
+	poetry publish --build
 
 #.PHONY: deploy
 #deploy:
