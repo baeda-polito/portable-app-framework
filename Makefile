@@ -2,6 +2,9 @@ VENV = .venv
 PYTHON = $(VENV)/bin/python3
 PIP = $(VENV)/bin/pip
 
+VENV-DOCS = .venv-docs
+PYTHON-DOCS = $(VENV-DOCS)/bin/python3
+PIP-DOCS = $(VENV-DOCS)/bin/pip
 
 .PHONY: clean
 clean:
@@ -12,16 +15,33 @@ clean:
 	rm -rf src/*.egg-info
 	rm -rf .pytest_cache
 	rm -rf test/*.log
+	rm -rf ${VENV}
+	rm -rf ${VENV-DOCS}
+
+.PHONY: setup
+setup:
+	@echo "Creating venv"
+	python3 -m venv ${VENV} && \
+	source ${VENV}/bin/activate && \
+	pip install --upgrade pip && \
+	pip install poetry && \
+	poetry config virtualenvs.create false && \
+	poetry install
+
+# https://johnfraney.ca/blog/create-publish-python-package-poetry/
+.PHONY: build
+build:
+	@echo "Building package"
+	source ${VENV}/bin/activate && \
+	poetry build
+
 
 .PHONY: test
 test:
 	@echo "Running tests"
-	source ${VENV}/bin/activate && python3 -m pytest
+	source ${VENV}/bin/activate && \
+ 	python3 -m test.test
 
-.PHONY: build
-build:
-	@echo "Building package"
-	source ${VENV}/bin/activate && python3 -m build --wheel
 
 #.PHONY: deploy
 #deploy:
@@ -30,10 +50,6 @@ build:
 #	pip install . \
 #	python3 -m twine upload --repository testpypi dist/* \
 #	python3 -m twine upload --repository pypi dist/*
-
-VENV-DOCS = .venv
-PYTHON-DOCS = $(VENV-DOCS)/bin/python3
-PIP-DOCS = $(VENV-DOCS)/bin/pip
 
 setup-docs: docs/requirements.txt
 	@echo "Creating venv in docs"

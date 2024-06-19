@@ -21,13 +21,14 @@ import inquirer
 import pandas as pd
 import yaml
 
-from .utils.logger import CustomLogger
+from .utils.logger import logger
 from .utils.util import load_file
 from .utils.util_brick import parse_raw_query
-from .utils.util_qualify import BasicValidationInterface, BuildingMotifValidationInterface
+from .utils.util_qualify import BasicValidationInterface
 
-logger = CustomLogger().get_logger()
-# todo spostare all'interno della cli setup
+# from .utils.util_qualify import BuildingMotifValidationInterface
+
+# todo if the user want to setup a different folder?
 # create app folder if not exists
 APP_FOLDER = os.path.join(os.getcwd(), 'app')
 if not os.path.exists(APP_FOLDER):
@@ -45,13 +46,13 @@ class Application:
 
     def __init__(self, metadata=None, app_name=None):
         # Class specific logger
-        self.logger = CustomLogger().get_logger()
+        self.logger = logger
         # The graph_path and datasource are external to the configuration file.
         self.metadata = metadata
         self.app_name = app_name
         self.res_qualify = None
         self.res_fetch = None
-        self.res_clean = None
+        self.res_preprocess = None
         self.res_analyze = None
         self.path_to_app = os.path.join(USER_BASEPATH, APP_FOLDER, app_name)
 
@@ -105,12 +106,13 @@ class Application:
             )
             res_basic_validation = basic_validation.validate()
 
-            building_motif_validation = BuildingMotifValidationInterface(
-                graph=self.metadata,
-                manifest=self.manifest,
-            )
-            res_building_motif_validation = building_motif_validation.validate()
-
+            # todo use when package dependencies is solved
+            # building_motif_validation = BuildingMotifValidationInterface(
+            #     graph=self.metadata,
+            #     manifest=self.manifest,
+            # )
+            # res_building_motif_validation = building_motif_validation.validate()
+            res_building_motif_validation = True
             # is at least one of the two validation valid?
             is_valid = any([res_basic_validation, res_building_motif_validation])
 
@@ -162,22 +164,22 @@ class Application:
 
         return data
 
-    def clean(self, *args, **kwargs):
+    def preprocess(self, *args, **kwargs):
         """
         The purpose of this component is to perform the actual analysis of the data.
         """
         # Dynamically import the analyze module
-        clean_module = importlib.import_module(f"app.{self.app_name}.clean", package=__name__)
+        preprocess_module = importlib.import_module(f"app.{self.app_name}.preprocess", package=__name__)
 
         # Get the function object from the module
-        clean_fn = getattr(clean_module, "clean_fn", None)
+        preprocess_fn = getattr(preprocess_module, "preprocess_fn", None)
 
-        if clean_fn is not None and callable(clean_fn):
+        if preprocess_fn is not None and callable(preprocess_fn):
             # Call the function with the provided arguments
-            self.res_clean = clean_fn(*args, **kwargs)
-            return self.res_clean
+            self.res_preprocess = preprocess_fn(*args, **kwargs)
+            return self.res_preprocess
         else:
-            self.logger.error(f"Function {clean_fn} not found in analyze module.")
+            self.logger.error(f"Function {preprocess_fn} not found in analyze module.")
             return None
 
     def analyze(self, *args, **kwargs):
@@ -280,15 +282,15 @@ def cli_new_app():
 #         f'cp -r {os.path.join(MODULE_BASEPATH, answer["app"])} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["app"])}')
 
 
-# def cli_list_app():
-#     """
-#     List available applications excluding example
-#     """
-#     # list folders in app folder inside the module
-#     app_folder = os.listdir(MODULE_BASEPATH)
-#     # list only folders that start with ap
-#     app_names = [app for app in app_folder if app.startswith('app')]
-#     print(app_names)
+def cli_list_app():
+    """
+    List available applications excluding example
+    """
+    # list folders in app folder inside the module
+    app_folder = os.listdir(os.path.join(USER_BASEPATH, APP_FOLDER))  # todo should be set by the user
+    # list only folders that start with ap
+    app_names = [app for app in app_folder if app.startswith('app')]
+    print(app_names)
 
 
 def update_readme(app_name):
@@ -311,7 +313,7 @@ def update_readme(app_name):
         md += f'- Configuration file ([config.yaml](config.yaml))\n'
         md += f'- SPARQL query ([query.rq](query.rq))\n'
         md += f'- SHACL Shape or manifest ([manifest.ttl](manifest.ttl))\n'
-        md += f'- Clean function ([clean.py](clean.py))\n'
+        md += f'- Preprocess function ([preprocess.py](preprocess.py))\n'
         md += f'- Analyze function ([analyze.py](analyze.py))\n\n\n'
         md += f'The app accepts the following parameters\n\n'
         for name, value in data["parameters"].items():
@@ -329,8 +331,8 @@ def update_readme(app_name):
         md += f'qualify_result = app.qualify() # True/False\n'
         md += f'fetch_result = app.fetch() # Dict of mapped variables\n'
         md += f'df = pd.DataFrame()# get df according to your logic \n'
-        md += f'df_clean = app.clean(df)\n'
-        md += f'final_result = app.analyze(df_clean)\n'
+        md += f'df_preprocess = app.preprocess(df)\n'
+        md += f'final_result = app.analyze(df_preprocess)\n'
         md += f'```\n\n'
         md += f'[^1]: by {data["details"]["author"]} - {data["details"]["email"]} \n'
         file.write(md)
@@ -386,7 +388,7 @@ def cli_entry_point():
     #     cli_clone_app()
     if args.command == 'update':
         cli_update_app()
-    # if args.command == 'ls':
-    #     cli_list_app()
+    if args.command == 'ls':
+        cli_list_app()
     else:
         parser.print_help()

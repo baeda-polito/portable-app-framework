@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "pfb-toolkit"
+version = "0.1.7"
+description = "Portable Framework for Building Applications - PFB-Toolkit"
+readme = "README.md"
+license = "MIT"
+authors = [
+    "RobertoChiosa <roberto.chiosa@polito.it>"
+]
+maintainers = [
+    "RobertoChiosa <roberto.chiosa@polito.it>",
+    "RoccoGiudice <rocco.giudice@polito.it>"
+]
+
+homepage = "https://github.com/baeda-polito/portable-app-framework"
+repository = "https://github.com/baeda-polito/portable-app-framework"
+documentation = "https://github.com/baeda-polito/portable-app-framework" # todo change
+
+keywords = ["energy", "data", "analysis", "pandas"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+packages = [
+    { include = "portable_app_framework", from = "src" },
+]
+
+#include = [
+#    { path = "**/*.md", format = "portable_app_framework" },
+#    { path = "**/*.rq", format = "portable_app_framework" },
+#    { path = "**/*.ttl", format = "portable_app_framework" },
+#    { path = "**/*.yaml", format = "portable_app_framework" },
+#]
+
+[tool.poetry.scripts]
+portable-app-framework = 'portable_app_framework:cli_entry_point'
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pytest = "^8.2.2"
+pandas = "^2.2.2"
+inquirer = "^3.2.5"
+pyyaml = "^6.0.1"
+brickschema = "^0.7.5"
+rdflib = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

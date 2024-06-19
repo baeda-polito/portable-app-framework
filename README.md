@@ -60,8 +60,8 @@ app = Application(
 qualify_result = app.qualify()  # True/False
 fetch_result = app.fetch()  # Dict of mapped variables
 df = pd.DataFrame()  # get df according to your logic 
-df_clean = app.clean(df)
-final_result = app.analyze(df_clean)
+df_preprocess = app.preprocess(df)
+final_result = app.analyze(df_preprocess)
 ```
 
 ## Installation

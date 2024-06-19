@@ -1,9 +1,0 @@
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX brick: <https://brickschema.org/schema/Brick#>
-PREFIX bldg: <http://bldg-59#>
-SELECT  ?ahu ?t_mix
-WHERE {
-    ?ahu a brick:AHU .
-    ?ahu brick:hasPoint ?t_mix .
-    ?t_mix a brick:Mixed_Air_Temperature_Sensor
-}

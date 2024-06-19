@@ -19,9 +19,11 @@ jobs:
         with:
           python-version: "3.x"
       - name: "Install pypa/build"
-        run: python3 -m pip install build --user
+        run: python3 -m pip install poetry
+      - name: "Install dependencies"
+        run: poetry install
       - name: "Build a binary wheel and a source tarball"
-        run: python3 -m build
+        run: poetry build
       - name: "Store the distribution packages"
         uses: actions/upload-artifact@v4
         with:
@@ -76,7 +78,8 @@ jobs:
   github-release:
     name: "Release"
     needs:
-      - build
+      - publish-to-pypi
+      - publish-to-testpypi
     runs-on: ubuntu-latest
     permissions:
       contents: write  # IMPORTANT: mandatory for making GitHub Releases
