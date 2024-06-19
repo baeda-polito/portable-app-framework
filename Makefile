@@ -23,6 +23,10 @@ build:
 	@echo "Building package"
 	source ${VENV}/bin/activate && python3 -m build --wheel
 
+.PHONY: install
+install:
+	@echo "Installing package"
+	source ${VENV}/bin/activate && python3 -m pip install .
 #.PHONY: deploy
 #deploy:
 #	python setup.py check \

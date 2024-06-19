@@ -51,7 +51,7 @@ class Application:
         self.app_name = app_name
         self.res_qualify = None
         self.res_fetch = None
-        self.res_clean = None
+        self.res_preprocess = None
         self.res_analyze = None
         self.path_to_app = os.path.join(USER_BASEPATH, APP_FOLDER, app_name)
 
@@ -162,22 +162,22 @@ class Application:
 
         return data
 
-    def clean(self, *args, **kwargs):
+    def preprocess(self, *args, **kwargs):
         """
         The purpose of this component is to perform the actual analysis of the data.
         """
         # Dynamically import the analyze module
-        clean_module = importlib.import_module(f"app.{self.app_name}.clean", package=__name__)
+        preprocess_module = importlib.import_module(f"app.{self.app_name}.preprocess", package=__name__)
 
         # Get the function object from the module
-        clean_fn = getattr(clean_module, "clean_fn", None)
+        preprocess_fn = getattr(preprocess_module, "preprocess_fn", None)
 
-        if clean_fn is not None and callable(clean_fn):
+        if preprocess_fn is not None and callable(preprocess_fn):
             # Call the function with the provided arguments
-            self.res_clean = clean_fn(*args, **kwargs)
-            return self.res_clean
+            self.res_preprocess = preprocess_fn(*args, **kwargs)
+            return self.res_preprocess
         else:
-            self.logger.error(f"Function {clean_fn} not found in analyze module.")
+            self.logger.error(f"Function {preprocess_fn} not found in analyze module.")
             return None
 
     def analyze(self, *args, **kwargs):
@@ -311,7 +311,7 @@ def update_readme(app_name):
         md += f'- Configuration file ([config.yaml](config.yaml))\n'
         md += f'- SPARQL query ([query.rq](query.rq))\n'
         md += f'- SHACL Shape or manifest ([manifest.ttl](manifest.ttl))\n'
-        md += f'- Clean function ([clean.py](clean.py))\n'
+        md += f'- Preprocess function ([preprocess.py](preprocess.py))\n'
         md += f'- Analyze function ([analyze.py](analyze.py))\n\n\n'
         md += f'The app accepts the following parameters\n\n'
         for name, value in data["parameters"].items():
@@ -329,8 +329,8 @@ def update_readme(app_name):
         md += f'qualify_result = app.qualify() # True/False\n'
         md += f'fetch_result = app.fetch() # Dict of mapped variables\n'
         md += f'df = pd.DataFrame()# get df according to your logic \n'
-        md += f'df_clean = app.clean(df)\n'
-        md += f'final_result = app.analyze(df_clean)\n'
+        md += f'df_preprocess = app.preprocess(df)\n'
+        md += f'final_result = app.analyze(df_preprocess)\n'
         md += f'```\n\n'
         md += f'[^1]: by {data["details"]["author"]} - {data["details"]["email"]} \n'
         file.write(md)
