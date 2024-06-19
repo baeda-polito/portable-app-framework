@@ -133,3 +133,6 @@ def example_logs(logger) -> None:
     logger.warning("warning")
     logger.error("error")
     logger.critical("critical")
+
+
+logger = CustomLogger().get_logger()
