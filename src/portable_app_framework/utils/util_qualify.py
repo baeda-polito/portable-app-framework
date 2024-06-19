@@ -15,12 +15,11 @@ Notes:
 
 import brickschema
 
-from .logger import CustomLogger
+from .logger import logger
+
 
 # from buildingmotif import BuildingMOTIF
 # from buildingmotif.dataclasses import Model, Library
-
-logger = CustomLogger().get_logger()
 
 
 class BasicValidationInterface:

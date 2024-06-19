@@ -21,14 +21,13 @@ import inquirer
 import pandas as pd
 import yaml
 
-from .utils.logger import CustomLogger
+from .utils.logger import logger
 from .utils.util import load_file
 from .utils.util_brick import parse_raw_query
 from .utils.util_qualify import BasicValidationInterface
 
 # from .utils.util_qualify import BuildingMotifValidationInterface
 
-logger = CustomLogger().get_logger()
 # todo if the user want to setup a different folder?
 # create app folder if not exists
 APP_FOLDER = os.path.join(os.getcwd(), 'app')
@@ -47,7 +46,7 @@ class Application:
 
     def __init__(self, metadata=None, app_name=None):
         # Class specific logger
-        self.logger = CustomLogger().get_logger()
+        self.logger = logger
         # The graph_path and datasource are external to the configuration file.
         self.metadata = metadata
         self.app_name = app_name
