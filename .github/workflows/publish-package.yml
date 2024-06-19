@@ -78,7 +78,8 @@ jobs:
   github-release:
     name: "Release"
     needs:
-      - build
+      - publish-to-pypi
+      - publish-to-testpypi
     runs-on: ubuntu-latest
     permissions:
       contents: write  # IMPORTANT: mandatory for making GitHub Releases
