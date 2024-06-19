@@ -13,20 +13,24 @@ clean:
 	rm -rf .pytest_cache
 	rm -rf test/*.log
 
-.PHONY: test
+.PHONY: setup
+setup:
+	@echo "Creating venv"
+	python3 -m venv ${VENV} && source ${VENV}/bin/activate && pip install --upgrade pip && pip install poetry && poetry config virtualenvs.create false && poetry install
+
+# https://johnfraney.ca/blog/create-publish-python-package-poetry/
+.PHONY: build
+build:
+	@echo "Building package"
+	source ${VENV}/bin/activate && poetry build
+
+
+.PHONY: test-package
 test:
 	@echo "Running tests"
 	source ${VENV}/bin/activate && python3 -m pytest
 
-.PHONY: build
-build:
-	@echo "Building package"
-	source ${VENV}/bin/activate && python3 -m build --wheel
 
-.PHONY: install
-install:
-	@echo "Installing package"
-	source ${VENV}/bin/activate && python3 -m pip install .
 #.PHONY: deploy
 #deploy:
 #	python setup.py check \

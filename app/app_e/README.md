@@ -1,4 +1,6 @@
-# App Template
+[//]: # (AUTOMATICALLY GENERATED DO NOT MODIFY)
+
+# App name
 
 #### Version v.1.0 (YYYY-MM-DD)
 
@@ -13,6 +15,7 @@ The app[^1] is structured as follows:
 - SHACL Shape or manifest ([manifest.ttl](manifest.ttl))
 - Preprocess function ([preprocess.py](preprocess.py))
 - Analyze function ([analyze.py](analyze.py))
+
 
 The app accepts the following parameters
 
@@ -31,9 +34,9 @@ app = Application(
     metadata=brickschema.Graph(),
     app_name='app_e'
 )
-qualify_result = app.qualify()  # True/False
-fetch_result = app.fetch()  # Dict of mapped variables
-df = pd.DataFrame()  # get df according to your logic 
+qualify_result = app.qualify() # True/False
+fetch_result = app.fetch() # Dict of mapped variables
+df = pd.DataFrame()# get df according to your logic 
 df_preprocess = app.preprocess(df)
 final_result = app.analyze(df_preprocess)
 ```

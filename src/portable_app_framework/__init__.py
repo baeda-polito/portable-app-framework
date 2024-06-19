@@ -24,10 +24,12 @@ import yaml
 from .utils.logger import CustomLogger
 from .utils.util import load_file
 from .utils.util_brick import parse_raw_query
-from .utils.util_qualify import BasicValidationInterface, BuildingMotifValidationInterface
+from .utils.util_qualify import BasicValidationInterface
+
+# from .utils.util_qualify import BuildingMotifValidationInterface
 
 logger = CustomLogger().get_logger()
-# todo spostare all'interno della cli setup
+# todo if the user want to setup a different folder?
 # create app folder if not exists
 APP_FOLDER = os.path.join(os.getcwd(), 'app')
 if not os.path.exists(APP_FOLDER):
@@ -105,12 +107,13 @@ class Application:
             )
             res_basic_validation = basic_validation.validate()
 
-            building_motif_validation = BuildingMotifValidationInterface(
-                graph=self.metadata,
-                manifest=self.manifest,
-            )
-            res_building_motif_validation = building_motif_validation.validate()
-
+            # todo use when package dependencies is solved
+            # building_motif_validation = BuildingMotifValidationInterface(
+            #     graph=self.metadata,
+            #     manifest=self.manifest,
+            # )
+            # res_building_motif_validation = building_motif_validation.validate()
+            res_building_motif_validation = True
             # is at least one of the two validation valid?
             is_valid = any([res_basic_validation, res_building_motif_validation])
 
@@ -280,15 +283,15 @@ def cli_new_app():
 #         f'cp -r {os.path.join(MODULE_BASEPATH, answer["app"])} {os.path.join(USER_BASEPATH, APP_FOLDER, answer["app"])}')
 
 
-# def cli_list_app():
-#     """
-#     List available applications excluding example
-#     """
-#     # list folders in app folder inside the module
-#     app_folder = os.listdir(MODULE_BASEPATH)
-#     # list only folders that start with ap
-#     app_names = [app for app in app_folder if app.startswith('app')]
-#     print(app_names)
+def cli_list_app():
+    """
+    List available applications excluding example
+    """
+    # list folders in app folder inside the module
+    app_folder = os.listdir(os.path.join(USER_BASEPATH, APP_FOLDER))  # todo should be set by the user
+    # list only folders that start with ap
+    app_names = [app for app in app_folder if app.startswith('app')]
+    print(app_names)
 
 
 def update_readme(app_name):
@@ -386,7 +389,7 @@ def cli_entry_point():
     #     cli_clone_app()
     if args.command == 'update':
         cli_update_app()
-    # if args.command == 'ls':
-    #     cli_list_app()
+    if args.command == 'ls':
+        cli_list_app()
     else:
         parser.print_help()
