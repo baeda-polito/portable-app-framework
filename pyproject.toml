@@ -42,7 +42,7 @@ packages = [
 portable-app-framework = 'portable_app_framework:cli_entry_point'
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 pytest = "^8.2.2"
 pandas = "^2.2.2"
 inquirer = "^3.2.5"
@@ -50,6 +50,12 @@ pyyaml = "^6.0.1"
 brickschema = "^0.7.5"
 rdflib = "^7.0.0"
 
+
+[tool.poetry.group.docs.dependencies]
+jupyter-book = "^1.0.0"
+matplotlib = "^3.9.0"
+numpy = "^2.0.0"
+pandas = "^2.2.2"
 
 [build-system]
 requires = ["poetry-core"]
