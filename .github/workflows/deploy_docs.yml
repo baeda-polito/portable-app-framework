@@ -20,11 +20,13 @@ jobs:
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
       - name: "Install Poetry"
         run: python -m pip install poetry;
       - name: "Install dependencies and build book"
-        run: python -m poetry install --with docs; jupyter-book build docs
+        run: python -m poetry install --with docs
+      - name: "Build the book"
+        run: jupyter-book build docs
       - name: "GitHub Pages action"
         uses: peaceiris/actions-gh-pages@v3.6.1
         with:
