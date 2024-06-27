@@ -25,8 +25,7 @@ from .utils.logger import logger
 from .utils.util import load_file
 from .utils.util_brick import parse_raw_query
 from .utils.util_qualify import BasicValidationInterface
-
-# from .utils.util_qualify import BuildingMotifValidationInterface
+from .utils.util_qualify import BuildingMotifValidationInterface
 
 # todo if the user want to setup a different folder?
 # create app folder if not exists
@@ -101,20 +100,17 @@ class Application:
         is_valid = False
         try:
             basic_validation = BasicValidationInterface(
-                graph=self.metadata,
-                manifest=self.manifest,
+                graph=self.metadata
             )
             res_basic_validation = basic_validation.validate()
 
-            # todo use when package dependencies is solved
-            # building_motif_validation = BuildingMotifValidationInterface(
-            #     graph=self.metadata,
-            #     manifest=self.manifest,
-            # )
-            # res_building_motif_validation = building_motif_validation.validate()
-            res_building_motif_validation = True
+            building_motif_validation = BuildingMotifValidationInterface(
+                graph=self.metadata,
+                app_name=self.app_name,
+            )
+            res_building_motif_validation = building_motif_validation.validate()
             # is at least one of the two validation valid?
-            is_valid = any([res_basic_validation, res_building_motif_validation])
+            is_valid = all([res_basic_validation, res_building_motif_validation])
 
         except Exception as e:
             # If some exception the valid is still false
