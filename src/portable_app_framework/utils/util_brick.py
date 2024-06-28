@@ -13,10 +13,8 @@ Script Description:
 Notes:
 """
 
-import brickschema
 import pandas as pd
-from rdflib import Literal
-from rdflib import URIRef, Variable
+from rdflib import Literal, URIRef, Variable, Graph
 
 
 def parse_raw_query(query_results):
@@ -142,14 +140,13 @@ class BrickGraph(object):
         """
         if load == "nightly":
             # load nightly version
-            self.graph = brickschema.Graph(load_brick_nightly=True).serialize('../config/libraries/Brick-nightly.ttl',
-                                                                              format='ttl')
+            self.graph = Graph.serialize('../config/libraries/Brick-nightly.ttl', format='ttl')
         elif load == "latest":
             # load latest stable version
-            self.graph = brickschema.Graph(load_brick=True)
+            self.graph = Graph.serialize('../config/libraries/Brick.ttl', format='ttl')
         else:
             # empty graph
-            self.graph = brickschema.Graph()
+            self.graph = Graph()
 
         # todo: expand to have all the relations
         # self.graph.expand(profile="owlrl+shacl+vbis+shacl")

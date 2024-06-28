@@ -1,7 +1,7 @@
 import os
 
 import pandas as pd
-from brickschema import Graph
+from rdflib import Graph
 
 from src.portable_app_framework import Application
 
@@ -84,7 +84,7 @@ def test_remap():
 
     # create a dataframe
     df_mock = pd.DataFrame({'t_mix': [1, 2, 3], 'ahu': [1, 1, 1]})
-    
+
     # remap the dataframe to external
     df_to_external = app.remap(data=df_mock, fetch_map_dict=fetch_mapping_dictionary, mode='to_external')
     print(df_to_external)
