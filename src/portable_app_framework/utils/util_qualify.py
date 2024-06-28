@@ -12,13 +12,14 @@ Script Description:
 
 Notes:
 """
-
-import brickschema
-from .logger import logger
 import os
-from rdflib import Namespace
+
+import rdflib
 from buildingmotif import BuildingMOTIF
 from buildingmotif.dataclasses import Model, Library
+from rdflib import Namespace
+
+from .logger import logger
 
 
 class BasicValidationInterface:
@@ -27,7 +28,7 @@ class BasicValidationInterface:
     https://github.com/gtfierro/shapes/blob/main/verify.py
     """
 
-    def __init__(self, graph: brickschema.Graph):
+    def __init__(self, graph: rdflib.Graph):
         # use the wrapper BrickGraph to initialize the graph
         self.graph = graph
         self.graph.parse(os.path.join(os.path.dirname(__file__), "..", "libraries", "Brick.ttl"), format='ttl')
@@ -54,7 +55,7 @@ class BuildingMotifValidationInterface:
     https://github.com/NREL/BuildingMOTIF
     """
 
-    def __init__(self, graph: brickschema.Graph, app_name: str):
+    def __init__(self, graph: rdflib.Graph, app_name: str):
         # Define graph path
         self.app_name = app_name
         self.graph = graph
