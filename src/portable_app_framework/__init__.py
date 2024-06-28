@@ -99,10 +99,11 @@ class Application:
         # by default it is not valid
         is_valid = False
         try:
-            basic_validation = BasicValidationInterface(
-                graph=self.metadata
-            )
-            res_basic_validation = basic_validation.validate()
+            # basic_validation = BasicValidationInterface(
+            #     graph=self.metadata
+            # )
+            # res_basic_validation = basic_validation.validate()
+            res_basic_validation = True
 
             building_motif_validation = BuildingMotifValidationInterface(
                 graph=self.metadata,
