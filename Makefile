@@ -60,6 +60,7 @@ install:
 publish:
 	@echo "Publishing package"
 	source ${VENV}/bin/activate && \
+	poetry install && \
 	poetry publish --build
 
 #.PHONY: deploy

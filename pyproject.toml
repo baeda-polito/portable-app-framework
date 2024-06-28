@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pfb-toolkit"
-version = "0.1.8"
+version = "0.1.9"
 description = "Portable Framework for Building Applications - PFB-Toolkit"
 readme = "README.md"
 license = "MIT"
