@@ -201,3 +201,6 @@ dmypy.json
 # OSX
 .DS_Store
 app
+
+
+!/test/app/

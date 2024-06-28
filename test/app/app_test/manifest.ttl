@@ -1,0 +1,17 @@
+@prefix brick:      <https://brickschema.org/schema/Brick#> .
+@prefix owl:        <http://www.w3.org/2002/07/owl#> .
+@prefix sh:         <http://www.w3.org/ns/shacl#> .
+@prefix constraint: <https://nrel.gov/BuildingMOTIF/constraints#> .
+@prefix :           <urn:my_site_constraints/> .
+
+:
+    a owl:Ontology .
+
+
+:ahu
+    a              sh:NodeShape ;
+    sh:targetClass brick:AHU ;
+    sh:property    [ sh:path                brick:hasPoint ;
+                     sh:message             "AHU should have at least one Mixed Air Temperature Sensor" ;
+                     sh:qualifiedValueShape [ sh:class brick:Mixed_Air_Temperature_Sensor ; ] ;
+                     sh:qualifiedMinCount   1 ; ] .

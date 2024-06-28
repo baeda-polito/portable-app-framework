@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pfb-toolkit"
-version = "0.1.8"
+version = "0.1.9"
 description = "Portable Framework for Building Applications - PFB-Toolkit"
 readme = "README.md"
 license = "MIT"
@@ -42,14 +42,20 @@ packages = [
 portable-app-framework = 'portable_app_framework:cli_entry_point'
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "~3.11.0"
 pytest = "^8.2.2"
 pandas = "^2.2.2"
-inquirer = "^3.2.5"
-pyyaml = "^6.0.1"
-brickschema = "^0.7.5"
-rdflib = "^7.0.0"
+inquirer = "^3.3.0"
+buildingmotif = "^0.2.0b0"
+setuptools = "^65.7.0"
 
+
+[tool.poetry.group.docs.dependencies]
+jupyter-book = "^1.0.0"
+matplotlib = "^3.9.0"
+numpy = "^2.0.0"
+pandas = "^2.2.2"
+rdflib = "^6.2.0"
 
 [build-system]
 requires = ["poetry-core"]

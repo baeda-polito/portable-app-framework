@@ -20,13 +20,16 @@ clean:
 
 .PHONY: setup
 setup:
-	@echo "Creating venv"
-	python3 -m venv ${VENV} && \
-	source ${VENV}/bin/activate && \
-	pip install --upgrade pip && \
-	pip install poetry && \
-	poetry config virtualenvs.create false && \
-	poetry install
+	@if [ ! -d "${VENV}" ]; then \
+		echo "Creating venv"; \
+		python3 -m venv ${VENV}; \
+	fi
+	echo "Venv already exists"; \
+	source ${VENV}/bin/activate; \
+	pip install --upgrade pip; \
+	pip install poetry; \
+	poetry config virtualenvs.create false; \
+	poetry install; \
 
 # https://johnfraney.ca/blog/create-publish-python-package-poetry/
 .PHONY: build
@@ -42,11 +45,22 @@ test:
 	source ${VENV}/bin/activate && \
  	python3 -m test.test
 
+
+.PHONY: install
+install:
+	@echo "Installing packa"
+	source ${VENV}/bin/activate && \
+ 	rm -rf poetry.lock && \
+ 	poetry install
+
+
+
 .PHONY: publish
 # https://stackoverflow.com/questions/68882603/using-python-poetry-to-publish-to-test-pypi-org
 publish:
 	@echo "Publishing package"
 	source ${VENV}/bin/activate && \
+	poetry install && \
 	poetry publish --build
 
 #.PHONY: deploy
