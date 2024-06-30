@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Roberto"
+  given-names: "Chiosa"
+  orcid: "https://orcid.org/0000-0002-9896-526X"
+- family-names: "Rocco"
+  given-names: "Giudice"
+  orcid: "https://orcid.org/0009-0009-4013-4373"
+title: "Portable Application Framework"
+version: 1.0.0
+date-released: 2024-06-30
+url: "https://github.com/baeda-polito/portable-app-framework"
