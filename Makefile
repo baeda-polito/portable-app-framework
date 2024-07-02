@@ -29,7 +29,7 @@ clean:
 setup:
 	@if [ ! -d "${VENV}" ]; then \
 		echo "Creating venv"; \
-		python3 -m venv ${VENV}; \
+		python3.11 -m venv ${VENV}; \
 	fi
 	echo "Venv already exists"; \
 	source ${VENV}/bin/activate; \
@@ -63,12 +63,12 @@ install:
 
 
 .PHONY: publish
-# https://stackoverflow.com/questions/68882603/using-python-poetry-to-publish-to-test-pypi-org
+# https://stackoverflow.com/questions/68882603/using-python-poetry-to-publish-to-test-pypi-org 	poetry version patch &&
 publish:
 	@echo "Publishing package"
 	source ${VENV}/bin/activate && \
 	poetry install && \
-	# poetry version patch && \
+	poetry build && \
 	poetry publish -r testpypi && \
 	poetry publish
 
@@ -80,15 +80,21 @@ publish:
 #	python3 -m twine upload --repository testpypi dist/* \
 #	python3 -m twine upload --repository pypi dist/*
 
-setup-docs: docs/requirements.txt
-	@echo "Creating venv in docs"
-	python3 -m venv ${VENV-DOCS}
-	@echo "Installing requirements for docs"
-	${PIP-DOCS} install -r docs/requirements.txt
+setup-docs:
+	@if [ ! -d "${VENV-DOCS}" ]; then \
+		echo "Creating venv"; \
+		python3.11 -m venv ${VENV-DOCS}; \
+	fi
+	echo "Venv already exists"; \
+	source ${VENV-DOCS}/bin/activate; \
+	pip install --upgrade pip; \
+	pip install poetry; \
+	poetry config virtualenvs.create false; \
+	poetry install --with docs;
 
 build-docs:
 #	@echo "Copying README to docs"
 #	cp README.md docs/intro.md
 	@echo "Building docs"
-	source ${VENV-DOCS}/bin/activate
-	jupyter-book build docs/
+	source ${VENV-DOCS}/bin/activate && \
+	jupyter-book build docs
