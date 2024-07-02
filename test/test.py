@@ -1,8 +1,6 @@
 import os
-
 import pandas as pd
 from rdflib import Graph
-
 from src.portable_app_framework import Application
 
 df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
