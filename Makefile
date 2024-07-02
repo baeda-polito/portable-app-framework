@@ -61,7 +61,8 @@ publish:
 	@echo "Publishing package"
 	source ${VENV}/bin/activate && \
 	poetry install && \
-	poetry publish --build
+	poetry publish -r testpypi && \
+	poetry publish
 
 #.PHONY: deploy
 #deploy:
