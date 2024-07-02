@@ -68,6 +68,7 @@ publish:
 	@echo "Publishing package"
 	source ${VENV}/bin/activate && \
 	poetry install && \
+	# poetry version patch && \
 	poetry publish -r testpypi && \
 	poetry publish
 
