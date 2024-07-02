@@ -191,7 +191,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-/test.db
+*.db
 # VSCode config
 .vscode
 

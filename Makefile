@@ -6,12 +6,19 @@ VENV-DOCS = .venv-docs
 PYTHON-DOCS = $(VENV-DOCS)/bin/python3
 PIP-DOCS = $(VENV-DOCS)/bin/pip
 
+.PHONY: rm-git-cache
+rm-git-cache:
+	@echo "Removing git cached files"
+	git rm -r --cached .
+	git add .
+
 .PHONY: clean
 clean:
 	@echo "Cleaning repository"
 	rm -rf build
 	rm -rf dist
 	rm -rf app
+	rm -rf *.db
 	rm -rf src/*.egg-info
 	rm -rf .pytest_cache
 	rm -rf test/*.log
@@ -48,7 +55,7 @@ test:
 
 .PHONY: install
 install:
-	@echo "Installing packa"
+	@echo "Installing package"
 	source ${VENV}/bin/activate && \
  	rm -rf poetry.lock && \
  	poetry install

@@ -42,12 +42,13 @@ packages = [
 portable-app-framework = 'portable_app_framework:cli_entry_point'
 
 [tool.poetry.dependencies]
-python = "~3.11.0"
+python = "^3.11"
 pytest = "^8.2.2"
 pandas = "^2.2.2"
 inquirer = "^3.3.0"
 buildingmotif = "^0.2.0b0"
 setuptools = "^65.7.0"
+pyshacl = "0.21"
 
 
 [tool.poetry.group.docs.dependencies]
