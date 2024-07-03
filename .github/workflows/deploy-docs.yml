@@ -2,10 +2,10 @@ name: Deploy docs to gh-pages
 
 on:
   #   Trigger the workflow on push to main branch
-  #  push:
-  #    branches:
-  #      - main
-  #      - dev
+  push:
+    branches:
+      - main
+      - dev
   workflow_dispatch:
 
 
