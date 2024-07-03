@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Setup &#8212; Portable Application Framework</title>
+    <title>Framework &#8212; Portable Application Framework</title>
   
   
   
@@ -57,11 +57,11 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/setup';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/framework';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Framework" href="framework.html" />
-    <link rel="prev" title="Portable Framework for Building Applications - PFB-Toolkit" href="../intro.html" />
+    <link rel="next" title="Tutorial" href="../tutorials/example.html" />
+    <link rel="prev" title="Setup" href="setup.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -175,8 +175,8 @@
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Framework</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="nav bd-sidenav">
@@ -252,7 +252,7 @@
       
       
       
-      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Freference/setup.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Freference/framework.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -282,7 +282,7 @@
       
       
       
-      <li><a href="../_sources/reference/setup.md" target="_blank"
+      <li><a href="../_sources/reference/framework.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -353,9 +353,7 @@ document.write(`
   </button>
 `);
 </script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</button>
+
 </div></div>
       
     </div>
@@ -366,21 +364,11 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Setup</h1>
+    <h1>Framework</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-source">From source</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-test-pypi">From test PyPI</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-pypi">From PyPI</a></li>
-</ul>
-            </nav>
         </div>
     </div>
 </div>
@@ -390,41 +378,11 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="setup">
-<h1>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h1>
-<p>The source code is currently hosted on GitHub at
-<a class="github reference external" href="https://github.com/RobertoChiosa/portable-app-framework">RobertoChiosa/portable-app-framework</a> and the list of changes for each release can be found in the
-<a class="reference external" href="https://github.com/RobertoChiosa/portable-app-framework/blob/main/CHANGELOG.md">CHANGELOG</a>.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">portable-app-framework</span></code> package requires Python &gt;= 3.8.</p>
-<p>You can install the package in different ways depending on the level of usage you want to have.</p>
-<ul class="contains-task-list simple">
-<li class="task-list-item"><p><input class="task-list-item-checkbox" checked="checked" disabled="disabled" type="checkbox"> From source</p></li>
-<li class="task-list-item"><p><input class="task-list-item-checkbox" checked="checked" disabled="disabled" type="checkbox"> From test PyPI</p></li>
-<li class="task-list-item"><p><input class="task-list-item-checkbox" disabled="disabled" type="checkbox"> From PyPI (not yet released)</p></li>
-</ul>
-<section id="from-source">
-<h2>From source<a class="headerlink" href="#from-source" title="Link to this heading">#</a></h2>
-<p>You can install the package from source by cloning the repository and running the following command:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/RobertoChiosa/portable-app-framework.git
-<span class="nb">cd</span><span class="w"> </span>portable-app-framework
-pip<span class="w"> </span>install<span class="w"> </span>.
-</pre></div>
-</div>
-</section>
-<section id="from-test-pypi">
-<h2>From test PyPI<a class="headerlink" href="#from-test-pypi" title="Link to this heading">#</a></h2>
-<p>You can install the latest test version from test PyPI with the following command:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span>portable-app-framework
-</pre></div>
-</div>
-</section>
-<section id="from-pypi">
-<h2>From PyPI<a class="headerlink" href="#from-pypi" title="Link to this heading">#</a></h2>
-<p>You can install the stable version from PyPI with the following command:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>portable-app-framework
-</pre></div>
-</div>
-</section>
+  <section class="tex2jax_ignore mathjax_ignore" id="framework">
+<h1>Framework<a class="headerlink" href="#framework" title="Link to this heading">#</a></h1>
+<p><a class="reference internal" href="#..%2F..%2F..%2Fafdd-polito-berkeley%2Fdocs%2Fportable-app.md"><span class="xref myst">portable-app.md</span></a>
+<a class="reference internal" href="#../framework.png"><code class="xref myst docutils literal notranslate"><span class="pre">../framework.png</span></code></a></p>
+<p>#<a class="reference internal" href="#..%2F..%2F..%2Fafdd-polito-berkeley%2Fdocs%2Fportable-app.md"><span class="xref myst">portable-app.md</span></a></p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -458,20 +416,20 @@ pip<span class="w"> </span>install<span class="w"> </span>.
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../intro.html"
+       href="setup.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Portable Framework for Building Applications - PFB-Toolkit</p>
+        <p class="prev-next-title">Setup</p>
       </div>
     </a>
     <a class="right-next"
-       href="framework.html"
+       href="../tutorials/example.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Framework</p>
+        <p class="prev-next-title">Tutorial</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -481,23 +439,6 @@ pip<span class="w"> </span>install<span class="w"> </span>.
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-source">From source</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-test-pypi">From test PyPI</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-pypi">From PyPI</a></li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>
