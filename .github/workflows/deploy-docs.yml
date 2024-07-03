@@ -1,4 +1,4 @@
-name: 📚Publish docs
+name: 📚 Publish docs
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
       - name: "Install Poetry"
         run: python -m pip install poetry && python -m poetry install --with docs
       - name: "Build the book"
-        run: jupyter-book build .
+        run: pip install jupyter-book && jupyter-book build .
       - name: "GitHub Pages action"
         uses: peaceiris/actions-gh-pages@v3.6.1
         with:
