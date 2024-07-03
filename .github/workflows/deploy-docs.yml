@@ -1,4 +1,4 @@
-name: Deploy docs to gh-pages
+name: 📚Publish docs
 
 on:
   push:
