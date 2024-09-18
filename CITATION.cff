@@ -4,14 +4,13 @@ type: article
 title: "A portable application framework for energy management and information systems (EMIS) solutions using Brick semantic schema"
 version: 2.0.4
 author:
-  - family-names: "Chiosa"
-    given-names: "Roberto"
-  - family-names: "Piscitelli"
-    given-names: "Marco Savino"
-  - family-names: "Pritoni"
-    given-names: "Marco"
-  - family-names: "Capozzoli"
-    given-names: "Alfonso"
-identifiers:
-  - type: doi
-    value: "doi:10.1016/j.enbuild.2024.114802"
+- family-names: "Chiosa"
+  given-names: "Roberto"
+- family-names: "Piscitelli"
+  given-names: "Marco Savino"
+- family-names: "Pritoni"
+  given-names: "Marco"
+- family-names: "Capozzoli"
+  given-names: "Alfonso"
+doi: https://doi.org/10.1016/j.enbuild.2024.114802
+date-released: 2024-09-13
