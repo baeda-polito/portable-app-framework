@@ -1,10 +1,12 @@
-# Portable Framework for Building Applications - PFB-Toolkit
+# `portable-app-framework` A framework for Energy Management solutions
 
 [![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-BAEDALAB-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](https://numfocus.org) [![License - BSD 3-Clause](https://img.shields.io/pypi/l/afdd.svg)](https://github.com/RobertoChiosa/afdd/blob/main/LICENSE)
 
-## What is it?
-
-**portable-app-framework** is a Python package that provides a toolkit to create portable applications.
+**portable-app-framework** is a Python package that provides a toolkit for developing, scaling and maintaining energy
+management and information systems (EMIS) applications using an ontology-based approach. Key contributions include an
+interoperable layer based on Brick schema, the formalization of application constraints pertaining metadata and data
+requirements, and a field demonstration. The framework allows for querying metadata models, fetching data,
+preprocessing, and analyzing data, thereby offering a modular and flexible workflow for application development.
 
 ## Table of Contents
 
@@ -76,8 +78,7 @@ the [`requirements.txt`](requirements.txt) and in the [`setup.py`](setup.py) fil
 You can install the package in different ways depending on the level of usage you want to have.
 
 - [x] From source
-- [x] From test PyPI
-- [ ] From PyPI (not yet released)
+- [x] From PyPI
 
 ### From source
 
@@ -89,20 +90,12 @@ cd portable-app-framework
 pip install .
 ```
 
-### From test PyPI
-
-You can install the latest test version from test PyPI with the following command:
-
-```sh
-pip install -i https://test.pypi.org/simple/ PFB-Toolkit==0.1.7
-```
-
 ### From PyPI
 
 You can install the stable version from PyPI with the following command:
 
 ```sh
-pip install portable-app-framework
+pip install pfb-toolkit
 ```
 
 ## Contributing
@@ -138,10 +131,18 @@ only.
 To cite the package in publications use:
 
 ```bibtex
-@software{portable-app-framework,
-    author = {Roberto Chiosa},
-    title = {Portable Framework for Building Applications - PFB-Toolkit},
-    url = {}
+@article{CHIOSA2024114802,
+    title = {A portable application framework for energy management and information systems (EMIS) solutions using Brick semantic schema},
+    journal = {Energy and Buildings},
+    volume = {323},
+    pages = {114802},
+    year = {2024},
+    issn = {0378-7788},
+    doi = {https://doi.org/10.1016/j.enbuild.2024.114802},
+    url = {https://www.sciencedirect.com/science/article/pii/S0378778824009186},
+    author = {Roberto Chiosa and Marco Savino Piscitelli and Marco Pritoni and Alfonso Capozzoli},
+    keywords = {Energy management and information systems, Portable application, Brick metadata schema, Anomaly detection, Machine learning},
+    abstract = {This paper introduces a portable framework for developing, scaling and maintaining energy management and information systems (EMIS) applications using an ontology-based approach. Key contributions include an interoperable layer based on Brick schema, the formalization of application constraints pertaining metadata and data requirements, and a field demonstration. The framework allows for querying metadata models, fetching data, preprocessing, and analyzing data, thereby offering a modular and flexible workflow for application development. Its effectiveness is demonstrated through a case study involving the development and implementation of a data-driven anomaly detection tool for the photovoltaic systems installed at the Politecnico di Torino, Italy. During eight months of testing, the framework was used to tackle practical challenges including: (i) developing a machine learning-based anomaly detection pipeline, (ii) replacing data-driven models during operation, (iii) optimizing model deployment and retraining, (iv) handling critical changes in variable naming conventions and sensor availability (v) extending the pipeline from one system to additional ones.}
 }
 ```
 
