@@ -1,6 +1,5 @@
 cff-version: 1.2.0
 message: "Please cite this paper if you use this work."
-type: article
 title: "A portable application framework for energy management and information systems (EMIS) solutions using Brick semantic schema"
 author:
   - family-names: "Chiosa"
@@ -11,17 +10,25 @@ author:
     given-names: "Marco"
   - family-names: "Capozzoli"
     given-names: "Alfonso"
-year: 2024
-journal: "Energy and Buildings"
-volume: 323
-pages: "114802"
-doi: "https://doi.org/10.1016/j.enbuild.2024.114802"
-issn: "0378-7788"
-url: "https://www.sciencedirect.com/science/article/pii/S0378778824009186"
-keywords:
-  - "Energy management and information systems"
-  - "Portable application"
-  - "Brick metadata schema"
-  - "Anomaly detection"
-  - "Machine learning"
-abstract: "This paper introduces a portable framework for developing, scaling and maintaining energy management and information systems (EMIS) applications using an ontology-based approach. Key contributions include an interoperable layer based on Brick schema, the formalization of application constraints pertaining metadata and data requirements, and a field demonstration. The framework allows for querying metadata models, fetching data, preprocessing, and analyzing data, thereby offering a modular and flexible workflow for application development. Its effectiveness is demonstrated through a case study involving the development and implementation of a data-driven anomaly detection tool for the photovoltaic systems installed at the Politecnico di Torino, Italy. During eight months of testing, the framework was used to tackle practical challenges including: (i) developing a machine learning-based anomaly detection pipeline, (ii) replacing data-driven models during operation, (iii) optimizing model deployment and retraining, (iv) handling critical changes in variable naming conventions and sensor availability (v) extending the pipeline from one system to additional ones."
+version: 0.1.11
+url: "https://doi.org/10.1016/j.enbuild.2024.114802"
+date-released: 2024-09-13
+
+preferred-citation:
+  type: article
+  title: "A portable application framework for energy management and information systems (EMIS) solutions using Brick semantic schema"
+  authors:
+    - family-names: "Chiosa"
+      given-names: "Roberto"
+    - family-names: "Piscitelli"
+      given-names: "Marco Savino"
+    - family-names: "Pritoni"
+      given-names: "Marco"
+    - family-names: "Capozzoli"
+      given-names: "Alfonso"
+  journal: "Energy and Buildings"
+  volume: 323
+  start: 114802 # First page number
+  year: 2024
+  doi: "https://doi.org/10.1016/j.enbuild.2024.114802"
+  issue: 1
