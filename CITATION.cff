@@ -2,7 +2,6 @@ cff-version: 1.2.0
 message: "Please cite this paper if you use this work."
 type: article
 title: "A portable application framework for energy management and information systems (EMIS) solutions using Brick semantic schema"
-version: 2.0.4
 author:
 - family-names: "Chiosa"
   given-names: "Roberto"
@@ -16,5 +15,6 @@ author:
 - family-names: "Capozzoli"
   given-names: "Alfonso"
   orcid: "https://orcid.org/0000-0002-9896-526X"
-doi: https://doi.org/10.1016/j.enbuild.2024.114802
+version: 2.0.4
+url: "https://doi.org/10.1016/j.enbuild.2024.114802"
 date-released: 2024-09-13
