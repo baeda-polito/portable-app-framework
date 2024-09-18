@@ -6,11 +6,15 @@ version: 2.0.4
 author:
 - family-names: "Chiosa"
   given-names: "Roberto"
+  orcid: "https://orcid.org/0000-0002-9896-526X"
 - family-names: "Piscitelli"
   given-names: "Marco Savino"
+  orcid: "https://orcid.org/0000-0002-9896-526X"
 - family-names: "Pritoni"
   given-names: "Marco"
+  orcid: "https://orcid.org/0000-0002-9896-526X"
 - family-names: "Capozzoli"
   given-names: "Alfonso"
+  orcid: "https://orcid.org/0000-0002-9896-526X"
 doi: https://doi.org/10.1016/j.enbuild.2024.114802
 date-released: 2024-09-13
