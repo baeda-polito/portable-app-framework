@@ -13,5 +13,6 @@ author:
     given-names: "Alfonso"
 year: 2024
 journal: "Energy and Buildings"
-doi: "https://doi.org/10.1016/j.enbuild.2024.114802"
-url: "https://www.sciencedirect.com/science/article/pii/S0378778824009186"
+identifiers:
+  - type: doi
+    value: https://doi.org/10.1016/j.enbuild.2024.114802
