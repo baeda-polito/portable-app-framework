@@ -11,8 +11,6 @@ author:
     given-names: "Marco"
   - family-names: "Capozzoli"
     given-names: "Alfonso"
-year: 2024
-journal: "Energy and Buildings"
 identifiers:
   - type: doi
     value: https://doi.org/10.1016/j.enbuild.2024.114802
