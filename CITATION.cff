@@ -2,43 +2,33 @@ cff-version: 1.2.0
 message: "Please cite this paper if you use this work."
 title: "A portable application framework for energy management and information systems (EMIS) solutions using Brick semantic schema"
 author:
-- family-names: "Chiosa"
-  given-names: "Roberto"
-  orcid: "https://orcid.org/0000-0002-9896-526X"
-- family-names: "Piscitelli"
-  given-names: "Marco Savino"
-  orcid: "https://orcid.org/0000-0002-9896-526X"
-- family-names: "Pritoni"
-  given-names: "Marco"
-  orcid: "https://orcid.org/0000-0002-9896-526X"
-- family-names: "Capozzoli"
-  given-names: "Alfonso"
-  orcid: "https://orcid.org/0000-0002-9896-526X"
-version: 2.0.4
+  - family-names: "Chiosa"
+    given-names: "Roberto"
+  - family-names: "Piscitelli"
+    given-names: "Marco Savino"
+  - family-names: "Pritoni"
+    given-names: "Marco"
+  - family-names: "Capozzoli"
+    given-names: "Alfonso"
+version: 0.1.11
 url: "https://doi.org/10.1016/j.enbuild.2024.114802"
 date-released: 2024-09-13
 
 preferred-citation:
   type: article
+  title: "A portable application framework for energy management and information systems (EMIS) solutions using Brick semantic schema"
   authors:
-  - family-names: "Chiosa"
-    given-names: "Roberto"
-    orcid: "https://orcid.org/0000-0002-9896-526X"
-  - family-names: "Piscitelli"
-    given-names: "Marco Savino"
-    orcid: "https://orcid.org/0000-0002-9896-526X"
-  - family-names: "Pritoni"
-    given-names: "Marco"
-    orcid: "https://orcid.org/0000-0002-9896-526X"
-  - family-names: "Capozzoli"
-    given-names: "Alfonso"
-    orcid: "https://orcid.org/0000-0002-9896-526X"
-  doi: "10.0000/00000"
-  journal: "Journal Title"
-  month: 9
-  start: 1 # First page number
-  end: 10 # Last page number
-  title: "My awesome research software"
+    - family-names: "Chiosa"
+      given-names: "Roberto"
+    - family-names: "Piscitelli"
+      given-names: "Marco Savino"
+    - family-names: "Pritoni"
+      given-names: "Marco"
+    - family-names: "Capozzoli"
+      given-names: "Alfonso"
+  journal: "Energy and Buildings"
+  volume: 323
+  start: 114802 # First page number
+  year: 2024
+  doi: "https://doi.org/10.1016/j.enbuild.2024.114802"
   issue: 1
-  volume: 1
-  year: 2021
