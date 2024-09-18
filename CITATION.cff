@@ -13,14 +13,5 @@ author:
     given-names: "Alfonso"
 year: 2024
 journal: "Energy and Buildings"
-volume: 323
-pages: "114802"
 doi: "https://doi.org/10.1016/j.enbuild.2024.114802"
-issn: "0378-7788"
 url: "https://www.sciencedirect.com/science/article/pii/S0378778824009186"
-keywords:
-  - "Energy management and information systems"
-  - "Portable application"
-  - "Brick metadata schema"
-  - "Anomaly detection"
-  - "Machine learning"
