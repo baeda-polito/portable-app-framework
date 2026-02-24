@@ -1,17 +1,3 @@
-"""
-Author:       Roberto Chiosa
-Copyright:    Roberto Chiosa, © 2024
-Email:        roberto.chiosa@pinvision.it
-
-Created:      12/01/24
-Script Name:  util_app.py
-Path:         utils
-
-Script Description:
-
-
-Notes:
-"""
 import argparse
 import importlib
 import os
@@ -27,15 +13,14 @@ from .utils.util_brick import parse_raw_query
 from .utils.util_qualify import BasicValidationInterface
 from .utils.util_qualify import BuildingMotifValidationInterface
 
-# todo if the user want to setup a different folder?
 # create app folder if not exists
-APP_FOLDER = os.path.join(os.getcwd(), 'app')
+MODULE_BASEPATH = os.path.dirname(__file__)
+USER_BASEPATH = os.getcwd()
+APP_FOLDER = os.path.join(USER_BASEPATH, 'app')
+
 if not os.path.exists(APP_FOLDER):
     os.makedirs(APP_FOLDER, exist_ok=True)
     logger.info(f'Created app folder in {APP_FOLDER}')
-
-MODULE_BASEPATH = os.path.dirname(__file__)
-USER_BASEPATH = os.getcwd()
 
 
 class Application:
@@ -43,7 +28,7 @@ class Application:
     Application class
     """
 
-    def __init__(self, metadata=None, app_name=None):
+    def __init__(self, metadata=None, app_name=None, base_path=None):
         # Class specific logger
         self.logger = logger
         # The graph_path and datasource are external to the configuration file.
@@ -53,7 +38,14 @@ class Application:
         self.res_fetch = None
         self.res_preprocess = None
         self.res_analyze = None
-        self.path_to_app = os.path.join(USER_BASEPATH, APP_FOLDER, app_name)
+
+        # Resolve the app folder based on provided base_path or default
+        if base_path:
+            self.app_folder = os.path.join(base_path, 'app')
+        else:
+            self.app_folder = APP_FOLDER
+
+        self.path_to_app = os.path.join(self.app_folder, app_name)
 
         '''
         The config folder should be structured as follows
@@ -64,25 +56,29 @@ class Application:
         '''
 
         # Class variable to store available app names
-        available_app = os.listdir(os.path.join(USER_BASEPATH, APP_FOLDER))  # Add your app names here
+        available_app = os.listdir(self.app_folder)  # Add your app names here
         # get only directories that start with app
         available_app_names = [app for app in available_app if app.startswith('app')]
+
+        # Log if no apps are found in the resolved path
+        if not available_app_names:
+            self.logger.warning(f'No apps found in {self.app_folder}. Check if the base_path is correct.')
 
         if app_name not in available_app_names:
             raise ValueError(f"Invalid app name. Available app names: {available_app_names}")
 
-        if os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'config.yaml') is None:
+        if not os.path.exists(os.path.join(self.app_folder, app_name, 'config.yaml')):
             raise FileNotFoundError('config.yaml not found')
-        elif os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'manifest.yaml') is None:
-            raise FileNotFoundError('manifest.yaml not found')
-        elif os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'query.ttl') is None:
-            raise FileNotFoundError('query.ttl not found')
+        elif not os.path.exists(os.path.join(self.app_folder, app_name, 'manifest.ttl')):
+            raise FileNotFoundError('manifest.ttl not found')
+        elif not os.path.exists(os.path.join(self.app_folder, app_name, 'query.rq')):
+            raise FileNotFoundError('query.rq not found')
         else:
-            config_file = load_file(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'config.yaml'), yaml_type=True)
+            config_file = load_file(os.path.join(self.app_folder, app_name, 'config.yaml'), yaml_type=True)
             self.details = config_file['details']
             self.parameters = config_file['parameters']
-            self.manifest = os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'manifest.ttl')
-            self.query = load_file(os.path.join(USER_BASEPATH, APP_FOLDER, app_name, 'query.rq'))
+            self.manifest = os.path.join(self.app_folder, app_name, 'manifest.ttl')
+            self.query = load_file(os.path.join(self.app_folder, app_name, 'query.rq'))
 
     def qualify(self) -> bool:
         """
@@ -195,7 +191,6 @@ class Application:
         else:
             self.logger.error(f"Function {analyze_fn} not found in analyze module.")
             return None
-
 
 def app_name_validation(answer, current):
     """
