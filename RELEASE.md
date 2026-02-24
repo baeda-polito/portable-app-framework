@@ -1,3 +1,3 @@
 ## Fixes
 
-- Removed dependency on brickschema that caused issues with buildingmotif
+- Add base_path to allow user to use the package outside the project root.
